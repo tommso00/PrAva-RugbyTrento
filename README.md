@@ -24,4 +24,4 @@ Il software permette la gestione completa di una squadra di rugby, includendo gi
 
 ## Istruzioni per compilazione
 
-(aggiungere qui le istruzioni specifiche per compilare ed eseguire il progetto, ad esempio:  
+--------------------------------------------------
