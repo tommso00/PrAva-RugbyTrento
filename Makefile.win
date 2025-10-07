@@ -6,9 +6,9 @@ CC       = gcc.exe -std=c++11
 WINDRES  = windres.exe
 OBJ      = main.o
 LINKOBJ  = main.o
-LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc
-INCS     = 
-CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include"
+LIBS     = -L"lib" -static-libgcc
+INCS     = -I"include"
+CXXINCS  = -I"lib/gcc/mingw32/3.4.2/include" -I"include/c++/3.4.2/backward" -I"include/c++/3.4.2/mingw32" -I"include/c++/3.4.2" -I"include"
 BIN      = PrAva_RugbyTrento.exe
 CXXFLAGS = $(CXXINCS) -std=c++11
 CFLAGS   = $(INCS) -std=c++11
