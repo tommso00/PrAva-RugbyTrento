@@ -1,10 +1,11 @@
 #include <iostream>
+#include "Menu.h"
 using namespace std;
 
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
-
-int main(int argc, char** argv) {
-	
-	cout<<"Hello World"<<endl;
-	return 0;
+int main() {
+    Menu menu;
+    menu.gestisciInput();
+    cout << "Uscita programma.\n";
+    return 0;
 }
+
