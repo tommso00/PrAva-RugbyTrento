@@ -1,48 +1,29 @@
 #include "Giocatore.h"
-#include <sstream>
+using namespace std;
 
-Giocatore::Giocatore() : id(0), nome(""), cognome(""), eta(0), punteggioTotale(0.0) {}
-Giocatore::Giocatore(int id, string nome, string cognome, int eta, double punteggio)
-    : id(id), nome(nome), cognome(cognome), eta(eta), punteggioTotale(punteggio) {}
-Giocatore::~Giocatore() {}
+Giocatore::Giocatore(const string& nome,const string& cognome ,int eta, const string& ruolo, int id)
+    : Persona(nome,cognome ,eta), ruolo(ruolo), id(id) {}
+
+Giocatore::~Giocatore() {
+    cout << "Distruttore Giocatore chiamato per: " << nome << endl;
+}
+
+string Giocatore::getRuolo() const { return ruolo; }
+void Giocatore::setRuolo(const string& nuovoRuolo) { ruolo = nuovoRuolo; }
 
 int Giocatore::getId() const { return id; }
-string Giocatore::getNome() const { return nome; }
-string Giocatore::getCognome() const { return cognome; }
-int Giocatore::getEta() const { return eta; }
-double Giocatore::getPunteggio() const { return punteggioTotale; }
-void Giocatore::setPunteggio(double punteggio) { punteggioTotale = punteggio; }
+void Giocatore::setId(int nuovoId) { id = nuovoId; }
 
-string Giocatore::toString() const {
-    return "Giocatore [" + to_string(id) + "] " + nome + " " + cognome +
-           ", eta: " + to_string(eta) + ", punti: " + to_string(punteggioTotale);
+ostream& operator<<(ostream& os, const Giocatore& g) {
+    os << "Giocatore: " << g.getNome() << " (" << g.getEta() << " anni), Ruolo: "
+       << g.getRuolo() << ", ID: " << g.getId();
+    return os;
 }
 
-string Giocatore::toCSV() const {
-    // id,nome,cognome,eta,punteggio
-    ostringstream oss;
-    oss << id << "," << nome << "," << cognome << "," << eta << "," << punteggioTotale;
-    return oss.str();
-}
+/*
+Possibili aggiunte future:
+- Metodo per aggiornare statistiche (falli, punti, calci sbagliati)
+- Metodo per confrontare due giocatori (==, <, >) per id o performance
+*/
 
-Giocatore Giocatore::fromCSV(const string &line) {
-    istringstream iss(line);
-    string token;
-    int id = 0;
-    string nome, cognome;
-    int eta = 0;
-    double punteggio = 0.0;
-
-    auto next = [&](string &out) {
-        if (!getline(iss, out, ',')) out = "";
-    };
-
-    next(token); if (!token.empty()) id = stoi(token);
-    next(nome);
-    next(cognome);
-    next(token); if (!token.empty()) eta = stoi(token);
-    next(token); if (!token.empty()) punteggio = stod(token);
-
-    return Giocatore(id, nome, cognome, eta, punteggio);
-}
 
