@@ -3,25 +3,26 @@
 
 #include "Persona.h"
 #include <iostream>
-using namespace std;
 
+// Evitare "using namespace std;" in header
 class Giocatore : public Persona {
 private:
-    string ruolo;
+    std::string ruolo;
     int id;
 
 public:
-    Giocatore(const string& nome,const string& cognome ,int eta, const string& ruolo, int id);
-    ~Giocatore();
+    Giocatore(const std::string& nome, const std::string& cognome, int eta, const std::string& ruolo, int id);
 
-    string getRuolo() const;
-    void setRuolo(const string& nuovoRuolo);
+    // Distruttore di default sufficiente
+    ~Giocatore() = default;
+
+    std::string getRuolo() const;
+    void setRuolo(const std::string& nuovoRuolo);
     int getId() const;
     void setId(int nuovoId);
 
-    friend ostream& operator<<(ostream& os, const Giocatore& g);
+    friend std::ostream& operator<<(std::ostream& os, const Giocatore& g);
 };
 
 #endif
-
 

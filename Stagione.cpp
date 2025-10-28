@@ -1,46 +1,50 @@
 #include "Stagione.h"
-using namespace std;
+#include <algorithm> // Per ordinamento e ricerca
+#include <stdexcept>
+#include <memory>
 
-Stagione::Stagione(int anno) : anno(anno) {}
+// Costruttore
+Stagione::Stagione(int anno_) : anno(anno_) {}
 
-Stagione::~Stagione() {
-    cout << "Distruttore Stagione " << anno << " chiamato" << endl;
-	// distrutte automaticamente grazie a unique_ptr :)
-
+// AddSquadra: prende ownership della squadra (occorre std::move!)
+void Stagione::addSquadra(std::unique_ptr<Squadra> s) {
+    squadre.push_back(std::move(s));
 }
 
-Squadra* Stagione::getClassificaFinale() {
-    if (squadre.empty()) return nullptr;
-    Squadra* a = squadre[0].get();
-    for (const auto& s : squadre){
-        if (s->getPunteggio() > a->getPunteggio()){
-  	        a = s.get();
-		}
-	}
-	return a;
-}
-
-const vector<Partita>& Stagione::getCalendario() const{
-    return partite;
-}
-
-void Stagione::addSquadra(unique_ptr<Squadra> s) {
-    squadre.push_back(move(s));
-}
-
+// AddPartita: copia una partita (snapshot nel calendario)
 void Stagione::addPartita(const Partita& p) {
     partite.push_back(p);
 }
 
-ostream& operator<<(ostream& os, const Stagione& s) {
-    os << "Stagione: " << s.anno << endl;
-    os << "Squadre partecipanti:" << endl;
-    for (const auto& squadra : s.squadre)
-        os << " - " << squadra->getNome() << endl;
-    os << "Partite:" << endl;
-    for (const auto& p : s.partite)
-        os << " - " << p << endl;
-    return os;
+// Restituisce il calendario (snapshot, solo lettura)
+const std::vector<Partita>& Stagione::getCalendario() const {
+    return partite;
 }
 
+// Ricava la squadra (costante) con il miglior punteggio finale
+const Squadra* Stagione::getClassificaFinale() const {
+    if (squadre.empty()) return nullptr;
+    // Esempio: supponiamo che Squadra abbia il metodo getPunteggio() costante.
+    // Cerchiamo la squadra con il punteggio massimo.
+    auto cmp = [](const std::unique_ptr<Squadra>& a, const std::unique_ptr<Squadra>& b) {
+        return a->getPunteggio() < b->getPunteggio();
+    };
+    auto it = std::max_element(squadre.begin(), squadre.end(), cmp);
+    // Restituiamo solo un puntatore const!
+    return it != squadre.end() ? it->get() : nullptr;
+}
+
+// Operatore di stampa per la stagione
+std::ostream& operator<<(std::ostream& os, const Stagione& s) {
+    os << "Stagione " << s.anno << "\n";
+    os << "Squadre:\n";
+    for (const auto& sq : s.squadre) {
+        if(sq) os << *sq << "\n"; // Richiede che Squadra abbia operator<<
+    }
+    os << "Calendario partite:\n";
+    for (const auto& p : s.partite) {
+        os << p << "\n"; // Richiede che Partita abbia operator<<
+    }
+    return os;
+}
 

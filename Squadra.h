@@ -6,34 +6,37 @@
 #include <iostream>
 #include "Giocatore.h"
 #include "Staff.h"
-using namespace std;
 
+// Evitare "using namespace std;" negli header
 class Squadra {
 private:
-    string nome, indirizzo;
-    int id, punteggioClassifica;
-    vector<Giocatore> giocatori;
+    std::string nome;
+    std::string indirizzo;
+    int id;
+    int punteggioClassifica;
+    std::vector<Giocatore> giocatori;
 
 public:
-    Squadra(const string& nome, const string& indirizzo, int id);
-    ~Squadra();
+    Squadra(const std::string& nome, const std::string& indirizzo, int id);
 
-    string getNome() const;
-    string getIndirizzo() const;
+    // Distruttore di default, poiché vector e string gestiscono la memoria automaticamente
+    ~Squadra() = default;
+
+    std::string getNome() const;
+    std::string getIndirizzo() const;
     int getId() const;
     int getPunteggio() const;
 
-    void setNome(const string& n);
-    void setIndirizzo(const string& i);
+    void setNome(const std::string& n);
+    void setIndirizzo(const std::string& i);
     void setId(int i);
     void setPunteggio(int p);
 
     void addGiocatore(const Giocatore& g);
     void removeGiocatore(int id);
 
-    friend ostream& operator<<(ostream& os, const Squadra& s);
+    friend std::ostream& operator<<(std::ostream& os, const Squadra& s);
 };
 
 #endif
-
 

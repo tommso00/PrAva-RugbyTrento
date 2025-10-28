@@ -1,42 +1,65 @@
 #include "Squadra.h"
-using namespace std;
+#include <algorithm>
 
-Squadra::Squadra(const string& nome, const string& indirizzo, int id)
-    : nome(nome), indirizzo(indirizzo), id(id), punteggioClassifica(0) {}
+// Costruttore
+Squadra::Squadra(const std::string& nome_, const std::string& indirizzo_, int id_)
+    : nome(nome_), indirizzo(indirizzo_), id(id_), punteggioClassifica(0) {}
 
-Squadra::~Squadra() {
-    cout << "Distruttore Squadra chiamato per: " << nome << endl;
+// Getter
+std::string Squadra::getNome() const {
+    return nome;
 }
 
-string Squadra::getNome() const { return nome; }
-string Squadra::getIndirizzo() const { return indirizzo; }
-int Squadra::getId() const { return id; }
-int Squadra::getPunteggio() const { return punteggioClassifica; }
+std::string Squadra::getIndirizzo() const {
+    return indirizzo;
+}
 
-void Squadra::setNome(const string& n) { nome = n; }
-void Squadra::setIndirizzo(const string& i) { indirizzo = i; }
-void Squadra::setId(int i) { id = i; }
-void Squadra::setPunteggio(int p) { punteggioClassifica = p; }
+int Squadra::getId() const {
+    return id;
+}
 
+int Squadra::getPunteggio() const {
+    return punteggioClassifica;
+}
+
+// Setter
+void Squadra::setNome(const std::string& n) {
+    nome = n;
+}
+
+void Squadra::setIndirizzo(const std::string& i) {
+    indirizzo = i;
+}
+
+void Squadra::setId(int i) {
+    id = i;
+}
+
+void Squadra::setPunteggio(int p) {
+    punteggioClassifica = p;
+}
+
+// Aggiunge un giocatore al vettore
 void Squadra::addGiocatore(const Giocatore& g) {
     giocatori.push_back(g);
 }
 
-void Squadra::removeGiocatore(int id) {
-    for (auto it = giocatori.begin(); it != giocatori.end(); ++it) {
-        if (it->getId() == id) {
-            giocatori.erase(it);
-            break;
-        }
+// Rimuove un giocatore tramite id
+void Squadra::removeGiocatore(int idGiocatore) {
+    auto it = std::remove_if(giocatori.begin(), giocatori.end(),
+        [idGiocatore](const Giocatore& g) { return g.getId() == idGiocatore; });
+    if (it != giocatori.end()) {
+        giocatori.erase(it, giocatori.end());
     }
 }
 
-ostream& operator<<(ostream& os, const Squadra& s) {
-    os << "Squadra: " << s.nome << " (ID: " << s.id << "), Punteggio: " 
-       << s.punteggioClassifica << ", Indirizzo: " << s.indirizzo << endl;
-    os << "Giocatori:" << endl;
+// Operatore di stampa
+std::ostream& operator<<(std::ostream& os, const Squadra& s) {
+    os << "Squadra: " << s.nome << " (ID: " << s.id << "), Indirizzo: " << s.indirizzo << "\n";
+    os << "Punteggio Classifica: " << s.punteggioClassifica << "\n";
+    os << "Giocatori:\n";
     for (const auto& g : s.giocatori) {
-        os << " - " << g << endl;
+        os << g << "\n"; // Presuppone operator<< per Giocatore
     }
     return os;
 }

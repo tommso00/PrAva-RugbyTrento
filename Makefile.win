@@ -4,8 +4,8 @@
 CPP      = g++.exe -std=c++11
 CC       = gcc.exe -std=c++11
 WINDRES  = windres.exe
-OBJ      = main.o Giocatore.o Partita.o Stagione.o Staff.o Squadra.o Persona.o
-LINKOBJ  = main.o Giocatore.o Partita.o Stagione.o Staff.o Squadra.o Persona.o
+OBJ      = main.o Giocatore.o Partita.o Persona.o Squadra.o Staff.o Stagione.o
+LINKOBJ  = main.o Giocatore.o Partita.o Persona.o Squadra.o Staff.o Stagione.o
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -pg
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -33,14 +33,14 @@ Giocatore.o: Giocatore.cpp
 Partita.o: Partita.cpp
 	$(CPP) -c Partita.cpp -o Partita.o $(CXXFLAGS)
 
-Stagione.o: Stagione.cpp
-	$(CPP) -c Stagione.cpp -o Stagione.o $(CXXFLAGS)
-
-Staff.o: Staff.cpp
-	$(CPP) -c Staff.cpp -o Staff.o $(CXXFLAGS)
+Persona.o: Persona.cpp
+	$(CPP) -c Persona.cpp -o Persona.o $(CXXFLAGS)
 
 Squadra.o: Squadra.cpp
 	$(CPP) -c Squadra.cpp -o Squadra.o $(CXXFLAGS)
 
-Persona.o: Persona.cpp
-	$(CPP) -c Persona.cpp -o Persona.o $(CXXFLAGS)
+Staff.o: Staff.cpp
+	$(CPP) -c Staff.cpp -o Staff.o $(CXXFLAGS)
+
+Stagione.o: Stagione.cpp
+	$(CPP) -c Stagione.cpp -o Stagione.o $(CXXFLAGS)

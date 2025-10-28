@@ -1,19 +1,28 @@
 #include "Persona.h"
 #include <iostream>
-using namespace std;
 
-Persona::Persona(const string& nome, const string& cognome, int eta) : nome(nome), eta(eta), cognome(cognome) {}
+// Costruttore
+Persona::Persona(const std::string& nome_, const std::string& cognome_, int eta_)
+    : nome(nome_), cognome(cognome_), eta(eta_) {}
 
-string Persona::getNome() const { return nome; }
-int Persona::getEta() const { return eta; }
-string Persona::getCognome() const { return cognome;}
+// Distruttore virtuale, vuoto ma necessario per polymorphism corretto
+Persona::~Persona() {}
 
+// Getter
+std::string Persona::getNome() const {
+    return nome;
+}
+
+std::string Persona::getCognome() const {
+    return cognome;
+}
+
+int Persona::getEta() const {
+    return eta;
+}
+
+// Metodo virtuale per stampa informazioni
 void Persona::stampaInfo() const {
-    cout << "Nome: " << nome << " Cognome: " << cognome <<", Eta: " << eta;
+    std::cout << "Nome: " << nome << ", Cognome: " << cognome << ", Età: " << eta;
 }
-
-Persona::~Persona(){
-	cout << "Distruttore Persona---> " << nome << endl; 
-}
-
 
