@@ -13,7 +13,7 @@ Il software permette la gestione completa di una squadra di rugby, includendo gi
 
 ## Struttura del progetto
 
-- Classi principali: `Player`, `Team`, `Match`, `Season`.  
+- Classi principali: `Giocatore`, `Squadra`, `Partita`, `Stagione`.  
 - Contenitori STL utilizzati per la gestione efficiente di liste e mappe.  
 - Modularità e separazione tra definizioni e implementazioni.  
 
@@ -24,4 +24,9 @@ Il software permette la gestione completa di una squadra di rugby, includendo gi
 
 ## Istruzioni per compilazione
 
+- L'IDE utilizzato è Dev-C++ 5.11
+- Compiler set to configure: TDM-GCC 4.9.2 64-bit Profiling
+- Controllare che in Tools>>Compiler Options>>Programs:
+    - gcc: gcc.exe -std=c++11
+    - g++: g++.exe -std=c++11
 --------------------------------------------------
