@@ -1,15 +1,46 @@
 #include <iostream>
+#include <cstdlib>
 #include <memory>
-#include "Stagione.h"
-#include "Squadra.h"
-#include "Giocatore.h"
-#include "Staff.h"
-#include "Partita.h"
+#include <stdexcept>
 #include "Gestionale.h"
 
 using namespace std;
 
-int main() {
+int getScelta(int min, int max);
+
+int main(int argc, char** argv) {
+	
+	Gestionale gest;
+	int scelta=0;
+	
+	cout<< "Selezionare azione:"<<endl<<" 1) Carica stagione"<<endl<<" 2) Crea stagione"<<endl<<" 3) Esci"<<endl;
+	scelta = getScelta(0,3);
+	//cout<<endl<<scelta<<endl;
+	
+	switch (scelta) {
+	    case 1:
+	        // Carica Stagione
+	        cout<<"Selezionare stagione da caricare:"<<endl;
+	        
+	        break;
+	    case 2:
+	        // Crea Stagione
+	        cout<<"Inserisci anno nuova stagione"<<endl;
+	        break;
+	    // Additional cases as needed
+	    default:
+	        // Ultimo caso: esci
+	        system("cls"); 
+	        cout<<"Arrivederci!"<<endl;
+	        break;
+	}
+
+
+	
+	
+	
+	
+	/*
 
     Stagione stagione2025(2025);
 
@@ -54,7 +85,21 @@ int main() {
 
     // Riepilogo stagione
     cout << "\nRiepilogo stagione:\n" << stagione2025;
+    */
+
 
     return 0;
+}
+
+int getScelta(int min, int max){
+	int temp;
+		try{
+		cin>>temp;
+		if(temp<min || temp>max){throw invalid_argument("ERR scelta non valida");}
+	}catch(const invalid_argument& e){
+		cout<< e.what()<<endl;
+		temp = getScelta(min, max);
+	}
+	return temp;
 }
 
