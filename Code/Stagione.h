@@ -28,6 +28,8 @@ public:
     // Calendario delle partite (solo lettura)
     const std::vector<Partita>& getCalendario() const;
 
+	const std::vector<std::unique_ptr<Squadra>>& getSquadre() const;
+
     // Aggiunge una squadra, trasferendone la ownership tramite std::move.
     void addSquadra(std::unique_ptr<Squadra> s);
 

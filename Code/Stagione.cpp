@@ -16,6 +16,10 @@ void Stagione::addPartita(const Partita& p) {
     partite.push_back(p);
 }
 
+const std::vector<std::unique_ptr<Squadra>>& Stagione::getSquadre() const {
+    return squadre;
+}
+
 // Restituisce il calendario (snapshot, solo lettura)
 const std::vector<Partita>& Stagione::getCalendario() const {
     return partite;
