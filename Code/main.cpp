@@ -5,6 +5,7 @@
 #include "Giocatore.h"
 #include "Staff.h"
 #include "Partita.h"
+#include "Gestionale.h"
 
 using namespace std;
 
