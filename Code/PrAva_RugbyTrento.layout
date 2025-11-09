@@ -2,8 +2,8 @@
 Order=1,3,4,5,6,7,8,9,10,2,11,12,0,13,14,15
 Focused=14
 [Editor_0]
-CursorCol=5
-CursorRow=8
+CursorCol=11
+CursorRow=4
 TopLine=1
 LeftChar=1
 [Editor_1]
@@ -56,6 +56,7 @@ CursorCol=1
 CursorRow=1
 TopLine=1
 LeftChar=1
+<<<<<<< Updated upstream
 [Editor_5]
 CursorCol=1
 CursorRow=1
@@ -85,4 +86,10 @@ LeftChar=1
 CursorCol=10
 CursorRow=16
 TopLine=3
+=======
+[Editor_12]
+CursorCol=1
+CursorRow=1
+TopLine=1
+>>>>>>> Stashed changes
 LeftChar=1
