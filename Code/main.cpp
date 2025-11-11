@@ -14,26 +14,31 @@ int main(int argc, char** argv) {
 	int scelta=0;
 	
 	cout<< "Selezionare azione:"<<endl<<" 1) Carica stagione"<<endl<<" 2) Crea stagione"<<endl<<" 3) Esci"<<endl;
-	scelta = getScelta(0,3);
-	//cout<<endl<<scelta<<endl;
 	
-	switch (scelta) {
-	    case 1:
-	        // Carica Stagione
-	        cout<<"Selezionare stagione da caricare:"<<endl;
-	        
-	        break;
-	    case 2:
-	        // Crea Stagione
-	        cout<<"Inserisci anno nuova stagione"<<endl;
-	        break;
-	    // Additional cases as needed
-	    default:
-	        // Ultimo caso: esci
-	        system("cls"); 
-	        cout<<"Arrivederci!"<<endl;
-	        break;
-	}
+	do{
+		scelta = getScelta(0,3);
+		switch (scelta) {
+		    case 1:
+		        // Carica Stagione
+		        cout<<"Selezionare stagione da caricare:"<<endl;
+		        //gest.fetchStagioni();
+		        //gest.selezionaStagioni();
+		        //gest.modificaStagione();
+		        break;
+		    case 2:
+		        // Crea Stagione
+		        gest.creaStagione();
+		        
+		        break;
+		    default:
+		        // Ultimo caso: esci
+		        system("cls"); 
+		        cout<<"Arrivederci!"<<endl;
+		        break;
+		}
+	}while(scelta!=3);
+	
+
 
 
 	

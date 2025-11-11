@@ -24,14 +24,15 @@ void Gestionale::avvia(){
 	}while( scelta!=0);
 }
 
-void Gestionale::creaStagione(){
+void Gestionale::creaStagione(){//deve diventare un macro metodo che include tuttio ciò che si puo'fare nel creare una Stagione
 	int anno;
 	cout << "Inserisci anno stagione: ";
 	cin >> anno;
 	stagioni.push_back(unique_ptr<Stagione>(new Stagione(anno)));
+	// TODO //Aggiungere QUA menu con scelta di aggiogere squadra, partita, giocatore etc etc
 }
 
-Stagione* Gestionale::selezionaStagione(){
+Stagione* Gestionale::selezionaStagione(){//con fetchStagioni() vai a stamparle. Qua chiedi quale vuole aprire dal DB e la carichi in memoria
 	if(stagioni.empty()){
 		cout << "Nessuna stagione presente.\n";
 		return nullptr;

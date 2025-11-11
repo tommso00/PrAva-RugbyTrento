@@ -15,7 +15,7 @@ class Gestionale {
 	
 	private:
 		std::vector<std::unique_ptr<Stagione>> stagioni;	
-		Stagione* selezionaStagione();
+		Stagione* selezionaStagione();// DA RIFARE: la lista stagioni la prendi dal DB (file .csv)
 		
 	public: 
 		Gestionale() = default;
@@ -26,6 +26,10 @@ class Gestionale {
 	    void addSquadraToStagione();
 	    void addPartitaToStagione();
 	    void addGiocatoreToStagione();
+		//void fetchStagioni(); //Va nel file .csv e prende lista stagioni per stamparla 
+		//void modificaStagione(); // abbastanza "simile" a creaStagione(): menu con scelte per usare i metodi gia creati
+		 
+	    
 		
 };
 
