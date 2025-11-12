@@ -14,6 +14,7 @@ private:
     int anno;
     std::vector<std::unique_ptr<Squadra>> squadre; // Ownership esclusiva sulle squadre
     std::vector<Partita> partite; // Snapshot: le partite contengono copie delle squadre
+	
 
 public:
     explicit Stagione(int anno);
@@ -27,14 +28,14 @@ public:
 
     // Calendario delle partite (solo lettura)
     const std::vector<Partita>& getCalendario() const;
-
 	const std::vector<std::unique_ptr<Squadra>>& getSquadre() const;
+	const std::vector<Partita>& getPartite() const;
 
-    // Aggiunge una squadra, trasferendone la ownership tramite std::move.
-    void addSquadra(std::unique_ptr<Squadra> s);
-
+	int getAnno() const;
+	
     // Inserisce una partita per valore (snapshot).
     void addPartita(const Partita& p);
+    void addSquadra(std::unique_ptr<Squadra> s);
 
     // Stampa la stagione
     friend std::ostream& operator<<(std::ostream& os, const Stagione& s);

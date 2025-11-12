@@ -15,6 +15,30 @@ void Partita::setRisultato(int ptLocali_, int ptOspiti_) {
     ptOspiti = ptOspiti_;
 }
 
+int Partita::getPuntiOspiti() const {
+    return ptOspiti;
+}
+
+int Partita::getPuntiLocali() const {
+    return ptLocali;
+}
+
+const Squadra& Partita::getOspiti() const {
+    return ospiti;
+}
+
+int Partita::getData() const {
+    return data;
+}
+
+const Squadra& Partita::getLocali() const {
+    return locali;
+}
+
+int Partita::getId() const {
+    return id;
+}
+
 // Operatore di stampa per mostrare informazioni della partita
 std::ostream& operator<<(std::ostream& os, const Partita& p) {
     os << "Partita ID: " << p.id << ", Data: " << p.data << "\n";

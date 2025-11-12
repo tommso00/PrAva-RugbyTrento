@@ -26,7 +26,8 @@ public:
     std::string getIndirizzo() const;
     int getId() const;
     int getPunteggio() const;
-
+	const std::vector<Giocatore>& getGiocatori() const{return giocatori;}
+	
     void setNome(const std::string& n);
     void setIndirizzo(const std::string& i);
     void setId(int i);

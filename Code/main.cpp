@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
 		    case 1:
 		        // Carica Stagione
 		        cout<<"Selezionare stagione da caricare:"<<endl;
-		        //gest.fetchStagioni();
+		        gest.fetchStagioni();
 		        //gest.selezionaStagioni();
 		        //gest.modificaStagione();
 		        break;

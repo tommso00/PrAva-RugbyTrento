@@ -9,27 +9,50 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 
 class Gestionale {
 	
 	private:
 		std::vector<std::unique_ptr<Stagione>> stagioni;	
-		Stagione* selezionaStagione();// DA RIFARE: la lista stagioni la prendi dal DB (file .csv)
+		
+		//percorsi dei CSV (potremmo mezzo configurarli in un file de setup data.csv) :)
+		std::string pathStagioni = "stagioni.csv";
+    	std::string pathSquadre = "squadre.csv";
+    	std::string pathGiocatori = "giocatori.csv";
+    	std::string pathPartite = "partite.csv";
+		
+		//metodi ausiliari CSV
+		std::vector<std::string> splitCSVLine(const std::string& path);
+    	void salvaSuFile(const std::string& path, const std::vector<std::string>& righe);
+    	std::vector<std::string> leggiDaFile(const std::string& path);
+		
+	    Stagione* selezionaStagione(); // seleziona stagione già caricata :)
+	    Stagione* trovaStagione(int anno);
+
 		
 	public: 
 		Gestionale() = default;
 		~Gestionale() = default;
+		
+		//menu
 		void avvia();		
-
 		void creaStagione();
-	    void addSquadraToStagione();
-	    void addPartitaToStagione();
-	    void addGiocatoreToStagione();
-		//void fetchStagioni(); //Va nel file .csv e prende lista stagioni per stamparla 
-		//void modificaStagione(); // abbastanza "simile" a creaStagione(): menu con scelte per usare i metodi gia creati
-		 
-	    
+		
+		//metodi CSV I/O
+		void fetchStagioni(); //legge stagioni e relative squadre/partite dal CSV :)
+		void salvaStagioni()const; //sovrascrive i CSV con i dati correnti in memoria
+
+	
+	    void fetchSquadre(Stagione& stagione);
+   		void salvaSquadre(const Stagione& stagione)const;
+
+    	void fetchGiocatori(Squadra& squadra);
+    	void salvaGiocatori(const Squadra& squadra)const;
+
+    	void fetchPartite(Stagione& stagione);
+    	void salvaPartite(const Stagione& stagione)const;
 		
 };
 

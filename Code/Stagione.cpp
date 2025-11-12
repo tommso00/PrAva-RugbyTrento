@@ -16,6 +16,10 @@ void Stagione::addPartita(const Partita& p) {
     partite.push_back(p);
 }
 
+int Stagione::getAnno() const {
+    return anno;
+}
+
 const std::vector<std::unique_ptr<Squadra>>& Stagione::getSquadre() const {
     return squadre;
 }

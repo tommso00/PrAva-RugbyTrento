@@ -18,7 +18,15 @@ public:
     // Il distruttore di default è sufficiente: nessun puntatore o risorsa gestita manualmente
     ~Partita() = default;
 
+	// GETTER aggiunti
+    int getId() const;
+    int getData() const;
+    const Squadra& getLocali() const;
+    const Squadra& getOspiti() const;
+    int getPuntiLocali() const;
+    int getPuntiOspiti() const;
     int getPunteggioPartita() const; 
+
     void setRisultato(int ptLocali, int ptOspiti);
 
     // Serve lo scope std:: per ostream, non "using namespace std;"
