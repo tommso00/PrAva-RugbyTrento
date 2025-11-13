@@ -41,6 +41,7 @@ class Gestionale {
 		
 		void selezionaStagione();
 		void creaStagione();
+		void modificaStagione();
 		void caricaStagione(const std::string& filename, int stagione);
 		
 		//metodi CSV I/O

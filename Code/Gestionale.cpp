@@ -77,12 +77,21 @@ void Gestionale::caricaStagione(const std::string& filename, int stagione) {
             std::cout << "Riga " << stagione << ": " << riga << std::endl;
             int anno = std::stoi(riga);
             stagioni.push_back(unique_ptr<Stagione>(new Stagione(anno)));
-    		cout << "Stagione " << anno << " CARICATA correttamente!\n";
+    		cout << "Stagione " << anno << " CARICATA correttamente!"<<endl;
             return;
         }
     }
 
     std::cout << "Riga " << stagione << " non trovata nel file." << std::endl;
+}
+
+// ====== MODIFICA STAGIONE ======
+
+void Gestionale::modificaStagione(){
+	int azione;
+	cout<<endl<<"Seleziona azione:"<<endl;
+	cout<<"1) Aggiungi squadra"<<endl<<"2) Aggiungi partita"<<endl<<"3) Salva stagione"<<endl;
+	cin>>azione;
 }
 
 // ==================== RICERCA STAGIONE ====================

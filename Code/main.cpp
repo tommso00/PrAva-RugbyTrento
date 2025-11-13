@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 		        cout<<"Selezionare stagione da caricare:"<<endl;
 		        //gest.fetchStagioni("database/squadre_girone_rugby_trento.csv");
 		        gest.selezionaStagione();
-		        //gest.modificaStagione();
+		        gest.modificaStagione();
 		        break;
 		    case 2:
 		        // Crea Stagione
