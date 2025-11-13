@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <cstdlib>
 
+
 //Ho pensato molto al fatto che fstream e sstream non bastino per la comunicazione tra .cpp e .csv 
 //per ora ho implementato così
 //non so' cosa hai in mente con Statistiche.h since
@@ -24,7 +25,7 @@ void Gestionale::avvia() {
         cin >> scelta;
 
         switch (scelta) {
-            case 1: fetchStagioni(); break;
+            case 1: fetchStagioni("database/squadre_girone_rugby_trento.csv"); break;
             case 2: creaStagione(); break;
             case 3: salvaStagioni(); break;
             case 0: cout << "Uscita...\n"; break;
@@ -53,6 +54,37 @@ void Gestionale::creaStagione() {
     
 }
 
+// ==== CARICA STAGIONE ===
+void Gestionale::caricaStagione(const std::string& filename, int stagione) {
+	std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Errore apertura file: " << filename << std::endl;
+        return;
+    }
+
+    std::string riga;
+    int contoRighe = 0;
+    bool intestazioneSaltata = false;
+
+    while (std::getline(file, riga)) {
+        if (!intestazioneSaltata) {
+            intestazioneSaltata = true; // salta intestazione
+            continue;
+        }
+        contoRighe++;
+        if (contoRighe == stagione) {
+            // Stampa la riga richiesta
+            std::cout << "Riga " << stagione << ": " << riga << std::endl;
+            int anno = std::stoi(riga);
+            stagioni.push_back(unique_ptr<Stagione>(new Stagione(anno)));
+    		cout << "Stagione " << anno << " CARICATA correttamente!\n";
+            return;
+        }
+    }
+
+    std::cout << "Riga " << stagione << " non trovata nel file." << std::endl;
+}
+
 // ==================== RICERCA STAGIONE ====================
 Stagione* Gestionale::trovaStagione(int anno) {
     for (size_t i = 0; i < stagioni.size(); ++i) {
@@ -63,22 +95,15 @@ Stagione* Gestionale::trovaStagione(int anno) {
 }
 
 // ==================== SELEZIONA STAGIONE ====================
-Stagione* Gestionale::selezionaStagione() {
-    if (stagioni.empty()) {
-        cout << "Nessuna stagione presente.\n";
-        return NULL;
-    }
-
-    cout << "Seleziona stagione:\n";
-    for (size_t i = 0; i < stagioni.size(); ++i)
-        cout << i << ") " << *stagioni[i] << "\n";
-
-    int scelta;
-    cin >> scelta;
-    if (scelta < 0 || scelta >= (int)stagioni.size())
-        return NULL;
-
-    return stagioni[scelta].get();
+void Gestionale::selezionaStagione() {
+	int stag;
+    fetchStagioni("database/stagioni.csv");
+    cout<<endl;
+    cout<<"Seleziona numero stagione da caricare:"<<endl;
+    cin>>stag;
+    cout<<"selezionata: "<<stag<<endl;
+    caricaStagione("database/stagioni.csv", stag);
+    
 }
 
 // ==================== LETTURA CSV ====================
@@ -133,17 +158,21 @@ vector<string> Gestionale::splitCSVLine(const string& line) {
 }
 
 // ==================== FETCH STAGIONI ====================
-void Gestionale::fetchStagioni() {
-    ifstream file(pathStagioni);
-    string line;
-
-    while (getline(file, line)) {
-        int anno = atoi(line.c_str());
-        stagioni.push_back(unique_ptr<Stagione>(new Stagione(anno)));
-    } 
-	
-	file.close();
-    
+void Gestionale::fetchStagioni(const std::string& filename) {
+    std::ifstream file(filename);
+    std::string riga;
+    int numeroRiga=1;
+    std::cout <<endl<< "=== Elenco Stagioni ==="<<endl;
+    bool prima = true;
+    while (std::getline(file, riga)) {
+        if (prima) { // salta intestazione
+            prima = false;
+            continue;
+        }
+        std::cout << numeroRiga<< ". " << riga << std::endl;
+        ++numeroRiga;
+    }
+    file.close();
 }
 
 // ==================== SALVA STAGIONI ====================

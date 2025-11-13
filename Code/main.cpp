@@ -13,16 +13,17 @@ int main(int argc, char** argv) {
 	Gestionale gest;
 	int scelta=0;
 	
-	cout<< "Selezionare azione:"<<endl<<" 1) Carica stagione"<<endl<<" 2) Crea stagione"<<endl<<" 3) Esci"<<endl;
+	//cout<< "Selezionare azione:"<<endl<<" 1) Carica stagione"<<endl<<" 2) Crea stagione"<<endl<<" 3) Esci"<<endl;
 	
 	do{
+		cout<< "Selezionare azione:"<<endl<<" 1) Carica stagione"<<endl<<" 2) Crea stagione"<<endl<<" 3) Esci"<<endl;
 		scelta = getScelta(0,3);
 		switch (scelta) {
 		    case 1:
 		        // Carica Stagione
 		        cout<<"Selezionare stagione da caricare:"<<endl;
-		        gest.fetchStagioni();
-		        //gest.selezionaStagioni();
+		        //gest.fetchStagioni("database/squadre_girone_rugby_trento.csv");
+		        gest.selezionaStagione();
 		        //gest.modificaStagione();
 		        break;
 		    case 2:

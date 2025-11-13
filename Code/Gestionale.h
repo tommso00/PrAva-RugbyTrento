@@ -28,7 +28,7 @@ class Gestionale {
     	void salvaSuFile(const std::string& path, const std::vector<std::string>& righe);
     	std::vector<std::string> leggiDaFile(const std::string& path);
 		
-	    Stagione* selezionaStagione(); // seleziona stagione già caricata :)
+	    //Stagione* selezionaStagione(); // seleziona stagione già caricata :)
 	    Stagione* trovaStagione(int anno);
 
 		
@@ -37,11 +37,14 @@ class Gestionale {
 		~Gestionale() = default;
 		
 		//menu
-		void avvia();		
+		void avvia();	
+		
+		void selezionaStagione();
 		void creaStagione();
+		void caricaStagione(const std::string& filename, int stagione);
 		
 		//metodi CSV I/O
-		void fetchStagioni(); //legge stagioni e relative squadre/partite dal CSV :)
+		void fetchStagioni(const std::string& filename); //legge stagioni e relative squadre/partite dal CSV :)
 		void salvaStagioni()const; //sovrascrive i CSV con i dati correnti in memoria
 
 	
