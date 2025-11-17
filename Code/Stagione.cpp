@@ -6,6 +6,9 @@
 // Costruttore
 Stagione::Stagione(int anno_) : anno(anno_) {}
 
+//Costruttore copia
+//Stagione::Stagione(const Stagione& other) = default;
+
 // AddSquadra: prende ownership della squadra (occorre std::move!)
 void Stagione::addSquadra(std::unique_ptr<Squadra> s) {
     squadre.push_back(std::move(s));

@@ -18,6 +18,14 @@ private:
 
 public:
     explicit Stagione(int anno);
+    
+    // Disabilita copia
+    Stagione(const Stagione& other) = delete;
+    Stagione& operator=(const Stagione& other) = delete;
+
+    // Abilita move
+    Stagione(Stagione&& other)  = default;
+    Stagione& operator=(Stagione&& other)  = default;
 
     // Il distruttore di default gestisce correttamente unique_ptr e vector!
     ~Stagione() = default;

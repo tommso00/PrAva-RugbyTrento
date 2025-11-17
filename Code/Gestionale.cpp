@@ -55,11 +55,11 @@ void Gestionale::creaStagione() {
 }
 
 // ==== CARICA STAGIONE ===
-void Gestionale::caricaStagione(const std::string& filename, int stagione) {
-	std::ifstream file(filename);
+int Gestionale::recuperaStagione(const std::string& filename, int stagione) {
+    std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Errore apertura file: " << filename << std::endl;
-        return;
+        return 0;
     }
 
     std::string riga;
@@ -73,16 +73,16 @@ void Gestionale::caricaStagione(const std::string& filename, int stagione) {
         }
         contoRighe++;
         if (contoRighe == stagione) {
-            // Stampa la riga richiesta
             std::cout << "Riga " << stagione << ": " << riga << std::endl;
             int anno = std::stoi(riga);
-            stagioni.push_back(unique_ptr<Stagione>(new Stagione(anno)));
-    		cout << "Stagione " << anno << " CARICATA correttamente!"<<endl;
-            return;
+            //outStagione = Stagione(anno); // costruiamo la stagione con l'anno letto
+            //std::cout << "Stagione " << outStagione.getAnno() << " caricata correttamente!" << std::endl;
+            return anno;
         }
     }
 
     std::cout << "Riga " << stagione << " non trovata nel file." << std::endl;
+    return 0;
 }
 
 // ====== MODIFICA STAGIONE ======
@@ -105,13 +105,15 @@ Stagione* Gestionale::trovaStagione(int anno) {
 
 // ==================== SELEZIONA STAGIONE ====================
 void Gestionale::selezionaStagione() {
-	int stag;
     fetchStagioni("database/stagioni.csv");
-    cout<<endl;
-    cout<<"Seleziona numero stagione da caricare:"<<endl;
-    cin>>stag;
-    cout<<"selezionata: "<<stag<<endl;
-    caricaStagione("database/stagioni.csv", stag);
+    
+    int stag;
+    std::cout << std::endl << "Seleziona numero stagione da caricare:" << std::endl;
+    std::cin >> stag;
+
+    std::cout << "Selezionata: " << stag << std::endl;
+
+    Stagione tempStagione(recuperaStagione("database/stagioni.csv", stag)); // Oggetto temporaneo per il caricamento
     
 }
 
