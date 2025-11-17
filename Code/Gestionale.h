@@ -30,7 +30,7 @@ class Gestionale {
 		
 	    //Stagione* selezionaStagione(); // seleziona stagione già caricata :)
 	    Stagione* trovaStagione(int anno);
-	    Stagione stagioneCorrente;
+	    //Stagione stagioneCorrente;
 
 		
 	public: 
@@ -42,14 +42,15 @@ class Gestionale {
 		
 		void selezionaStagione();
 		void creaStagione();
-		void modificaStagione();
+		void modificaStagione(Stagione& stagione);
 		int recuperaStagione(const std::string& filename, int stagione);
 		
 		//metodi CSV I/O
 		void fetchStagioni(const std::string& filename); //legge stagioni e relative squadre/partite dal CSV :)
 		void salvaStagioni()const; //sovrascrive i CSV con i dati correnti in memoria
 
-	
+		//SQUADRE
+		std::unique_ptr<Squadra> aggiungiSquadra();
 	    void fetchSquadre(Stagione& stagione);
    		void salvaSquadre(const Stagione& stagione)const;
 

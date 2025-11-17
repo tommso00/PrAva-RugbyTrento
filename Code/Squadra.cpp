@@ -2,8 +2,8 @@
 #include <algorithm>
 
 // Costruttore
-Squadra::Squadra(const std::string& nome_, const std::string& indirizzo_, int id_)
-    : nome(nome_), indirizzo(indirizzo_), id(id_), punteggioClassifica(0) {}
+Squadra::Squadra(const std::string& nome_, const std::string& indirizzo_)
+    : nome(nome_), indirizzo(indirizzo_), punteggioClassifica(0) {}
 
 // Getter
 std::string Squadra::getNome() const {
@@ -14,9 +14,9 @@ std::string Squadra::getIndirizzo() const {
     return indirizzo;
 }
 
-int Squadra::getId() const {
+/*int Squadra::getId() const {
     return id;
-}
+}*/
 
 int Squadra::getPunteggio() const {
     return punteggioClassifica;
@@ -31,9 +31,9 @@ void Squadra::setIndirizzo(const std::string& i) {
     indirizzo = i;
 }
 
-void Squadra::setId(int i) {
+/*void Squadra::setId(int i) {
     id = i;
-}
+}*/
 
 void Squadra::setPunteggio(int p) {
     punteggioClassifica = p;
@@ -55,7 +55,7 @@ void Squadra::removeGiocatore(int idGiocatore) {
 
 // Operatore di stampa
 std::ostream& operator<<(std::ostream& os, const Squadra& s) {
-    os << "Squadra: " << s.nome << " (ID: " << s.id << "), Indirizzo: " << s.indirizzo << "\n";
+    os << "Squadra: " << s.nome << "), Indirizzo: " << s.indirizzo << "\n";
     os << "Punteggio Classifica: " << s.punteggioClassifica << "\n";
     os << "Giocatori:\n";
     for (const auto& g : s.giocatori) {

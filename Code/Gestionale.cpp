@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <cstdlib>
+#include <memory>
 
 
 //Ho pensato molto al fatto che fstream e sstream non bastino per la comunicazione tra .cpp e .csv 
@@ -87,11 +88,49 @@ int Gestionale::recuperaStagione(const std::string& filename, int stagione) {
 
 // ====== MODIFICA STAGIONE ======
 
-void Gestionale::modificaStagione(){
-	int azione;
-	cout<<endl<<"Seleziona azione:"<<endl;
-	cout<<"1) Aggiungi squadra"<<endl<<"2) Aggiungi partita"<<endl<<"3) Salva stagione"<<endl;
-	cin>>azione;
+void Gestionale::modificaStagione(Stagione& stagione) {
+    int azione;
+    cout << endl << "Seleziona azione:" << endl;
+    cout << "1) Aggiungi squadra" << endl << "2) Aggiungi partita" << endl << "3) Salva stagione" << endl;
+    cin >> azione;
+
+    switch (azione) {
+        case 1: {
+        	int c=0;
+        	while(c==0){
+                 // Chiamata a aggiungiSquadra che ritorna unique_ptr
+	            auto squadraPtr = aggiungiSquadra();
+	            // Aggiunta della squadra alla stagione
+	            stagione.addSquadra(move(squadraPtr));
+				cout<<"Vuoi aggiungere un'altra squadra?  0=si / 1=no"<<endl;
+				cin>>c;	
+			}
+
+            break;
+        }
+        case 2:
+            // aggiungiPartita(stagione);
+            break;
+        case 3:
+            // Logica per salvare stagione...
+            break;
+        default:
+            cout << "Azione non valida." << endl;
+            break;
+    }
+}
+
+// === AGGIUNGI SQUADRA ===
+
+std::unique_ptr<Squadra> Gestionale::aggiungiSquadra() {
+    string nome, indirizzo;
+    cout << "Nome squadra: ";
+    cin >> nome;
+    cout << "Indirizzo squadra: ";
+    cin >> indirizzo;
+
+    std::unique_ptr<Squadra> s1(new Squadra(nome, indirizzo));
+    return s1;
 }
 
 // ==================== RICERCA STAGIONE ====================
@@ -115,6 +154,7 @@ void Gestionale::selezionaStagione() {
 
     Stagione tempStagione(recuperaStagione("database/stagioni.csv", stag)); // Oggetto temporaneo per il caricamento
     
+    modificaStagione(tempStagione);
 }
 
 // ==================== LETTURA CSV ====================
@@ -204,7 +244,7 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
         string nome = t[0];
         string indirizzo = t[1];
         int id = atoi(t[2].c_str());
-        stagione.addSquadra(unique_ptr<Squadra>(new Squadra(nome, indirizzo, id)));
+        stagione.addSquadra(unique_ptr<Squadra>(new Squadra(nome, indirizzo)));
     }
     file.close();
 }
@@ -212,7 +252,7 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
 void Gestionale::salvaSquadre(const Stagione& stagione) const{
     ofstream file(pathSquadre);
     for (const auto& sPtr : stagione.getSquadre())
-        file << sPtr->getNome() << "," << sPtr->getIndirizzo() << "," << sPtr->getId() << "\n";
+        file << sPtr->getNome() << "," << sPtr->getIndirizzo() << "," << "\n";
     file.close();
 }
 
@@ -244,7 +284,7 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) const{
 
 // ==================== FETCH / SAVE PARTITE ====================
 void Gestionale::fetchPartite(Stagione& stagione) {
-    ifstream file(pathPartite);
+    /*ifstream file(pathPartite);
     string line;
     while (getline(file, line)) {
         vector<string> t = splitCSVLine(line);
@@ -270,15 +310,15 @@ void Gestionale::fetchPartite(Stagione& stagione) {
         p.setRisultato(ptLocali, ptOspiti);
         stagione.addPartita(p);
     }
-    file.close();
+    file.close();*/
 }
 
 void Gestionale::salvaPartite(const Stagione& stagione) const {
-    ofstream file(pathPartite);
+    /*ofstream file(pathPartite);
     for (const auto& p : stagione.getCalendario())
         file << p.getId() << "," << p.getData() << ","
              << p.getLocali().getId() << "," << p.getOspiti().getId() << ","
              << p.getPuntiLocali() << "," << p.getPuntiOspiti() << "\n";
-    file.close();
+    file.close();*/
 }
 
