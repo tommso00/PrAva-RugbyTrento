@@ -91,7 +91,7 @@ int Gestionale::recuperaStagione(const std::string& filename, int stagione) {
 void Gestionale::modificaStagione(Stagione& stagione) {
     int azione;
     cout << endl << "Seleziona azione:" << endl;
-    cout << "1) Aggiungi squadra" << endl << "2) Aggiungi partita" << endl << "3) Salva stagione" << endl;
+    cout << "1) Aggiungi squadra" << endl << "2) Aggiungi partita" << endl << "3) ALTRO" << endl;
     cin >> azione;
 
     switch (azione) {
@@ -102,6 +102,7 @@ void Gestionale::modificaStagione(Stagione& stagione) {
 	            auto squadraPtr = aggiungiSquadra();
 	            // Aggiunta della squadra alla stagione
 	            stagione.addSquadra(move(squadraPtr));
+	            //===========AGGIUNGERE LISTA GIOCATORI PRIMA DI AGGIUNGERE ALTRE SQUADRE 
 				cout<<"Vuoi aggiungere un'altra squadra?  0=si / 1=no"<<endl;
 				cin>>c;	
 			}
@@ -118,6 +119,7 @@ void Gestionale::modificaStagione(Stagione& stagione) {
             cout << "Azione non valida." << endl;
             break;
     }
+    //=== IMPLEMENTARE WHILE PER NON USCIRE AL MENU PRINCIPALE
 }
 
 // === AGGIUNGI SQUADRA ===
