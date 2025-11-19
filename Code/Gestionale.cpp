@@ -26,9 +26,9 @@ void Gestionale::avvia() {
         cin >> scelta;
 
         switch (scelta) {
-            case 1: fetchStagioni("database/squadre_girone_rugby_trento.csv"); break;
-            case 2: creaStagione(); break;
-            case 3: salvaStagioni(); break;
+            case 1: //fetchStagioni("database/squadre_girone_rugby_trento.csv"); break;
+            case 2: //creaStagione(); break;
+            case 3: //salvaStagioni(); break;
             case 0: cout << "Uscita...\n"; break;
             default: cout << "Scelta non valida.\n"; break;
         }
@@ -46,12 +46,11 @@ void Gestionale::creaStagione() {
         return;
     }
 
-    stagioni.push_back(unique_ptr<Stagione>(new Stagione(anno)));
+    //stagioni.push_back(unique_ptr<Stagione>(new Stagione(anno)));
     cout << "Stagione " << anno << " creata correttamente!\n";
     
-    //dopo averla creata che si fa'? :) 
-    //bisognerebbe indicare un calendario -> partite->vari set partite
-    //bisognerebbe anche indicare quante squadre composto (del tipo che segna quante ne mettiamo noi, non ho sbatta di poi dover inserire da terminale nome per nome di una squadra ;| )
+    Stagione tempStagione(anno); // Oggetto temporaneo per il caricamento
+    modificaStagione(tempStagione);
     
 }
 
@@ -89,37 +88,76 @@ int Gestionale::recuperaStagione(const std::string& filename, int stagione) {
 // ====== MODIFICA STAGIONE ======
 
 void Gestionale::modificaStagione(Stagione& stagione) {
-    int azione;
-    cout << endl << "Seleziona azione:" << endl;
-    cout << "1) Aggiungi squadra" << endl << "2) Aggiungi partita" << endl << "3) ALTRO" << endl;
-    cin >> azione;
+	int lastSquadraId = 0;  
+	for (const auto& s : stagione.getSquadre()) {
+	    if (s->getId() > lastSquadraId) lastSquadraId = s->getId();
+	}
 
-    switch (azione) {
-        case 1: {
-        	int c=0;
-        	while(c==0){
-                 // Chiamata a aggiungiSquadra che ritorna unique_ptr
-	            auto squadraPtr = aggiungiSquadra();
-	            // Aggiunta della squadra alla stagione
-	            stagione.addSquadra(move(squadraPtr));
-	            //===========AGGIUNGERE LISTA GIOCATORI PRIMA DI AGGIUNGERE ALTRE SQUADRE 
-				cout<<"Vuoi aggiungere un'altra squadra?  0=si / 1=no"<<endl;
-				cin>>c;	
-			}
-
-            break;
-        }
-        case 2:
-            // aggiungiPartita(stagione);
-            break;
-        case 3:
-            // Logica per salvare stagione...
-            break;
-        default:
-            cout << "Azione non valida." << endl;
-            break;
-    }
-    //=== IMPLEMENTARE WHILE PER NON USCIRE AL MENU PRINCIPALE
+    int azione, azgioc;
+    int controllo=0;
+    int c=0;
+    string nome, cognome, ruolo;
+    int eta;
+	while(controllo==0){
+		cout << endl << "Seleziona azione:" << endl;
+	    cout << "1) Aggiungi squadra" << endl << "2) Aggiungi partita" << endl << "3) Stampa Stagione" << endl;
+	    cin >> azione;
+		switch (azione) {
+	        case 1: {
+	        	while(c==0){
+	                 // Chiamata a aggiungiSquadra che ritorna unique_ptr
+		            auto squadraPtr = aggiungiSquadra();
+		            squadraPtr->setId(++lastSquadraId);  // assegna ID unico
+		            //===========AGGIUNGERE LISTA GIOCATORI PRIMA DI AGGIUNGERE ALTRE SQUADRE 
+		            cout<< "Vuoi Aggiungere Giocatori? 0=si / 1=no"<<endl;
+		            cin>>azgioc;
+		            int lastGiocatoreId = 0;  
+					if (!squadraPtr->getGiocatori().empty()) {
+					    for (const auto& g : squadraPtr->getGiocatori()) {
+					        if (g.getId() > lastGiocatoreId) lastGiocatoreId = g.getId();
+					    }
+					}
+		            while(azgioc==0){
+		            	cout<<"Nome: ";
+		            	cin>>nome;
+		            	cout<<"Cognome: ";
+		            	cin>>cognome;
+		            	Giocatore g1(nome, cognome, 28, "Mediano", ++lastGiocatoreId);
+		            	squadraPtr->addGiocatore(g1);
+			            cout<< "Vuoi Aggiungere Giocatori? 0=si / 1=no"<<endl;
+			            cin>>azgioc;
+					}	            
+		            
+		            // Aggiunta della squadra alla stagione
+		            stagione.addSquadra(move(squadraPtr));
+		            
+	
+					cout<<"Vuoi aggiungere un'altra squadra?  0=si / 1=no"<<endl;
+					cin>>c;	
+				}
+				//cout<<stagione;
+	
+	            break;
+	        }
+	        case 2:
+	            // aggiungiPartita(stagione);
+	            break;
+	        case 3:
+	            cout<<stagione;
+	            break;
+	        default:
+	            cout << "Azione non valida." << endl;
+	            break;
+    	}
+    	cout<<"Vuoi modificare ancora?  0=si / 1=no"<<endl;
+    	cin>>controllo;
+	}
+	salvaStagioni(stagione);
+	salvaSquadre(stagione);
+	for (const auto& squadra : stagione.getSquadre()) {
+	    salvaGiocatori(*squadra);
+	}
+    
 }
 
 // === AGGIUNGI SQUADRA ===
@@ -201,7 +239,7 @@ e la restituisce:
 	
 	da far coincidere con la raccolta dati nostra
 */
-vector<string> Gestionale::splitCSVLine(const string& line) {
+vector<string> Gestionale::splitCSVLine(const string& line)const {
     vector<string> tokens;
     stringstream ss(line);
     string cell;
@@ -229,12 +267,40 @@ void Gestionale::fetchStagioni(const std::string& filename) {
 }
 
 // ==================== SALVA STAGIONI ====================
-void Gestionale::salvaStagioni() const{
-    ofstream file(pathStagioni);
-    for (const auto& sPtr : stagioni) file << sPtr->getAnno() << "\n";
-    file.close();
+void Gestionale::salvaStagioni(const Stagione& nuovaStagione)  {
+    // 1. Ricarica tutte le stagioni esistenti
+    vector<int> anni;
+    
+    ifstream lettura("database/stagioni.csv");
+    string line;
+    bool primaRiga = true;
+    while (getline(lettura, line)) {
+        if (primaRiga) { primaRiga = false; continue; } // salta intestazione
+        if (!line.empty()) {
+            anni.push_back(stoi(line));
+        }
+    }
+    lettura.close();
 
+    // 2. Aggiungi la nuova stagione se non c'è già
+    int annoNuova = nuovaStagione.getAnno();
+    if (find(anni.begin(), anni.end(), annoNuova) == anni.end()) {
+        anni.push_back(annoNuova);
+    }
+    
+    // 3. Riscrivi tutto il file con tutte le stagioni (inclusa la nuova)
+    ofstream scrittura("database/stagioni.csv");
+    if (!scrittura.is_open()) {
+        throw runtime_error("Errore apertura file: database/stagioni.csv");
+    }
+    scrittura << "anno\n"; // intestazione
+    for (int anno : anni) {
+        scrittura << anno << "\n";
+    }
+    scrittura.close();
 }
+
+
 
 // ==================== FETCH / SAVE SQUADRE ====================
 void Gestionale::fetchSquadre(Stagione& stagione) {
@@ -251,12 +317,61 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
     file.close();
 }
 
-void Gestionale::salvaSquadre(const Stagione& stagione) const{
-    ofstream file(pathSquadre);
-    for (const auto& sPtr : stagione.getSquadre())
-        file << sPtr->getNome() << "," << sPtr->getIndirizzo() << "," << "\n";
-    file.close();
+void Gestionale::salvaSquadre(const Stagione& stagione) const {
+    // 1. Carica tutte le squadre esistenti
+    std::vector<std::tuple<int, int, std::string, std::string>> squadreEsistenti; // (id, stagione_anno, nome, indirizzo)
+
+    std::ifstream lettura("database/squadre.csv");
+    std::string line;
+    bool primaRiga = true;
+    while (std::getline(lettura, line)) {
+        if (primaRiga) { primaRiga = false; continue; } // Salta intestazione
+        if (!line.empty()) {
+            std::vector<std::string> tokens = splitCSVLine(line);
+            if (tokens.size() >= 4) {
+                int id = std::stoi(tokens[0]);
+                int anno = std::stoi(tokens[1]);
+                std::string nome = tokens[2];
+                std::string indirizzo = tokens[3];
+                squadreEsistenti.emplace_back(id, anno, nome, indirizzo);
+            }
+        }
+    }
+    lettura.close();
+
+    // 2. Aggiungi le squadre della stagione passata come parametro che non sono già presenti
+    for (const auto& squadraPtr : stagione.getSquadre()) {
+        int id = squadraPtr->getId();
+        int anno = stagione.getAnno();
+        std::string nome = squadraPtr->getNome();
+        std::string indirizzo = squadraPtr->getIndirizzo();
+
+        bool presente = false;
+        for (const auto& s : squadreEsistenti) {
+            if (std::get<0>(s) == id && std::get<1>(s) == anno) {
+                presente = true;
+                break;
+            }
+        }
+        if (!presente) {
+            squadreEsistenti.emplace_back(id, anno, nome, indirizzo);
+        }
+    }
+
+    // 3. Riscrivi tutto il file
+    std::ofstream scrittura("database/squadre.csv");
+    if (!scrittura.is_open()) {
+        throw std::runtime_error("Errore apertura file: database/squadre.csv");
+    }
+    scrittura << "squadra_id,stagione_anno,nome,indirizzo\n";
+    for (const auto& s : squadreEsistenti) {
+        scrittura << std::get<0>(s) << "," << std::get<1>(s) << ","
+                  << std::get<2>(s) << "," << std::get<3>(s) << "\n";
+    }
+    scrittura.close();
 }
+
+
 
 // ==================== FETCH / SAVE GIOCATORI ====================
 void Gestionale::fetchGiocatori(Squadra& squadra) {
@@ -276,13 +391,67 @@ void Gestionale::fetchGiocatori(Squadra& squadra) {
     file.close();
 }
 
-void Gestionale::salvaGiocatori(const Squadra& squadra) const{
-    ofstream file(pathGiocatori);
-    for (const auto& g : squadra.getGiocatori())
-        file << g.getNome() << "," << g.getCognome() << "," << g.getEta()
-             << "," << g.getRuolo() << "," << g.getId() << "\n";
-    file.close();
+void Gestionale::salvaGiocatori(const Squadra& squadra) const {
+    // 1. Carica tutti i giocatori esistenti
+    std::vector<std::tuple<int, int, std::string, std::string, int, std::string>> giocatoriEsistenti; 
+    // (giocatore_id, squadra_id, nome, cognome, eta, ruolo)
+
+    std::ifstream lettura("database/giocatori.csv");
+    std::string line;
+    bool primaRiga = true;
+    while (std::getline(lettura, line)) {
+        if (primaRiga) { primaRiga = false; continue; } // Salta intestazione
+        if (!line.empty()) {
+            std::vector<std::string> tokens = splitCSVLine(line);
+            if (tokens.size() >= 6) {
+                int id = std::stoi(tokens[0]);
+                int squadra_id = std::stoi(tokens[1]);
+                std::string nome = tokens[2];
+                std::string cognome = tokens[3];
+                int eta = std::stoi(tokens[4]);
+                std::string ruolo = tokens[5];
+                giocatoriEsistenti.emplace_back(id, squadra_id, nome, cognome, eta, ruolo);
+            }
+        }
+    }
+    lettura.close();
+
+    // 2. Aggiungi i giocatori della squadra passata come parametro se non sono già presenti
+    int squadraId = squadra.getId();
+    for (const auto& g : squadra.getGiocatori()) {
+        int id = g.getId();
+        std::string nome = g.getNome();
+        std::string cognome = g.getCognome();
+        int eta = g.getEta();
+        std::string ruolo = g.getRuolo();
+
+        bool presente = false;
+        for (const auto& player : giocatoriEsistenti) {
+            if (std::get<0>(player) == id && std::get<1>(player) == squadraId) {
+                presente = true;
+                break;
+            }
+        }
+        if (!presente) {
+            giocatoriEsistenti.emplace_back(id, squadraId, nome, cognome, eta, ruolo);
+        }
+    }
+
+    // 3. Riscrivi tutto il file
+    std::ofstream scrittura("database/giocatori.csv");
+    if (!scrittura.is_open()) {
+        throw std::runtime_error("Errore apertura file: database/giocatori.csv");
+    }
+    scrittura << "giocatore_id,squadra_id,nome,cognome,eta,ruolo\n";
+    for (const auto& g : giocatoriEsistenti) {
+        scrittura << std::get<0>(g) << "," << std::get<1>(g) << ","
+                  << std::get<2>(g) << "," << std::get<3>(g) << ","
+                  << std::get<4>(g) << "," << std::get<5>(g) << "\n";
+    }
+    scrittura.close();
 }
+
+
 
 // ==================== FETCH / SAVE PARTITE ====================
 void Gestionale::fetchPartite(Stagione& stagione) {

@@ -12,7 +12,7 @@ class Squadra {
 private:
     std::string nome;
     std::string indirizzo;
-    //int id;
+    int id;
     int punteggioClassifica;
     std::vector<Giocatore> giocatori;
 
@@ -24,13 +24,13 @@ public:
 
     std::string getNome() const;
     std::string getIndirizzo() const;
-    //int getId() const;
+    int getId() const;
     int getPunteggio() const;
 	const std::vector<Giocatore>& getGiocatori() const{return giocatori;}
 	
     void setNome(const std::string& n);
     void setIndirizzo(const std::string& i);
-    //void setId(int i);
+    void setId(int i);
     void setPunteggio(int p);
 
     void addGiocatore(const Giocatore& g);

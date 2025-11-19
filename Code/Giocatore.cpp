@@ -25,7 +25,7 @@ void Giocatore::setId(int nuovoId) {
 // Operatore di stampa
 std::ostream& operator<<(std::ostream& os, const Giocatore& g) {
     os << "Giocatore: " << g.getNome() << " " << g.getCognome()
-       << ", Età: " << g.getEta()
+       << ", Eta': " << g.getEta()
        << ", Ruolo: " << g.ruolo
        << ", ID: " << g.id;
     return os;

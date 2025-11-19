@@ -10,6 +10,8 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <algorithm>
+
 
 
 class Gestionale {
@@ -24,7 +26,7 @@ class Gestionale {
     	std::string pathPartite = "partite.csv";
 		
 		//metodi ausiliari CSV
-		std::vector<std::string> splitCSVLine(const std::string& path);
+		std::vector<std::string> splitCSVLine(const std::string& path) const;
     	void salvaSuFile(const std::string& path, const std::vector<std::string>& righe);
     	std::vector<std::string> leggiDaFile(const std::string& path);
 		
@@ -47,12 +49,12 @@ class Gestionale {
 		
 		//metodi CSV I/O
 		void fetchStagioni(const std::string& filename); //legge stagioni e relative squadre/partite dal CSV :)
-		void salvaStagioni()const; //sovrascrive i CSV con i dati correnti in memoria
+		void salvaStagioni(const Stagione& nuovaStagione) ; //sovrascrive i CSV con i dati correnti in memoria
 
 		//SQUADRE
 		std::unique_ptr<Squadra> aggiungiSquadra();
 	    void fetchSquadre(Stagione& stagione);
-   		void salvaSquadre(const Stagione& stagione)const;
+   		void salvaSquadre(const Stagione& stagione) const;
 
     	void fetchGiocatori(Squadra& squadra);
     	void salvaGiocatori(const Squadra& squadra)const;

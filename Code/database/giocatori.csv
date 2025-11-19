@@ -1,0 +1,5 @@
+giocatore_id,squadra_id,nome,cognome,eta,ruolo
+1,2,bbb,bbb,28,Mediano
+2,2,xxx,xxx,28,Mediano
+1,1,AGiocA,AAA,28,Mediano
+2,1,AGiocB,BBB,28,Mediano

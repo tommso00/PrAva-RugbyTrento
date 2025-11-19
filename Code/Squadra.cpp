@@ -14,9 +14,9 @@ std::string Squadra::getIndirizzo() const {
     return indirizzo;
 }
 
-/*int Squadra::getId() const {
+int Squadra::getId() const {
     return id;
-}*/
+}
 
 int Squadra::getPunteggio() const {
     return punteggioClassifica;
@@ -31,9 +31,9 @@ void Squadra::setIndirizzo(const std::string& i) {
     indirizzo = i;
 }
 
-/*void Squadra::setId(int i) {
+void Squadra::setId(int i) {
     id = i;
-}*/
+}
 
 void Squadra::setPunteggio(int p) {
     punteggioClassifica = p;
