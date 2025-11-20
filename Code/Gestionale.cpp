@@ -140,7 +140,7 @@ void Gestionale::modificaStagione(Stagione& stagione) {
 	            break;
 	        }
 	        case 2:
-	            // aggiungiPartita(stagione);
+	            aggiungiPartita(stagione);
 	            break;
 	        case 3:
 	            cout<<stagione;
@@ -170,7 +170,7 @@ std::unique_ptr<Squadra> Gestionale::aggiungiSquadra() {
     cout << "Indirizzo squadra: ";
     cin >> indirizzo;
 
-    std::unique_ptr<Squadra> s1(new Squadra(newId, nome, indirizzo));//FIX THIS
+    std::unique_ptr<Squadra> s1(new Squadra(newId, nome, indirizzo));
     return s1;
 }
 
@@ -546,6 +546,58 @@ void Gestionale::salvaPartite(const Stagione& stagione) const {
              << p.getPuntiLocali() << "," << p.getPuntiOspiti() << "\n";
     file.close();*/
 }
+
+// === AGGIUNGI PARTITA ===
+void Gestionale::aggiungiPartita(Stagione& stagione) {
+    int idPartita = stagione.getCalendario().size() + 1; // ID partita incrementale
+    int dataPartita;
+    int idSquadraLocale, idSquadraOspite;
+    int puntiLocali, puntiOspiti;
+
+    // Mostra elenco squadre per selezionare
+    std::cout << "Elenco squadre disponibili:\n";
+    for (const auto& squadraPtr : stagione.getSquadre()) {
+        std::cout << "ID: " << squadraPtr->getId() << " - " << squadraPtr->getNome() << std::endl;
+    }
+
+    // Input dati partita
+    std::cout << "Inserisci data della partita (formato numerico e.g. AAAAMMGG): ";
+    std::cin >> dataPartita;
+
+    std::cout << "Inserisci ID squadra locale: ";
+    std::cin >> idSquadraLocale;
+    std::cout << "Inserisci ID squadra ospite: ";
+    std::cin >> idSquadraOspite;
+
+    // Trova puntatori alle squadre dalla stagione
+    Squadra* locali = nullptr;
+    Squadra* ospiti = nullptr;
+
+    for (const auto& squadraPtr : stagione.getSquadre()) {
+        if (squadraPtr->getId() == idSquadraLocale) locali = squadraPtr.get();
+        if (squadraPtr->getId() == idSquadraOspite) ospiti = squadraPtr.get();
+    }
+
+    if (!locali || !ospiti) {
+        std::cout << "Squadre non trovate. Operazione annullata.\n";
+        return;
+    }
+
+    std::cout << "Inserisci punti squadra locale: ";
+    std::cin >> puntiLocali;
+    std::cout << "Inserisci punti squadra ospite: ";
+    std::cin >> puntiOspiti;
+
+    // Crea partita e setta risultato
+    Partita nuovaPartita(idPartita, dataPartita, *locali, *ospiti);
+    nuovaPartita.setRisultato(puntiLocali, puntiOspiti);
+
+    // Aggiungi la partita alla stagione
+    stagione.addPartita(nuovaPartita);
+
+    std::cout << "Partita aggiunta con successo.\n";
+}
+
 
 // METODO AUSILIARIO
 
