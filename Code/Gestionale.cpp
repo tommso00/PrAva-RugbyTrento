@@ -169,7 +169,7 @@ std::unique_ptr<Squadra> Gestionale::aggiungiSquadra() {
     cout << "Indirizzo squadra: ";
     cin >> indirizzo;
 
-    std::unique_ptr<Squadra> s1(new Squadra(nome, indirizzo));
+    std::unique_ptr<Squadra> s1(new Squadra(1, nome, indirizzo));//FIX THIS
     return s1;
 }
 
@@ -193,7 +193,10 @@ void Gestionale::selezionaStagione() {
     std::cout << "Selezionata: " << stag << std::endl;
 
     Stagione tempStagione(recuperaStagione("database/stagioni.csv", stag)); // Oggetto temporaneo per il caricamento
-    
+    fetchSquadre(tempStagione);
+    for (auto& squadraPtr : tempStagione.getSquadre()) {
+        fetchGiocatori(*squadraPtr);
+    }
     modificaStagione(tempStagione);
 }
 
@@ -304,18 +307,45 @@ void Gestionale::salvaStagioni(const Stagione& nuovaStagione)  {
 
 // ==================== FETCH / SAVE SQUADRE ====================
 void Gestionale::fetchSquadre(Stagione& stagione) {
-    ifstream file(pathSquadre);
-    string line;
-    while (getline(file, line)) {
-        vector<string> t = splitCSVLine(line);
-        if (t.size() < 3) continue;
-        string nome = t[0];
-        string indirizzo = t[1];
-        int id = atoi(t[2].c_str());
-        stagione.addSquadra(unique_ptr<Squadra>(new Squadra(nome, indirizzo)));
+    std::ifstream file("database/squadre.csv");
+    if (!file.is_open()) {
+        std::cerr << "Impossibile aprire il file squadre.csv" << std::endl;
+        return;
     }
+
+    std::string line;
+    bool primaRiga = true;
+    int stagioneAnno = stagione.getAnno(); // l'anno della stagione corrente (ID)
+
+    while (std::getline(file, line)) {
+        if (primaRiga) { // salta intestazione
+            primaRiga = false;
+            continue;
+        }
+
+        if (line.empty()) continue;
+
+        // Dividi la riga in tokens
+        std::vector<std::string> tokens = splitCSVLine(line);
+        if (tokens.size() >= 4) {
+            int id = std::stoi(tokens[0]);
+            int anno = std::stoi(tokens[1]);
+            std::string nome = tokens[2];
+            std::string indirizzo = tokens[3];
+
+            // Se la squadra appartiene alla stagione corrente
+            if (anno == stagioneAnno) {
+                // Crea e aggiungi la squadra se non già presente
+                auto squadraPtr = unique_ptr<Squadra> (new Squadra(id, nome, indirizzo));
+                //unique_ptr<Squadra> s1(new Squadra(id, nome, indirizzo));
+                stagione.addSquadra(std::move(squadraPtr));
+            }
+        }
+    }
+
     file.close();
 }
+
 
 void Gestionale::salvaSquadre(const Stagione& stagione) const {
     // 1. Carica tutte le squadre esistenti
@@ -375,21 +405,44 @@ void Gestionale::salvaSquadre(const Stagione& stagione) const {
 
 // ==================== FETCH / SAVE GIOCATORI ====================
 void Gestionale::fetchGiocatori(Squadra& squadra) {
-    ifstream file(pathGiocatori);
-    string line;
-    while (getline(file, line)) {
-        vector<string> t = splitCSVLine(line);
-        if (t.size() < 5) continue;
-        string nome = t[0];
-        string cognome = t[1];
-        int eta = atoi(t[2].c_str());
-        string ruolo = t[3];
-        int id = atoi(t[4].c_str());
-        Giocatore g(nome, cognome, eta, ruolo, id);
-        squadra.addGiocatore(g);
+    std::ifstream file("database/giocatori.csv");
+    if (!file.is_open()) {
+        std::cerr << "Impossibile aprire il file giocatori.csv" << std::endl;
+        return;
     }
+
+    std::string line;
+    bool primaRiga = true;
+    int squadraId = squadra.getId(); // ID della squadra corrente
+
+    while (std::getline(file, line)) {
+        if (primaRiga) { // salta intestazione
+            primaRiga = false;
+            continue;
+        }
+
+        if (line.empty()) continue;
+
+        std::vector<std::string> tokens = splitCSVLine(line);
+
+        if (tokens.size() >= 6) {
+            int id = std::stoi(tokens[0]);
+            int idSquadra = std::stoi(tokens[1]);
+            std::string nome = tokens[2];
+            std::string cognome = tokens[3];
+            int eta = std::stoi(tokens[4]);
+            std::string ruolo = tokens[5];
+
+            if (idSquadra == squadraId) {
+                Giocatore g(nome, cognome, eta, ruolo, id);
+                squadra.addGiocatore(g);
+            }
+        }
+    }
+
     file.close();
 }
+
 
 void Gestionale::salvaGiocatori(const Squadra& squadra) const {
     // 1. Carica tutti i giocatori esistenti

@@ -17,7 +17,7 @@ private:
     std::vector<Giocatore> giocatori;
 
 public:
-    Squadra(const std::string& nome, const std::string& indirizzo);
+    Squadra(int id_, const std::string& nome, const std::string& indirizzo);
 
     // Distruttore di default, poiché vector e string gestiscono la memoria automaticamente
     ~Squadra() = default;
