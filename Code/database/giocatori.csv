@@ -3,3 +3,5 @@ giocatore_id,squadra_id,nome,cognome,eta,ruolo
 2,1,BAB,aaa,28,Mediano
 1,2,GBA,bbb,28,Mediano
 2,2,GBB,bbb,28,Mediano
+1,3,GCA,ccc,28,Mediano
+2,3,GCB,ccc,28,Mediano

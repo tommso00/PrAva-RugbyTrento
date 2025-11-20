@@ -2,8 +2,8 @@
 #include <algorithm>
 
 // Costruttore
-Squadra::Squadra(const std::string& nome_, const std::string& indirizzo_)
-    : nome(nome_), indirizzo(indirizzo_), punteggioClassifica(0) {}
+Squadra::Squadra(int id_, const std::string& nome_, const std::string& indirizzo_)
+    : id(id_), nome(nome_), indirizzo(indirizzo_), punteggioClassifica(0) {}
 
 // Getter
 std::string Squadra::getNome() const {
