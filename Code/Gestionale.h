@@ -55,12 +55,17 @@ class Gestionale {
 		std::unique_ptr<Squadra> aggiungiSquadra();
 	    void fetchSquadre(Stagione& stagione);
    		void salvaSquadre(const Stagione& stagione) const;
-
+   		int getMaxSquadraId() const;
+   		
+   		//GIOCATORI
     	void fetchGiocatori(Squadra& squadra);
     	void salvaGiocatori(const Squadra& squadra)const;
-
+    	
+    	//PARTITE
     	void fetchPartite(Stagione& stagione);
     	void salvaPartite(const Stagione& stagione)const;
+    	
+    	
 		
 };
 

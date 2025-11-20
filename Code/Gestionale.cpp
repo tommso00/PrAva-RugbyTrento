@@ -88,7 +88,7 @@ int Gestionale::recuperaStagione(const std::string& filename, int stagione) {
 // ====== MODIFICA STAGIONE ======
 
 void Gestionale::modificaStagione(Stagione& stagione) {
-	int lastSquadraId = 0;  
+	int lastSquadraId = getMaxSquadraId();  
 	for (const auto& s : stagione.getSquadre()) {
 	    if (s->getId() > lastSquadraId) lastSquadraId = s->getId();
 	}
@@ -163,13 +163,14 @@ void Gestionale::modificaStagione(Stagione& stagione) {
 // === AGGIUNGI SQUADRA ===
 
 std::unique_ptr<Squadra> Gestionale::aggiungiSquadra() {
+	int newId = getMaxSquadraId() + 1;
     string nome, indirizzo;
     cout << "Nome squadra: ";
     cin >> nome;
     cout << "Indirizzo squadra: ";
     cin >> indirizzo;
 
-    std::unique_ptr<Squadra> s1(new Squadra(1, nome, indirizzo));//FIX THIS
+    std::unique_ptr<Squadra> s1(new Squadra(newId, nome, indirizzo));//FIX THIS
     return s1;
 }
 
@@ -545,4 +546,28 @@ void Gestionale::salvaPartite(const Stagione& stagione) const {
              << p.getPuntiLocali() << "," << p.getPuntiOspiti() << "\n";
     file.close();*/
 }
+
+// METODO AUSILIARIO
+
+int Gestionale::getMaxSquadraId() const {
+    std::ifstream file("database/squadre.csv");
+    if (!file.is_open()) return 0;
+
+    std::string line;
+    bool primaRiga = true;
+    int maxId = 0;
+    while (std::getline(file, line)) {
+        if (primaRiga) { primaRiga = false; continue; }
+        if (line.empty()) continue;
+
+        std::vector<std::string> tokens = splitCSVLine(line);
+        if (tokens.size() >= 4) {
+            int id = std::stoi(tokens[0]);
+            if (id > maxId) maxId = id;
+        }
+    }
+    file.close();
+    return maxId;
+}
+
 

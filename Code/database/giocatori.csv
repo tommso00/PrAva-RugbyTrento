@@ -1,7 +1,10 @@
 giocatore_id,squadra_id,nome,cognome,eta,ruolo
-1,1,GAA,aaa,28,Mediano
-2,1,BAB,aaa,28,Mediano
-1,2,GBA,bbb,28,Mediano
-2,2,GBB,bbb,28,Mediano
-1,3,GCA,ccc,28,Mediano
-2,3,GCB,ccc,28,Mediano
+1,1,BBB,bbb,28,Mediano
+2,1,CCC,ccc,28,Mediano
+1,2,EEE,eee,28,Mediano
+1,3,MMM,mmm,28,Mediano
+2,3,LLL,lll,28,Mediano
+1,4,GaSa,aaa,28,Mediano
+2,4,GbSa,aaa,28,Mediano
+1,5,GaSb,bbb,28,Mediano
+2,5,GbSb,bbb,28,Mediano
