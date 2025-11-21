@@ -47,20 +47,25 @@ class Gestionale {
 		void modificaStagione(Stagione& stagione);
 		int recuperaStagione(const std::string& filename, int stagione);
 		
-		//metodi CSV I/O
-		void fetchStagioni(const std::string& filename); //legge stagioni e relative squadre/partite dal CSV :)
-		void salvaStagioni(const Stagione& nuovaStagione) ; //sovrascrive i CSV con i dati correnti in memoria
+		//STAGIONI
+		void fetchStagioni(const std::string& filename);
+		void salvaStagioni(const Stagione& nuovaStagione) ;
 
 		//SQUADRE
 		std::unique_ptr<Squadra> aggiungiSquadra();
 	    void fetchSquadre(Stagione& stagione);
    		void salvaSquadre(const Stagione& stagione) const;
-
+   		int getMaxSquadraId() const;
+   		
+   		//GIOCATORI
     	void fetchGiocatori(Squadra& squadra);
     	void salvaGiocatori(const Squadra& squadra)const;
-
+    	
+    	//PARTITE
     	void fetchPartite(Stagione& stagione);
     	void salvaPartite(const Stagione& stagione)const;
+    	void aggiungiPartita(Stagione& stagione);
+    	
 		
 };
 
