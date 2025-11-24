@@ -160,6 +160,7 @@ void Gestionale::modificaStagione(Stagione& stagione) {
 	for (const auto& squadra : stagione.getSquadre()) {
 	    salvaGiocatori(*squadra);
 	}
+	salvaPartite(stagione);
     
 }
 
@@ -201,6 +202,7 @@ void Gestionale::selezionaStagione() {
     for (auto& squadraPtr : tempStagione.getSquadre()) {
         fetchGiocatori(*squadraPtr);
     }
+    fetchPartite(tempStagione);
     modificaStagione(tempStagione);
 }
 
@@ -512,43 +514,112 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) const {
 
 // ==================== FETCH / SAVE PARTITE ====================
 void Gestionale::fetchPartite(Stagione& stagione) {
-    /*ifstream file(pathPartite);
-    string line;
-    while (getline(file, line)) {
-        vector<string> t = splitCSVLine(line);
-        if (t.size() < 6) continue;
-
-        int id = atoi(t[0].c_str());
-        int data = atoi(t[1].c_str());
-        int idLocali = atoi(t[2].c_str());
-        int idOspiti = atoi(t[3].c_str());
-        int ptLocali = atoi(t[4].c_str());
-        int ptOspiti = atoi(t[5].c_str());
-
-        // Trova squadre dalla stagione
-        Squadra* locali = nullptr;
-        Squadra* ospiti = nullptr;
-        for (const auto& sPtr : stagione.getSquadre()) {
-            if (sPtr->getId() == idLocali) locali = sPtr.get();
-            if (sPtr->getId() == idOspiti) ospiti = sPtr.get();
-        }
-        if (!locali || !ospiti) continue;
-
-        Partita p(id, data, *locali, *ospiti);
-        p.setRisultato(ptLocali, ptOspiti);
-        stagione.addPartita(p);
+    std::ifstream file("database/partite.csv");
+    if (!file.is_open()) {
+        std::cerr << "Impossibile aprire partite.csv" << std::endl;
+        return;
     }
-    file.close();*/
+
+    std::string line;
+    bool primaRiga = true;
+    int stagioneAnno = stagione.getAnno();
+
+    // Accedi alle squadre esistenti della stagione per trovare i riferimenti giusti
+    const auto& squadre = stagione.getSquadre();
+
+    while (getline(file, line)) {
+        if (primaRiga) { primaRiga = false; continue; }
+        if (line.empty()) continue;
+
+        auto tokens = splitCSVLine(line);
+        if (tokens.size() >= 7) {
+            int id = std::stoi(tokens[0]);
+            int anno = std::stoi(tokens[1]);
+            int data = std::stoi(tokens[2]);
+            int idLocali = std::stoi(tokens[3]);
+            int idOspiti = std::stoi(tokens[4]);
+            int ptLocali = std::stoi(tokens[5]);
+            int ptOspiti = std::stoi(tokens[6]);
+
+            if (anno == stagioneAnno) {
+                Squadra* locali = nullptr;
+                Squadra* ospiti = nullptr;
+                for (const auto& sqPtr : squadre) {
+                    if (sqPtr->getId() == idLocali) locali = sqPtr.get();
+                    if (sqPtr->getId() == idOspiti) ospiti = sqPtr.get();
+                }
+                if (locali && ospiti) {
+                    Partita p(id, data, *locali, *ospiti);
+                    p.setRisultato(ptLocali, ptOspiti);
+                    stagione.addPartita(p);
+                }
+            }
+        }
+    }
+    file.close();
 }
+
 
 void Gestionale::salvaPartite(const Stagione& stagione) const {
-    /*ofstream file(pathPartite);
-    for (const auto& p : stagione.getCalendario())
-        file << p.getId() << "," << p.getData() << ","
-             << p.getLocali().getId() << "," << p.getOspiti().getId() << ","
-             << p.getPuntiLocali() << "," << p.getPuntiOspiti() << "\n";
-    file.close();*/
+    // 1. Carica tutte le partite esistenti
+    std::vector<std::tuple<int, int, int, int, int, int, int>> partiteEsistenti;
+    std::ifstream lettura("database/partite.csv");
+    std::string line;
+    bool primaRiga = true;
+    while (std::getline(lettura, line)) {
+        if (primaRiga) { primaRiga = false; continue; }
+        if (!line.empty()) {
+            auto tokens = splitCSVLine(line);
+            if (tokens.size() >= 7) {
+                int id = std::stoi(tokens[0]);
+                int anno = std::stoi(tokens[1]);
+                int data = std::stoi(tokens[2]);
+                int idLocali = std::stoi(tokens[3]);
+                int idOspiti = std::stoi(tokens[4]);
+                int ptLocali = std::stoi(tokens[5]);
+                int ptOspiti = std::stoi(tokens[6]);
+                partiteEsistenti.emplace_back(id, anno, data, idLocali, idOspiti, ptLocali, ptOspiti);
+            }
+        }
+    }
+    lettura.close();
+
+    // 2. Aggiungi tutte le partite della stagione, solo se non già presenti (controllo su id e anno)
+    for (const auto& p : stagione.getCalendario()) {
+        int id = p.getId();
+        int anno = stagione.getAnno();
+        int data = p.getData();
+        int idLocali = p.getLocali().getId();
+        int idOspiti = p.getOspiti().getId();
+        int ptLocali = p.getPuntiLocali();
+        int ptOspiti = p.getPuntiOspiti();
+
+        bool presente = false;
+        for (const auto& pe : partiteEsistenti) {
+            if (std::get<0>(pe) == id && std::get<1>(pe) == anno) {
+                presente = true;
+                break;
+            }
+        }
+        if (!presente) {
+            partiteEsistenti.emplace_back(id, anno, data, idLocali, idOspiti, ptLocali, ptOspiti);
+        }
+    }
+
+    // 3. Riscrivi tutto il file
+    std::ofstream scrittura("database/partite.csv");
+    if (!scrittura.is_open()) {
+        throw std::runtime_error("Errore apertura file: database/partite.csv");
+    }
+    scrittura << "partita_id,stagione_anno,data,id_locali,id_ospiti,pt_locali,pt_ospiti\n";
+    for (const auto& p : partiteEsistenti) {
+        scrittura << std::get<0>(p) << "," << std::get<1>(p) << "," << std::get<2>(p) << ","
+                  << std::get<3>(p) << "," << std::get<4>(p) << "," << std::get<5>(p) << ","
+                  << std::get<6>(p) << "\n";
+    }
+    scrittura.close();
 }
+
 
 // === AGGIUNGI PARTITA ===
 void Gestionale::aggiungiPartita(Stagione& stagione) {
