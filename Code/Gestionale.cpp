@@ -41,6 +41,7 @@ void Gestionale::creaStagione() {
     cout << "Inserisci anno stagione: ";
     cin >> anno;
 
+//dovrebbe essere inutile sto if in quanto trovaStagione controlla stagioni caricate in RAM, non nel csv
     if (trovaStagione(anno) != NULL) {
         cout << "Stagione " << anno << " già esistente.\n";
         return;
@@ -54,7 +55,8 @@ void Gestionale::creaStagione() {
     
 }
 
-// ==== CARICA STAGIONE ===
+// ==== RECUPERA STAGIONE ===
+//abbiamo un indicizzazione per riga fragile
 int Gestionale::recuperaStagione(const std::string& filename, int stagione) {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -122,6 +124,7 @@ void Gestionale::modificaStagione(Stagione& stagione) {
 		            	cin>>nome;
 		            	cout<<"Cognome: ";
 		            	cin>>cognome;
+		            	//aggiustare per aggiungere eta e ruolo da cin >>
 		            	Giocatore g1(nome, cognome, 28, "Mediano", ++lastGiocatoreId);
 		            	squadraPtr->addGiocatore(g1);
 			            cout<< "Vuoi Aggiungere Giocatori? 0=si / 1=no"<<endl;
