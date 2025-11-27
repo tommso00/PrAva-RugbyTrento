@@ -5,34 +5,33 @@
 Squadra::Squadra(int id_, const std::string& nome_, const std::string& indirizzo_)
     : id(id_), nome(nome_), indirizzo(indirizzo_), punteggioClassifica(0) {}
 
-// Getter
+// Getter/Setter info principali
 std::string Squadra::getNome() const {
     return nome;
+}
+
+void Squadra::setNome(const std::string& n) {
+    nome = n;
 }
 
 std::string Squadra::getIndirizzo() const {
     return indirizzo;
 }
 
-int Squadra::getId() const {
-    return id;
-}
-
-int Squadra::getPunteggio() const {
-    return punteggioClassifica;
-}
-
-// Setter
-void Squadra::setNome(const std::string& n) {
-    nome = n;
-}
-
 void Squadra::setIndirizzo(const std::string& i) {
     indirizzo = i;
 }
 
+int Squadra::getId() const {
+    return id;
+}
+
 void Squadra::setId(int i) {
     id = i;
+}
+
+int Squadra::getPunteggio() const {
+    return punteggioClassifica;
 }
 
 void Squadra::setPunteggio(int p) {
