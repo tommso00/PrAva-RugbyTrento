@@ -2,6 +2,7 @@
 #define GIOCATORE_H
 
 #include "Persona.h"
+#include "StatsGiocatore.h"
 #include <iostream>
 
 // Evitare "using namespace std;" in header
@@ -10,7 +11,7 @@ private:
     std::string ruolo;
     int id;
 	
-	
+/*	
 	//STATS GIOCATORE
 	int placcaggiRiusciti;
 	int placcaggiMancati;
@@ -28,6 +29,9 @@ private:
 	int calciPiazzatiSegnatiPartita;
 	int calciPiazzatiSegnatiStagione;
 
+	int calciPiazzatiTentatiPartita;
+	int calciPiazzatiTentatiStagione;
+
 	int falliCommessiPartita;
 	int falliCommessiStagione;
 
@@ -36,12 +40,16 @@ private:
 
 	int minutiGiocati;
 	int partiteGiocate;
+*/
 
 	
 public:
     Giocatore(const std::string& nome, const std::string& cognome, int eta, const std::string& ruolo, int id);
 
-    // Distruttore di default sufficiente
+//aggiunto da ciaka
+	StatsGiocatore statsPartita;
+	StatsGiocatore statsStagione;
+
     ~Giocatore() = default;
 
     std::string getRuolo() const;
@@ -81,14 +89,18 @@ public:
     void setTurnoverStagione(int v);
 
     // Calci piazzati
-    int getCalciPiazzatiSegnatiPartita() const;
-    void setCalciPiazzatiSegnatiPartita(int v);
+    int getCalciPiazzatiSegnatiPartita()const;
+    void setCalciPiazzatiSegnatiPartita(int c);
 
     int getCalciPiazzatiSegnatiStagione() const;
-    void setCalciPiazzatiSegnatiStagione(int v);
+    void setCalciPiazzatiSegnatiStagione(int c);
 
-	int calciPiazzatiTentatiPartita;
-	int calciPiazzatiTentatiStagione;
+	int getCalciPiazzatiTentatiPartita()const;
+	void setCalciPiazzatiTentatiPartita(int c);
+
+	void setCalciPiazzatiTentatiStagione(int c);
+	int getCalciPiazzatiTentatiStagione() const;
+
 
     // Falli
     int getFalliCommessiPartita() const;
@@ -98,8 +110,10 @@ public:
     void setFalliCommessiStagione(int v);
 
     // Altro
-    int getOffload() const;
-    void setOffload(int v);
+    int getOffloadPartita() const;
+	int getOffloadStagione() const;
+    void setOffloadPartita(int v);
+	void setOffloadStagione(int v);
 
     double getEfficaciaRuck() const;
     void setEfficaciaRuck(double v);
@@ -113,6 +127,8 @@ public:
 	//metodo percentuale calcipiazzati
     double getPercentualeCalciPiazzatiStagione() const; 
 	double getPercentualeCalciPiazzatiPartita() const; 
+
+	
 	
     friend std::ostream& operator<<(std::ostream& os, const Giocatore& g);
 };

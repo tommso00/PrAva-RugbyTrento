@@ -1,5 +1,5 @@
 #include "Giocatore.h"
-
+#include "StatsGiocatore.h"
 // Costruttore
 Giocatore::Giocatore(const std::string& nome, 
 					 const std::string& cognome,
@@ -26,6 +26,9 @@ Giocatore::Giocatore(const std::string& nome,
 
 	int calciPiazzatiSegnatiPartita=0;
 	int calciPiazzatiSegnatiStagione=0;
+	
+	int calciPiazzatiTentatiPartita=0;
+	int calciPiazzatiTentatiStagione=0;
 
 	int falliCommessiPartita=0;
 	int falliCommessiStagione=0;
@@ -75,63 +78,79 @@ void Giocatore::setId(int nuovoId) {
 }
 
 //Statistiche - Getter e Setter
-int Giocatore::getPlaccaggiRiusciti() const { return placcaggiRiusciti; }
-void Giocatore::setPlaccaggiRiusciti(int v) { placcaggiRiusciti = v; }
+int Giocatore::getPlaccaggiRiusciti() const { return statsPartita.placcaggiRiusciti; }
+void Giocatore::setPlaccaggiRiusciti(int v) { statsPartita.placcaggiRiusciti = v; }
 
-int Giocatore::getPlaccaggiMancati() const { return placcaggiMancati; }
-void Giocatore::setPlaccaggiMancati(int v) { placcaggiMancati = v; }
+int Giocatore::getPlaccaggiMancati() const { return statsPartita.placcaggiMancati; }
+void Giocatore::setPlaccaggiMancati(int v) { statsPartita.placcaggiMancati = v; }
 
-int Giocatore::getMetriCorsi() const { return metriCorsi; }
-void Giocatore::setMetriCorsi(int v) { metriCorsi = v; }
+int Giocatore::getMetriCorsi() const { return statsPartita.metriCorsi; }
+void Giocatore::setMetriCorsi(int v) { statsPartita.metriCorsi = v; }
 
-int Giocatore::getLineBreaks() const { return lineBreaks; }
-void Giocatore::setLineBreaks(int v) { lineBreaks = v; }
+int Giocatore::getLineBreaks() const { return statsPartita.lineBreaks; }
+void Giocatore::setLineBreaks(int v) { statsPartita.lineBreaks = v; }
 
-int Giocatore::getDifensoriBattuti() const { return difensoriBattuti; }
-void Giocatore::setDifensoriBattuti(int v) { difensoriBattuti = v; }
+int Giocatore::getDifensoriBattuti() const { return statsPartita.difensoriBattuti; }
+void Giocatore::setDifensoriBattuti(int v) { statsPartita.difensoriBattuti = v; }
 
-int Giocatore::getMetePartita() const { return metePartita; }
-void Giocatore::setMetePartita(int v) { metePartita = v; }
+int Giocatore::getMetePartita() const { return statsPartita.mete; }
+void Giocatore::setMetePartita(int v) { statsPartita.mete = v; }
 
-int Giocatore::getMeteStagione() const { return meteStagione; }
-void Giocatore::setMeteStagione(int v) { meteStagione = v; }
+int Giocatore::getMeteStagione() const { return statsStagione.mete; }
+void Giocatore::setMeteStagione(int v) { statsStagione.mete = v; }
 
-int Giocatore::getTurnoverStagione() const { return turnoverStagione; }
-void Giocatore::setTurnoverStagione(int v) { turnoverStagione = v; }
+int Giocatore::getTurnoverStagione() const { return statsStagione.turnover; }
+void Giocatore::setTurnoverStagione(int v) { statsStagione.turnover = v; }
 
-int Giocatore::getTurnoverPartita() const { return turnoverPartita; }
-void Giocatore::setTurnoverPartita(int v) { turnoverPartita = v; }
+int Giocatore::getTurnoverPartita() const { return statsPartita.turnover; }
+void Giocatore::setTurnoverPartita(int v) { statsPartita.turnover = v; }
 
-int Giocatore::getFalliCommessiPartita() const { return falliCommessiPartita; }
-void Giocatore::setFalliCommessiPartita(int v) { falliCommessiPartita = v; }
+int Giocatore::getFalliCommessiPartita() const { return statsPartita.falliCommessi; }
+void Giocatore::setFalliCommessiPartita(int v) { statsPartita.falliCommessi = v; }
 
-int Giocatore::getFalliCommessiStagione() const { return falliCommessiStagione; }
-void Giocatore::setFalliCommessiStagione(int v) { falliCommessiStagione = v; }
+int Giocatore::getFalliCommessiStagione() const { return statsStagione.falliCommessi; }
+void Giocatore::setFalliCommessiStagione(int v) { statsStagione.falliCommessi = v; }
 
-int Giocatore::getOffload() const { return offload; }
-void Giocatore::setOffload(int v) { offload = v; }
+int Giocatore::getCalciPiazzatiTentatiPartita() const{return statsPartita.calciPiazzatiTentati; }
+void Giocatore::setCalciPiazzatiTentatiPartita(int c){ statsPartita.calciPiazzatiTentati = c; }
 
-double Giocatore::getEfficaciaRuck() const { return efficaciaRuck; }
-void Giocatore::setEfficaciaRuck(double v) { efficaciaRuck = v; }
+int Giocatore::getCalciPiazzatiTentatiStagione()const{return statsStagione.calciPiazzatiSegnati;}
+void Giocatore::setCalciPiazzatiTentatiStagione(int c){ statsStagione.calciPiazzatiTentati= c; }
 
-int Giocatore::getMinutiGiocati() const { return minutiGiocati; }
-void Giocatore::setMinutiGiocati(int v) { minutiGiocati = v; }
+int Giocatore::getCalciPiazzatiSegnatiPartita() const{return statsPartita.calciPiazzatiSegnati; }
+void Giocatore::setCalciPiazzatiSegnatiPartita(int c) {statsPartita.calciPiazzatiSegnati = c; }
 
-int Giocatore::getPartiteGiocate() const { return partiteGiocate; }
-void Giocatore::setPartiteGiocate(int v) { partiteGiocate = v; }
+int Giocatore::getCalciPiazzatiSegnatiStagione() const{return statsStagione.calciPiazzatiSegnati; }
+void Giocatore::setCalciPiazzatiSegnatiStagione(int c) {statsStagione.calciPiazzatiSegnati = c; }
+
+
+int Giocatore::getOffloadPartita() const { return statsPartita.offload; }
+int Giocatore::getOffloadStagione() const { return statsStagione.offload; }
+
+void Giocatore::setOffloadPartita(int v) { statsPartita.offload = v; }
+void Giocatore::setOffloadStagione(int v) { statsStagione.offload = v; }
+
+double Giocatore::getEfficaciaRuck() const { return statsPartita.efficaciaRuck; }
+void Giocatore::setEfficaciaRuck(double v) { statsPartita.efficaciaRuck = v; }
+
+int Giocatore::getMinutiGiocati() const { return statsPartita.minutiGiocati; }
+void Giocatore::setMinutiGiocati(int v) { statsPartita.minutiGiocati = v; }
+
+int Giocatore::getPartiteGiocate() const { return statsPartita.partiteGiocate; }
+void Giocatore::setPartiteGiocate(int v) { statsPartita.partiteGiocate = v; }
 
 double Giocatore::getPercentualeCalciPiazzatiPartita() const {
-    if (calciPiazzatiTentatiPartita == 0)
+    if (statsPartita.calciPiazzatiTentati == 0)
         return 0.0;
 
-    return (100.0 * calciPiazzatiSegnatiPartita) / calciPiazzatiTentatiPartita;
+    return (100.0 * statsPartita.calciPiazzatiSegnati) / statsPartita.calciPiazzatiTentati;
 }
 
 double Giocatore::getPercentualeCalciPiazzatiStagione() const {
-    if (calciPiazzatiTentatiStagione == 0)
+    if (statsStagione.calciPiazzatiTentati == 0)
         return 0.0;
 
-    return (100.0 * calciPiazzatiSegnatiStagione) / calciPiazzatiTentatiStagione;
+    return (100.0 * statsStagione.calciPiazzatiSegnati) / statsStagione.calciPiazzatiTentati;
 }
 
 

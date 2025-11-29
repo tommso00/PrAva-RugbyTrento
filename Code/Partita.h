@@ -2,7 +2,12 @@
 #define PARTITA_H
 
 #include "Squadra.h"
+#include "StatsSquadra.h"
+#include <string>
 #include <iostream>
+
+
+
 
 // Non usare "using namespace std;" nei file header
 class Partita {
@@ -11,6 +16,10 @@ private:
     Squadra locali;
     Squadra ospiti;
     int ptLocali, ptOspiti;
+    
+    StatsSquadra statsLocali;
+    StatsSquadra statsOspiti;	
+	
 
 public:
     Partita(int id, int data, const Squadra& locali, const Squadra& ospiti);
@@ -21,13 +30,26 @@ public:
 	// GETTER aggiunti
     int getId() const;
     int getData() const;
+    
     const Squadra& getLocali() const;
     const Squadra& getOspiti() const;
-    int getPuntiLocali() const;
+    
+	int getPuntiLocali() const;
     int getPuntiOspiti() const;
     int getPunteggioPartita() const; 
 
     void setRisultato(int ptLocali, int ptOspiti);
+	
+	//Statistiche - Getter e Setter
+	const StatsSquadra& getStatsLocali() const;
+    const StatsSquadra& getStatsOspiti() const;
+    
+ 
+    
+    void calcolaStatsDaGiocatori();
+
+
+
 
     // Serve lo scope std:: per ostream, non "using namespace std;"
     friend std::ostream& operator<<(std::ostream& os, const Partita& p);

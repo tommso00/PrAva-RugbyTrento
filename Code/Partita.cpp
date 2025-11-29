@@ -1,15 +1,13 @@
 #include "Partita.h"
 
-// Costruttore: crea la partita con id, data e squadre locali e ospiti
+// Costruttore
 Partita::Partita(int id_, int data_, const Squadra& locali_, const Squadra& ospiti_) 
     : id(id_), data(data_), locali(locali_), ospiti(ospiti_), ptLocali(0), ptOspiti(0) {}
 
-// Restituisce il punteggio totale (ad esempio la somma dei punti segnati)
 int Partita::getPunteggioPartita() const {
-    return ptLocali + ptOspiti;
+    return ptLocali + ptOspiti;	//dovremmo farlo ritornare una stringa??? ptlocali << ":" << ptospiti?
 }
 
-// Imposta il risultato della partita (punti locali e ospiti)
 void Partita::setRisultato(int ptLocali_, int ptOspiti_) {
     ptLocali = ptLocali_;
     ptOspiti = ptOspiti_;
@@ -38,6 +36,55 @@ const Squadra& Partita::getLocali() const {
 int Partita::getId() const {
     return id;
 }
+
+//GETTER STATS
+const StatsSquadra& Partita::getStatsLocali() const { return statsLocali; }
+const StatsSquadra& Partita::getStatsOspiti() const { return statsOspiti; }
+
+//calcolo automarico statistiche
+void Partita::calcolaStatsDaGiocatori(){
+	statsLocali = StatsSquadra();
+
+	for(const auto& g : locali.getGiocatori()){
+		
+		statsLocali.placcaggiTotali += g.getPlaccaggiRiusciti();
+		statsLocali.placcaggiTotali += g.getPlaccaggiMancati();
+		
+		statsLocali.metriGuadagnatiTotali += g.getMetriCorsi();
+		
+		statsLocali.turnoverVinti += g.getTurnoverPartita();
+
+        statsLocali.calciPiazzatiSegnati += g.getCalciPiazzatiSegnatiPartita();
+		statsLocali.calciPiazzatiTentati += g.getCalciPiazzatiTentatiPartita();
+        
+        statsLocali.meteSegnate += g.getMetePartita();
+
+        statsLocali.falliCommessi += g.getFalliCommessiPartita();
+					
+	}
+	
+	statsOspiti = StatsSquadra();
+	for (const Giocatore& g : ospiti.getGiocatori()) {
+
+        statsOspiti.placcaggiTotali += g.getPlaccaggiRiusciti();
+        statsOspiti.placcaggiTotali += g.getPlaccaggiMancati();
+
+        statsOspiti.metriGuadagnatiTotali += g.getMetriCorsi();
+
+        statsOspiti.turnoverVinti += g.getTurnoverPartita();
+
+        statsOspiti.calciPiazzatiSegnati += g.getCalciPiazzatiSegnatiPartita();
+
+        statsOspiti.meteSegnate += g.getMetePartita();
+
+        statsOspiti.falliCommessi += g.getFalliCommessiPartita();
+    }
+	
+	
+
+}
+
+
 
 // Operatore di stampa per mostrare informazioni della partita
 std::ostream& operator<<(std::ostream& os, const Partita& p) {
