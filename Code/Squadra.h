@@ -15,6 +15,38 @@ private:
     int id;
     int punteggioClassifica;
     std::vector<Giocatore> giocatori;
+    
+/*
+	int possessoPalla;               // percentuale 0-100
+    double territorio;            // percentuale 0-100
+
+    int placcaggiTotali;
+    int metriGuadagnatiTotali;
+
+    int turnoverVinti;
+
+    int mischieVinte;
+    int mischiePerse;
+
+    int toucheVinte;
+    int touchePerse;
+
+    int calciPiazzatiSegnati;
+    int calciPiazzatiTentati;
+
+    int meteSegnate;
+    int falliCommessi;
+
+    // Percentuale calci piazzati
+    double getPercentualeCalciPiazzati() const {
+        if (calciPiazzatiTentati == 0)
+            return 0.0;
+        return 100.0 * calciPiazzatiSegnati / calciPiazzatiTentati;
+    }
+
+*/    
+    
+    
 
 public:
     Squadra(int id_, const std::string& nome, const std::string& indirizzo);
