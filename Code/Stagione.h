@@ -7,6 +7,9 @@
 #include "Squadra.h"
 #include "Partita.h"
 
+//CIAKA IMPLEMENTA LA CLASSIFICA, ATTENTO ALLE CLASSI SQUADRA/PARTITA/STAGIONE
+
+
 // La classe Stagione possiede le squadre tramite unique_ptr, evitando memory leak.
 // Le partite sono snapshot e vengono memorizzate per valore.
 class Stagione {
@@ -40,6 +43,9 @@ public:
 	const std::vector<Partita>& getPartite() const;
 
 	int getAnno() const;
+
+
+
 	
     // Inserisce una partita per valore (snapshot).
     void addPartita(const Partita& p);

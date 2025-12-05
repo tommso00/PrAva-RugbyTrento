@@ -2,7 +2,9 @@
 
 // Costruttore
 Partita::Partita(int id_, int data_, const Squadra& locali_, const Squadra& ospiti_) 
-    : id(id_), data(data_), locali(locali_), ospiti(ospiti_), ptLocali(0), ptOspiti(0) {}
+    : id(id_), data(data_), locali(locali_), ospiti(ospiti_), ptLocali(0), ptOspiti(0),cartellinoRossoLoc(0), cartellinoRossoOsp(0),
+      cartellinoGialloLoc(0), cartellinoGialloOsp(0),
+      possessoLoc(0.0), possessoOsp(0.0)  {}
 
 int Partita::getPunteggioPartita() const {
     return ptLocali + ptOspiti;	//dovremmo farlo ritornare una stringa??? ptlocali << ":" << ptospiti?
@@ -21,6 +23,61 @@ int Partita::getPuntiLocali() const {
     return ptLocali;
 }
 
+int Partita::getCartellinoRossoLoc() const {
+    return cartellinoRossoLoc;
+}
+void Partita::setCartellinoRossoLoc(int value) {
+    cartellinoRossoLoc = value;
+}
+
+int Partita::getCartellinoRossoOsp() const {
+    return cartellinoRossoOsp;
+}
+
+void Partita::setCartellinoRossoOsp(int value) {
+    cartellinoRossoOsp = value;
+}
+
+int Partita::getCartellinoGialloLoc() const {
+    return cartellinoGialloLoc;
+}
+
+void Partita::setCartellinoGialloLoc(int value) {
+    cartellinoGialloLoc = value;
+}
+
+int Partita::getCartellinoGialloOsp() const {
+    return cartellinoGialloOsp;
+}
+
+void Partita::setCartellinoGialloOsp(int value) {
+    cartellinoGialloOsp = value;
+}
+
+double Partita::getPossessoLoc() const {
+    return possessoLoc;
+}
+
+void Partita::setPossessoLoc(double value) {
+    possessoLoc = value;
+}
+
+double Partita::getPossessoOsp() const {
+    return possessoOsp;
+}
+
+void Partita::setPossessoOsp(double value) {
+    possessoOsp = value;
+}
+
+void Partita::setPuntiLocali(int value) {
+    ptLocali = value;
+}
+
+void Partita::setPuntiOspiti(int value) {
+    ptOspiti = value;
+}
+
 const Squadra& Partita::getOspiti() const {
     return ospiti;
 }
@@ -36,54 +93,6 @@ const Squadra& Partita::getLocali() const {
 int Partita::getId() const {
     return id;
 }
-
-//GETTER STATS
-const StatsSquadra& Partita::getStatsLocali() const { return statsLocali; }
-const StatsSquadra& Partita::getStatsOspiti() const { return statsOspiti; }
-
-//calcolo automarico statistiche
-void Partita::calcolaStatsDaGiocatori(){
-	statsLocali = StatsSquadra();
-
-	for(const auto& g : locali.getGiocatori()){
-		
-		statsLocali.placcaggiTotali += g.getPlaccaggiRiusciti();
-		statsLocali.placcaggiTotali += g.getPlaccaggiMancati();
-		
-		statsLocali.metriGuadagnatiTotali += g.getMetriCorsi();
-		
-		statsLocali.turnoverVinti += g.getTurnoverPartita();
-
-        statsLocali.calciPiazzatiSegnati += g.getCalciPiazzatiSegnatiPartita();
-		statsLocali.calciPiazzatiTentati += g.getCalciPiazzatiTentatiPartita();
-        
-        statsLocali.meteSegnate += g.getMetePartita();
-
-        statsLocali.falliCommessi += g.getFalliCommessiPartita();
-					
-	}
-	
-	statsOspiti = StatsSquadra();
-	for (const Giocatore& g : ospiti.getGiocatori()) {
-
-        statsOspiti.placcaggiTotali += g.getPlaccaggiRiusciti();
-        statsOspiti.placcaggiTotali += g.getPlaccaggiMancati();
-
-        statsOspiti.metriGuadagnatiTotali += g.getMetriCorsi();
-
-        statsOspiti.turnoverVinti += g.getTurnoverPartita();
-
-        statsOspiti.calciPiazzatiSegnati += g.getCalciPiazzatiSegnatiPartita();
-
-        statsOspiti.meteSegnate += g.getMetePartita();
-
-        statsOspiti.falliCommessi += g.getFalliCommessiPartita();
-    }
-	
-	
-
-}
-
 
 
 // Operatore di stampa per mostrare informazioni della partita

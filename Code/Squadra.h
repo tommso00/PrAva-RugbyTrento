@@ -16,36 +16,22 @@ private:
     int punteggioClassifica;
     std::vector<Giocatore> giocatori;
     
-/*
+
 	int possessoPalla;               // percentuale 0-100
     double territorio;            // percentuale 0-100
 
+//somma delle stats dei singoli per squadra
     int placcaggiTotali;
-    int metriGuadagnatiTotali;
+    int metriGuadagnatiTotali;	//metriCorsiTot
+	int meteTotali;
+    int falliTotali;
 
-    int turnoverVinti;
-
+//set e get imprtanti 
     int mischieVinte;
     int mischiePerse;
 
     int toucheVinte;
-    int touchePerse;
-
-    int calciPiazzatiSegnati;
-    int calciPiazzatiTentati;
-
-    int meteSegnate;
-    int falliCommessi;
-
-    // Percentuale calci piazzati
-    double getPercentualeCalciPiazzati() const {
-        if (calciPiazzatiTentati == 0)
-            return 0.0;
-        return 100.0 * calciPiazzatiSegnati / calciPiazzatiTentati;
-    }
-
-*/    
-    
+    int touchePerse;    
     
 
 public:
@@ -67,6 +53,41 @@ public:
 
     void addGiocatore(const Giocatore& g);
     void removeGiocatore(int id);
+    
+    // Statistiche generali di squadra
+	int getPossessoPalla() const;
+	void setPossessoPalla(int value);
+
+	double getTerritorio() const;
+	void setTerritorio(double value);
+
+	int getPlaccaggiTotali() const;
+	void setPlaccaggiTotali(int value);
+
+	int getMetriGuadagnatiTotali() const;
+	void setMetriGuadagnatiTotali(int value);
+
+	int getMeteTotali() const;
+	void setMeteTotali(int value);
+
+	int getFalliTotali() const;
+	void setFalliTotali(int value);
+
+	// Mischie e touche
+	int getMischieVinte() const;
+	void setMischieVinte(int value);
+
+	int getMischiePerse() const;
+	void setMischiePerse(int value);
+
+	int getToucheVinte() const;
+	void setToucheVinte(int value);
+
+	int getTouchePerse() const;
+	void setTouchePerse(int value);
+
+	void aggiornaStatistiche();
+
 
     friend std::ostream& operator<<(std::ostream& os, const Squadra& s);
 };

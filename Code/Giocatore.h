@@ -2,7 +2,6 @@
 #define GIOCATORE_H
 
 #include "Persona.h"
-#include "StatsGiocatore.h"
 #include <iostream>
 
 // Evitare "using namespace std;" in header
@@ -11,44 +10,22 @@ private:
     std::string ruolo;
     int id;
 	
-/*	
-	//STATS GIOCATORE
-	int placcaggiRiusciti;
-	int placcaggiMancati;
-	
+	//STATS GIOCATORE ANNULAI (da considerarsi
+	int placcaggi;
 	int metriCorsi;
-	int lineBreaks;
-	int difensoriBattuti;
+	int mete;
+	int calciPiazzati;
 
-	int metePartita;
-	int meteStagione;
-
-	int turnoverPartita;
-	int turnoverStagione;
-
-	int calciPiazzatiSegnatiPartita;
-	int calciPiazzatiSegnatiStagione;
-
-	int calciPiazzatiTentatiPartita;
-	int calciPiazzatiTentatiStagione;
-
-	int falliCommessiPartita;
-	int falliCommessiStagione;
-
+	int falliCommessi;
 	int offload;
-	double efficaciaRuck;
 
 	int minutiGiocati;
-	int partiteGiocate;
-*/
+	int partiteGiocate;	
 
 	
 public:
     Giocatore(const std::string& nome, const std::string& cognome, int eta, const std::string& ruolo, int id);
 
-//aggiunto da ciaka
-	StatsGiocatore statsPartita;
-	StatsGiocatore statsStagione;
 
     ~Giocatore() = default;
 
@@ -56,80 +33,35 @@ public:
     void setRuolo(const std::string& nuovoRuolo);
     int getId() const;
     void setId(int nuovoId);
-    
-    //get/set x stats
-    int getPlaccaggiRiusciti() const;
-    void setPlaccaggiRiusciti(int v);
 
-    int getPlaccaggiMancati() const;
-    void setPlaccaggiMancati(int v);
+	int getPlaccaggi() const;
+	void setPlaccaggi(int value);
 
-    // Attacco
-    int getMetriCorsi() const;
-    void setMetriCorsi(int v);
+	int getMetriCorsi() const;
+	void setMetriCorsi(int value);
 
-    int getLineBreaks() const;
-    void setLineBreaks(int v);
+	int getMete() const;
+	void setMete(int value);
+	
+	int getCalciPiazzati() const;
+	void setCalciPiazzati(int value);
 
-    int getDifensoriBattuti() const;
-    void setDifensoriBattuti(int v);
+	int getFalliCommessi() const;
+	void setFalliCommessi(int value);
 
-    // Mete
-    int getMetePartita() const;
-    void setMetePartita(int v);
+	int getOffload() const;
+	void setOffload(int value);
 
-    int getMeteStagione() const;
-    void setMeteStagione(int v);
+	int getMinutiGiocati() const;
+	void setMinutiGiocati(int value);
 
-    // Turnover
-    int getTurnoverPartita() const;
-    void setTurnoverPartita(int v);
-
-    int getTurnoverStagione() const;
-    void setTurnoverStagione(int v);
-
-    // Calci piazzati
-    int getCalciPiazzatiSegnatiPartita()const;
-    void setCalciPiazzatiSegnatiPartita(int c);
-
-    int getCalciPiazzatiSegnatiStagione() const;
-    void setCalciPiazzatiSegnatiStagione(int c);
-
-	int getCalciPiazzatiTentatiPartita()const;
-	void setCalciPiazzatiTentatiPartita(int c);
-
-	void setCalciPiazzatiTentatiStagione(int c);
-	int getCalciPiazzatiTentatiStagione() const;
-
-
-    // Falli
-    int getFalliCommessiPartita() const;
-    void setFalliCommessiPartita(int v);
-
-    int getFalliCommessiStagione() const;
-    void setFalliCommessiStagione(int v);
-
-    // Altro
-    int getOffloadPartita() const;
-	int getOffloadStagione() const;
-    void setOffloadPartita(int v);
-	void setOffloadStagione(int v);
-
-    double getEfficaciaRuck() const;
-    void setEfficaciaRuck(double v);
-
-    int getMinutiGiocati() const;
-    void setMinutiGiocati(int v);
-
-    int getPartiteGiocate() const;
-    void setPartiteGiocate(int v);
-
-	//metodo percentuale calcipiazzati
-    double getPercentualeCalciPiazzatiStagione() const; 
-	double getPercentualeCalciPiazzatiPartita() const; 
+	int getPartiteGiocate() const;
+	void setPartiteGiocate(int value);
 
 	
-	
+
+	   
+
     friend std::ostream& operator<<(std::ostream& os, const Giocatore& g);
 };
 

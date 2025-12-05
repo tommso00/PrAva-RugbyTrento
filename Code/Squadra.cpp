@@ -3,7 +3,16 @@
 
 // Costruttore
 Squadra::Squadra(int id_, const std::string& nome_, const std::string& indirizzo_)
-    : id(id_), nome(nome_), indirizzo(indirizzo_), punteggioClassifica(0) {}
+    : id(id_), nome(nome_), indirizzo(indirizzo_), punteggioClassifica(0),possessoPalla(0),
+      territorio(0.0),
+      placcaggiTotali(0),
+      metriGuadagnatiTotali(0),
+      meteTotali(0),
+      falliTotali(0),
+      mischieVinte(0),
+      mischiePerse(0),
+      toucheVinte(0),
+      touchePerse(0) {}
 
 // Getter/Setter info principali
 std::string Squadra::getNome() const {
@@ -62,6 +71,110 @@ std::ostream& operator<<(std::ostream& os, const Squadra& s) {
     }
     return os;
 }
+
+int Squadra::getPossessoPalla() const {
+    return possessoPalla;
+}
+
+void Squadra::setPossessoPalla(int value) {
+    possessoPalla = value;
+}
+
+double Squadra::getTerritorio() const {
+    return territorio;
+}
+
+void Squadra::setTerritorio(double value) {
+    territorio = value;
+}
+
+int Squadra::getPlaccaggiTotali() const {
+    return placcaggiTotali;
+}
+
+void Squadra::setPlaccaggiTotali(int value) {
+    placcaggiTotali = value;
+}
+
+int Squadra::getMetriGuadagnatiTotali() const {
+    return metriGuadagnatiTotali;
+}
+
+void Squadra::setMetriGuadagnatiTotali(int value) {
+    metriGuadagnatiTotali = value;
+}
+
+int Squadra::getMeteTotali() const {
+    return meteTotali;
+}
+
+void Squadra::setMeteTotali(int value) {
+    meteTotali = value;
+}
+
+int Squadra::getFalliTotali() const {
+    return falliTotali;
+}
+
+void Squadra::setFalliTotali(int value) {
+    falliTotali = value;
+}
+
+int Squadra::getMischieVinte() const {
+    return mischieVinte;
+}
+
+void Squadra::setMischieVinte(int value) {
+    mischieVinte = value;
+}
+
+int Squadra::getMischiePerse() const {
+    return mischiePerse;
+}
+
+void Squadra::setMischiePerse(int value) {
+    mischiePerse = value;
+}
+
+int Squadra::getToucheVinte() const {
+    return toucheVinte;
+}
+
+void Squadra::setToucheVinte(int value) {
+    toucheVinte = value;
+}
+
+int Squadra::getTouchePerse() const {
+    return touchePerse;
+}
+
+void Squadra::setTouchePerse(int value) {
+    touchePerse = value;
+}
+
+void Squadra::aggiornaStatistiche() {
+    placcaggiTotali = 0;
+    metriGuadagnatiTotali = 0;
+    meteTotali = 0;
+    falliTotali = 0;
+
+    for (const auto& g : giocatori) {
+        placcaggiTotali += g.getPlaccaggi();
+        metriGuadagnatiTotali += g.getMetriCorsi();
+        meteTotali += g.getMete();
+        falliTotali += g.getFalliCommessi();
+    }
+}
+
+/*Ogni volta che aggiungi, rimuovi o modifichi i giocatori, puoi aggiornare le statistiche totali così:
+
+squadra.addGiocatore(nuovoGiocatore);
+squadra.aggiornaStatistiche();
+
+squadra.removeGiocatore(42);
+squadra.aggiornaStatistiche();
+*/
+
 
 /*
 Possibili aggiunte future:

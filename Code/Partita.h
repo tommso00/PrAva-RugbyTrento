@@ -2,7 +2,6 @@
 #define PARTITA_H
 
 #include "Squadra.h"
-#include "StatsSquadra.h"
 #include <string>
 #include <iostream>
 
@@ -15,10 +14,18 @@ private:
     int id, data;
     Squadra locali;
     Squadra ospiti;
-    int ptLocali, ptOspiti;
     
-    StatsSquadra statsLocali;
-    StatsSquadra statsOspiti;	
+//Statistiche - Getter e Setter
+	int cartellinoRossoLoc;
+	int cartellinoRossoOsp;
+	int cartellinoGialloLoc;
+	int cartellinoGialloOsp;
+	double possessoLoc;
+	double possessoOsp;
+	int ptLocali, ptOspiti;
+    
+    
+    	
 	
 
 public:
@@ -36,17 +43,34 @@ public:
     
 	int getPuntiLocali() const;
     int getPuntiOspiti() const;
-    int getPunteggioPartita() const; 
+	void setPuntiLocali(int value);
+	void setPuntiOspiti(int value);
+    
+	int getCartellinoRossoLoc() const;
+	void setCartellinoRossoLoc(int value);
 
+	int getCartellinoRossoOsp() const;
+	void setCartellinoRossoOsp(int value);
+
+	int getCartellinoGialloLoc() const;
+	void setCartellinoGialloLoc(int value);
+
+	int getCartellinoGialloOsp() const;
+	void setCartellinoGialloOsp(int value);
+
+	double getPossessoLoc() const;
+	void setPossessoLoc(double value);
+
+	double getPossessoOsp() const;
+	void setPossessoOsp(double value);
+
+    int getPunteggioPartita() const; 
     void setRisultato(int ptLocali, int ptOspiti);
 	
-	//Statistiche - Getter e Setter
-	const StatsSquadra& getStatsLocali() const;
-    const StatsSquadra& getStatsOspiti() const;
-    
- 
-    
-    void calcolaStatsDaGiocatori();
+
+	
+	
+	
 
 
 
