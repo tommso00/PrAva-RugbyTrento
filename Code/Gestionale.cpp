@@ -90,79 +90,73 @@ int Gestionale::recuperaStagione(const std::string& filename, int stagione) {
 // ====== MODIFICA STAGIONE ======
 
 void Gestionale::modificaStagione(Stagione& stagione) {
-	int lastSquadraId = getMaxSquadraId();  
-	for (const auto& s : stagione.getSquadre()) {
-	    if (s->getId() > lastSquadraId) lastSquadraId = s->getId();
-	}
+    int lastSquadraId = getMaxSquadraId();  
+    for (const auto& s : stagione.getSquadre()) {
+        if (s->getId() > lastSquadraId) lastSquadraId = s->getId();
+    }
 
-    int azione, azgioc;
-    int controllo=0;
-    int c=0;
+    int azione, azgioc, controllo = 0, c = 0;
     string nome, cognome, ruolo;
     int eta;
-	while(controllo==0){
-		cout << endl << "Seleziona azione:" << endl;
-	    cout << "1) Aggiungi squadra" << endl << "2) Aggiungi partita" << endl << "3) Stampa Stagione" << endl;
-	    cin >> azione;
-		switch (azione) {
-	        case 1: {
-	        	while(c==0){
-	                 // Chiamata a aggiungiSquadra che ritorna unique_ptr
-		            auto squadraPtr = aggiungiSquadra();
-		            squadraPtr->setId(++lastSquadraId);  // assegna ID unico
-		            //===========AGGIUNGERE LISTA GIOCATORI PRIMA DI AGGIUNGERE ALTRE SQUADRE 
-		            cout<< "Vuoi Aggiungere Giocatori? 0=si / 1=no"<<endl;
-		            cin>>azgioc;
-		            int lastGiocatoreId = 0;  
-					if (!squadraPtr->getGiocatori().empty()) {
-					    for (const auto& g : squadraPtr->getGiocatori()) {
-					        if (g.getId() > lastGiocatoreId) lastGiocatoreId = g.getId();
-					    }
-					}
-		            while(azgioc==0){
-		            	cout<<"Nome: ";
-		            	cin>>nome;
-		            	cout<<"Cognome: ";
-		            	cin>>cognome;
-		            	//aggiustare per aggiungere eta e ruolo da cin >>
-		            	Giocatore g1(nome, cognome, 28, "Mediano", ++lastGiocatoreId);
-		            	squadraPtr->addGiocatore(g1);
-			            cout<< "Vuoi Aggiungere Giocatori? 0=si / 1=no"<<endl;
-			            cin>>azgioc;
-					}	            
-		            
-		            // Aggiunta della squadra alla stagione
-		            stagione.addSquadra(move(squadraPtr));
-		            
-	
-					cout<<"Vuoi aggiungere un'altra squadra?  0=si / 1=no"<<endl;
-					cin>>c;	
-				}
-				//cout<<stagione;
-	
-	            break;
-	        }
-	        case 2:
-	            aggiungiPartita(stagione);
-	            break;
-	        case 3:
-	            cout<<stagione;
-	            break;
-	        default:
-	            cout << "Azione non valida." << endl;
-	            break;
-    	}
-    	cout<<"Vuoi modificare ancora?  0=si / 1=no"<<endl;
-    	cin>>controllo;
-	}
-	salvaStagioni(stagione);
-	salvaSquadre(stagione);
-	for (const auto& squadra : stagione.getSquadre()) {
-	    salvaGiocatori(*squadra);
-	}
-	salvaPartite(stagione);
     
+    while(controllo == 0) {
+        cout << endl << "Seleziona azione:" << endl;
+        cout << "1) Aggiungi squadra" << endl << "2) Aggiungi partita" << endl << "3) Stampa Stagione" << endl;
+        cin >> azione;
+        
+        switch (azione) {
+            case 1: {
+                while(c == 0) {
+                    auto squadraPtr = aggiungiSquadra();
+                    squadraPtr->setId(++lastSquadraId);
+                    
+                    cout << "Vuoi Aggiungere Giocatori? 0=si / 1=no" << endl;
+                    cin >> azgioc;
+                    int lastGiocatoreId = 0;  
+                    
+                    if (!squadraPtr->getGiocatori().empty()) {
+                        for (const auto& g : squadraPtr->getGiocatori()) {
+                            if (g.getId() > lastGiocatoreId) lastGiocatoreId = g.getId();
+                        }
+                    }
+                    
+                    while(azgioc == 0) {
+                        cout << "Nome: "; cin >> nome;
+                        cout << "Cognome: "; cin >> cognome;
+                        cout << "Eta: "; cin >> eta;
+                        cout << "Ruolo: "; cin >> ruolo;
+                        
+                        Giocatore g1(nome, cognome, eta, ruolo, ++lastGiocatoreId);
+                        squadraPtr->addGiocatore(g1);
+                        
+                        cout << "Vuoi Aggiungere Giocatori? 0=si / 1=no" << endl;
+                        cin >> azgioc;
+                    }	            
+                    
+                    stagione.addSquadra(move(squadraPtr));
+                    cout << "Vuoi aggiungere un'altra squadra? 0=si / 1=no" << endl;
+                    cin >> c;	
+                }
+                break;
+            }
+            case 2:
+                aggiungiPartita(stagione);
+                break;
+            case 3:
+                cout << stagione;
+                break;
+            default:
+                cout << "Azione non valida." << endl;
+                break;
+        }
+        cout << "Vuoi modificare ancora? 0=si / 1=no" << endl;
+        cin >> controllo;
+    }
+    
+    // SALVATAGGIO PARALLELO SICURO
+    salvaParallel(stagione);
 }
+
 
 // === AGGIUNGI SQUADRA ===
 
@@ -276,7 +270,7 @@ void Gestionale::fetchStagioni(const std::string& filename) {
 }
 
 // ==================== SALVA STAGIONI ====================
-void Gestionale::salvaStagioni(const Stagione& nuovaStagione)  {
+void Gestionale::salvaStagioni(const Stagione& nuovaStagione) const {
     // 1. Ricarica tutte le stagioni esistenti
     vector<int> anni;
     
@@ -849,6 +843,53 @@ int Gestionale::getMaxSquadraId() const {
     }
     file.close();
     return maxId;
+}
+
+// ==================== SALVATAGGIO PARALLELO C++11 PURO ====================
+void Gestionale::salvaParallel(const Stagione& stagione) const {
+    std::vector<std::thread> threads;
+    const unsigned int max_threads = std::thread::hardware_concurrency();
+    
+    std::cout << "Avvio salvataggio parallelo (" << max_threads << " core)..." << std::endl;
+    
+    // VARIABILI locali catturate by value (C++11 puro)
+    int anno_stagione = stagione.getAnno();
+    
+    // THREAD 1: Stagioni
+    threads.emplace_back([this, anno_stagione]() {
+        Stagione temp(anno_stagione);
+        this->salvaStagioni(temp);
+    });
+    
+    // THREAD 2: Squadre  
+    threads.emplace_back([this, &stagione]() {
+        this->salvaSquadre(stagione);
+    });
+    
+    // THREAD 3: Partite
+    threads.emplace_back([this, &stagione]() {
+        this->salvaPartite(stagione);
+    });
+    
+    // THREAD paralleli: Giocatori per squadra
+    for (const auto& squadraPtr : stagione.getSquadre()) {
+        if (threads.size() < max_threads * 2) {
+            int squadra_id = squadraPtr->getId();
+            threads.emplace_back([this, squadra_id]() {
+                Squadra temp_squadra(squadra_id, "temp", "temp");
+                this->salvaGiocatori(temp_squadra);
+            });
+        }
+    }
+    
+    // JOIN tutti i thread
+    for (auto& t : threads) {
+        if (t.joinable()) {
+            t.join();
+        }
+    }
+    
+    std::cout << "? Salvataggio completato con " << threads.size() << " thread!" << std::endl;
 }
 
 

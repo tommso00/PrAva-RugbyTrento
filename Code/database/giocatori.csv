@@ -49,13 +49,3 @@ giocatore_id,squadra_id,nome,cognome,eta,ruolo,placcaggi,metri_corsi,mete,calci_
 48,4,Omar,Caputo,27,Pilone,45,108,1,0,9,3,690,8
 49,4,Kevin,Martino,25,SecondaLinea,51,132,3,0,7,5,730,9
 50,4,Samuel,Longo,28,SecondaLinea,47,128,2,0,5,4,710,9
-51,4,Adriano,Cattaneo,23,TerzaLineaAla,57,178,4,0,4,7,750,9
-52,4,Yuri,Donati,25,TerzaLineaAla,60,190,5,0,6,8,770,9
-53,4,Dario,De Rosa,29,TerzaLineaCentro,54,205,6,0,5,9,800,10
-54,4,Alex,Marini,24,Mediano,31,240,8,11,2,10,810,10
-55,4,Liam,Sorrentino,26,Apertura,27,275,7,33,3,9,830,10
-56,4,Noah,Bellini,21,AlaThreeQuarter,24,315,12,0,2,12,740,9
-57,4,Ethan,Battaglia,24,CentroThreeQuarter,34,255,8,7,3,13,760,9
-58,4,Ryan,Pagano,25,CentroThreeQuarter,37,248,8,5,4,12,750,9
-59,4,Sebastian,Silvestri,22,AlaThreeQuarter,21,335,14,0,1,15,770,9
-60,4,Lucas,Mazza,27,Estremo,29,285,10,17,2,9,800,10
