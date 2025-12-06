@@ -49,11 +49,10 @@ int getScelta(int min, int max) {
                 throw invalid_argument("Errore: inserire un numero intero valido.");
             }
             
-            cin.ignore(10000, '\n');  // pulisce buffer
+            //cin.ignore(10000, '\n');  // pulisce buffer
             
             if (scelta < min || scelta > max) {
-                throw invalid_argument("ERR scelta non valida: inserire tra " + 
-                                     to_string(min) + " e " + to_string(max));
+                throw invalid_argument("ERR scelta non valida: inserire tra " + to_string(min) + " e " + to_string(max));
             }
             
             return scelta;
@@ -62,7 +61,6 @@ int getScelta(int min, int max) {
             cin.clear();
             cin.ignore(10000, '\n');
             cout << e.what() << endl;
-            // continua il ciclo invece di ricorsione
         }
     }
 }

@@ -333,17 +333,41 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
 
         // Dividi la riga in tokens
         std::vector<std::string> tokens = splitCSVLine(line);
-        if (tokens.size() >= 4) {
+        if (tokens.size() >= 15) {  // Nuova struttura completa
             int id = std::stoi(tokens[0]);
             int anno = std::stoi(tokens[1]);
-            std::string nome = tokens[2];
-            std::string indirizzo = tokens[3];
+            string nome = tokens[2];
+            string indirizzo = tokens[3];
+            int possessoPalla = std::stoi(tokens[4]);
+            double territorio = std::stod(tokens[5]);
+            int placcaggiTotali = std::stoi(tokens[6]);
+            int metriGuadagnatiTotali = std::stoi(tokens[7]);
+            int meteTotali = std::stoi(tokens[8]);
+            int falliTotali = std::stoi(tokens[9]);
+            int mischieVinte = std::stoi(tokens[10]);
+            int mischiePerse = std::stoi(tokens[11]);
+            int toucheVinte = std::stoi(tokens[12]);
+            int touchePerse = std::stoi(tokens[13]);
+            int punteggio = std::stoi(tokens[14]);
 
             // Se la squadra appartiene alla stagione corrente
             if (anno == stagioneAnno) {
                 // Crea e aggiungi la squadra se non già presente
                 auto squadraPtr = unique_ptr<Squadra> (new Squadra(id, nome, indirizzo));
-                //unique_ptr<Squadra> s1(new Squadra(id, nome, indirizzo));
+                
+                // Imposta tutti i nuovi campi
+                squadraPtr->setPossessoPalla(possessoPalla);
+                squadraPtr->setTerritorio(territorio);
+                squadraPtr->setPlaccaggiTotali(placcaggiTotali);
+                squadraPtr->setMetriGuadagnatiTotali(metriGuadagnatiTotali);
+                squadraPtr->setMeteTotali(meteTotali);
+                squadraPtr->setFalliTotali(falliTotali);
+                squadraPtr->setMischieVinte(mischieVinte);
+                squadraPtr->setMischiePerse(mischiePerse);
+                squadraPtr->setToucheVinte(toucheVinte);
+                squadraPtr->setTouchePerse(touchePerse);
+                squadraPtr->setPunteggio(punteggio);
+                
                 stagione.addSquadra(std::move(squadraPtr));
             }
         }
@@ -353,9 +377,13 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
 }
 
 
+
 void Gestionale::salvaSquadre(const Stagione& stagione) const {
     // 1. Carica tutte le squadre esistenti
-    std::vector<std::tuple<int, int, std::string, std::string>> squadreEsistenti; // (id, stagione_anno, nome, indirizzo)
+    std::vector<std::tuple<int, int, std::string, std::string, int, double, int, int, int, int, 
+                          int, int, int, int, int>> squadreEsistenti;
+    // (id, anno, nome, indirizzo, possesso_palla, territorio, placcaggi, metri, mete, falli,
+    //  mischieVinte, mischiePerse, toucheVinte, touchePerse, punteggio)
 
     std::ifstream lettura("database/squadre.csv");
     std::string line;
@@ -364,12 +392,26 @@ void Gestionale::salvaSquadre(const Stagione& stagione) const {
         if (primaRiga) { primaRiga = false; continue; } // Salta intestazione
         if (!line.empty()) {
             std::vector<std::string> tokens = splitCSVLine(line);
-            if (tokens.size() >= 4) {
+            if (tokens.size() >= 15) {  // Nuova struttura completa
                 int id = std::stoi(tokens[0]);
                 int anno = std::stoi(tokens[1]);
                 std::string nome = tokens[2];
                 std::string indirizzo = tokens[3];
-                squadreEsistenti.emplace_back(id, anno, nome, indirizzo);
+                int possessoPalla = std::stoi(tokens[4]);
+                double territorio = std::stod(tokens[5]);
+                int placcaggiTotali = std::stoi(tokens[6]);
+                int metriGuadagnatiTotali = std::stoi(tokens[7]);
+                int meteTotali = std::stoi(tokens[8]);
+                int falliTotali = std::stoi(tokens[9]);
+                int mischieVinte = std::stoi(tokens[10]);
+                int mischiePerse = std::stoi(tokens[11]);
+                int toucheVinte = std::stoi(tokens[12]);
+                int touchePerse = std::stoi(tokens[13]);
+                int punteggio = std::stoi(tokens[14]);
+                
+                squadreEsistenti.emplace_back(id, anno, nome, indirizzo, possessoPalla, territorio,
+                                            placcaggiTotali, metriGuadagnatiTotali, meteTotali, falliTotali,
+                                            mischieVinte, mischiePerse, toucheVinte, touchePerse, punteggio);
             }
         }
     }
@@ -381,6 +423,17 @@ void Gestionale::salvaSquadre(const Stagione& stagione) const {
         int anno = stagione.getAnno();
         std::string nome = squadraPtr->getNome();
         std::string indirizzo = squadraPtr->getIndirizzo();
+        int possessoPalla = squadraPtr->getPossessoPalla();
+        double territorio = squadraPtr->getTerritorio();
+        int placcaggiTotali = squadraPtr->getPlaccaggiTotali();
+        int metriGuadagnatiTotali = squadraPtr->getMetriGuadagnatiTotali();
+        int meteTotali = squadraPtr->getMeteTotali();
+        int falliTotali = squadraPtr->getFalliTotali();
+        int mischieVinte = squadraPtr->getMischieVinte();
+        int mischiePerse = squadraPtr->getMischiePerse();
+        int toucheVinte = squadraPtr->getToucheVinte();
+        int touchePerse = squadraPtr->getTouchePerse();
+        int punteggio = squadraPtr->getPunteggio();
 
         bool presente = false;
         for (const auto& s : squadreEsistenti) {
@@ -390,7 +443,9 @@ void Gestionale::salvaSquadre(const Stagione& stagione) const {
             }
         }
         if (!presente) {
-            squadreEsistenti.emplace_back(id, anno, nome, indirizzo);
+            squadreEsistenti.emplace_back(id, anno, nome, indirizzo, possessoPalla, territorio,
+                                        placcaggiTotali, metriGuadagnatiTotali, meteTotali, falliTotali,
+                                        mischieVinte, mischiePerse, toucheVinte, touchePerse, punteggio);
         }
     }
 
@@ -399,10 +454,19 @@ void Gestionale::salvaSquadre(const Stagione& stagione) const {
     if (!scrittura.is_open()) {
         throw std::runtime_error("Errore apertura file: database/squadre.csv");
     }
-    scrittura << "squadra_id,stagione_anno,nome,indirizzo\n";
+    scrittura << "squadra_id,stagione_anno,nome,indirizzo,possesso_palla,territorio,"
+              << "placcaggi_totali,metri_guadagnati_totali,mete_totali,falli_totali,"
+              << "mischie_vinte,mischie_perse,touche_vinte,touche_perse,punteggio_classifica\n";
+    
     for (const auto& s : squadreEsistenti) {
         scrittura << std::get<0>(s) << "," << std::get<1>(s) << ","
-                  << std::get<2>(s) << "," << std::get<3>(s) << "\n";
+                  << "\"" << std::get<2>(s) << "\"," << "\"" << std::get<3>(s) << "\","
+                  << std::get<4>(s) << "," << std::get<5>(s) << ","
+                  << std::get<6>(s) << "," << std::get<7>(s) << ","
+                  << std::get<8>(s) << "," << std::get<9>(s) << ","
+                  << std::get<10>(s) << "," << std::get<11>(s) << ","
+                  << std::get<12>(s) << "," << std::get<13>(s) << ","
+                  << std::get<14>(s) << "\n";
     }
     scrittura.close();
 }
@@ -431,16 +495,35 @@ void Gestionale::fetchGiocatori(Squadra& squadra) {
 
         std::vector<std::string> tokens = splitCSVLine(line);
 
-        if (tokens.size() >= 6) {
+        if (tokens.size() >= 14) {  // Nuova struttura completa
             int id = std::stoi(tokens[0]);
             int idSquadra = std::stoi(tokens[1]);
             std::string nome = tokens[2];
             std::string cognome = tokens[3];
             int eta = std::stoi(tokens[4]);
             std::string ruolo = tokens[5];
+            int placcaggi = std::stoi(tokens[6]);
+            int metriCorsi = std::stoi(tokens[7]);
+            int mete = std::stoi(tokens[8]);
+            int calciPiazzati = std::stoi(tokens[9]);
+            int falliCommessi = std::stoi(tokens[10]);
+            int offload = std::stoi(tokens[11]);
+            int minutiGiocati = std::stoi(tokens[12]);
+            int partiteGiocate = std::stoi(tokens[13]);
 
             if (idSquadra == squadraId) {
                 Giocatore g(nome, cognome, eta, ruolo, id);
+                
+                // Imposta tutte le statistiche
+                g.setPlaccaggi(placcaggi);
+                g.setMetriCorsi(metriCorsi);
+                g.setMete(mete);
+                g.setCalciPiazzati(calciPiazzati);
+                g.setFalliCommessi(falliCommessi);
+                g.setOffload(offload);
+                g.setMinutiGiocati(minutiGiocati);
+                g.setPartiteGiocate(partiteGiocate);
+                
                 squadra.addGiocatore(g);
             }
         }
@@ -452,8 +535,10 @@ void Gestionale::fetchGiocatori(Squadra& squadra) {
 
 void Gestionale::salvaGiocatori(const Squadra& squadra) const {
     // 1. Carica tutti i giocatori esistenti
-    std::vector<std::tuple<int, int, std::string, std::string, int, std::string>> giocatoriEsistenti; 
-    // (giocatore_id, squadra_id, nome, cognome, eta, ruolo)
+    std::vector<std::tuple<int, int, std::string, std::string, int, std::string, 
+                          int, int, int, int, int, int, int, int>> giocatoriEsistenti; 
+    // (giocatore_id, squadra_id, nome, cognome, eta, ruolo, placcaggi, metriCorsi, 
+    //  mete, calciPiazzati, falliCommessi, offload, minutiGiocati, partiteGiocate)
 
     std::ifstream lettura("database/giocatori.csv");
     std::string line;
@@ -462,14 +547,25 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) const {
         if (primaRiga) { primaRiga = false; continue; } // Salta intestazione
         if (!line.empty()) {
             std::vector<std::string> tokens = splitCSVLine(line);
-            if (tokens.size() >= 6) {
+            if (tokens.size() >= 14) {
                 int id = std::stoi(tokens[0]);
                 int squadra_id = std::stoi(tokens[1]);
                 std::string nome = tokens[2];
                 std::string cognome = tokens[3];
                 int eta = std::stoi(tokens[4]);
                 std::string ruolo = tokens[5];
-                giocatoriEsistenti.emplace_back(id, squadra_id, nome, cognome, eta, ruolo);
+                int placcaggi = std::stoi(tokens[6]);
+                int metriCorsi = std::stoi(tokens[7]);
+                int mete = std::stoi(tokens[8]);
+                int calciPiazzati = std::stoi(tokens[9]);
+                int falliCommessi = std::stoi(tokens[10]);
+                int offload = std::stoi(tokens[11]);
+                int minutiGiocati = std::stoi(tokens[12]);
+                int partiteGiocate = std::stoi(tokens[13]);
+                
+                giocatoriEsistenti.emplace_back(id, squadra_id, nome, cognome, eta, ruolo,
+                                              placcaggi, metriCorsi, mete, calciPiazzati,
+                                              falliCommessi, offload, minutiGiocati, partiteGiocate);
             }
         }
     }
@@ -483,6 +579,14 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) const {
         std::string cognome = g.getCognome();
         int eta = g.getEta();
         std::string ruolo = g.getRuolo();
+        int placcaggi = g.getPlaccaggi();
+        int metriCorsi = g.getMetriCorsi();
+        int mete = g.getMete();
+        int calciPiazzati = g.getCalciPiazzati();
+        int falliCommessi = g.getFalliCommessi();
+        int offload = g.getOffload();
+        int minutiGiocati = g.getMinutiGiocati();
+        int partiteGiocate = g.getPartiteGiocate();
 
         bool presente = false;
         for (const auto& player : giocatoriEsistenti) {
@@ -492,7 +596,9 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) const {
             }
         }
         if (!presente) {
-            giocatoriEsistenti.emplace_back(id, squadraId, nome, cognome, eta, ruolo);
+            giocatoriEsistenti.emplace_back(id, squadraId, nome, cognome, eta, ruolo,
+                                          placcaggi, metriCorsi, mete, calciPiazzati,
+                                          falliCommessi, offload, minutiGiocati, partiteGiocate);
         }
     }
 
@@ -501,15 +607,21 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) const {
     if (!scrittura.is_open()) {
         throw std::runtime_error("Errore apertura file: database/giocatori.csv");
     }
-    scrittura << "giocatore_id,squadra_id,nome,cognome,eta,ruolo\n";
+    scrittura << "giocatore_id,squadra_id,nome,cognome,eta,ruolo,"
+              << "placcaggi,metri_corsi,mete,calci_piazzati,"
+              << "falli_commessi,offload,minuti_giocati,partite_giocate\n";
+    
     for (const auto& g : giocatoriEsistenti) {
         scrittura << std::get<0>(g) << "," << std::get<1>(g) << ","
                   << std::get<2>(g) << "," << std::get<3>(g) << ","
-                  << std::get<4>(g) << "," << std::get<5>(g) << "\n";
+                  << std::get<4>(g) << "," << std::get<5>(g) << ","
+                  << std::get<6>(g) << "," << std::get<7>(g) << ","
+                  << std::get<8>(g) << "," << std::get<9>(g) << ","
+                  << std::get<10>(g) << "," << std::get<11>(g) << ","
+                  << std::get<12>(g) << "," << std::get<13>(g) << "\n";
     }
     scrittura.close();
 }
-
 
 
 // ==================== FETCH / SAVE PARTITE ====================
@@ -532,7 +644,7 @@ void Gestionale::fetchPartite(Stagione& stagione) {
         if (line.empty()) continue;
 
         auto tokens = splitCSVLine(line);
-        if (tokens.size() >= 7) {
+        if (tokens.size() >= 13) {  // Nuova struttura completa
             int id = std::stoi(tokens[0]);
             int anno = std::stoi(tokens[1]);
             int data = std::stoi(tokens[2]);
@@ -540,6 +652,12 @@ void Gestionale::fetchPartite(Stagione& stagione) {
             int idOspiti = std::stoi(tokens[4]);
             int ptLocali = std::stoi(tokens[5]);
             int ptOspiti = std::stoi(tokens[6]);
+            int cartellinoRossoLoc = std::stoi(tokens[7]);
+            int cartellinoRossoOsp = std::stoi(tokens[8]);
+            int cartellinoGialloLoc = std::stoi(tokens[9]);
+            int cartellinoGialloOsp = std::stoi(tokens[10]);
+            double possessoLoc = std::stod(tokens[11]);
+            double possessoOsp = std::stod(tokens[12]);
 
             if (anno == stagioneAnno) {
                 Squadra* locali = nullptr;
@@ -551,6 +669,15 @@ void Gestionale::fetchPartite(Stagione& stagione) {
                 if (locali && ospiti) {
                     Partita p(id, data, *locali, *ospiti);
                     p.setRisultato(ptLocali, ptOspiti);
+                    
+                    // Imposta tutte le statistiche aggiuntive
+                    p.setCartellinoRossoLoc(cartellinoRossoLoc);
+                    p.setCartellinoRossoOsp(cartellinoRossoOsp);
+                    p.setCartellinoGialloLoc(cartellinoGialloLoc);
+                    p.setCartellinoGialloOsp(cartellinoGialloOsp);
+                    p.setPossessoLoc(possessoLoc);
+                    p.setPossessoOsp(possessoOsp);
+                    
                     stagione.addPartita(p);
                 }
             }
@@ -562,7 +689,11 @@ void Gestionale::fetchPartite(Stagione& stagione) {
 
 void Gestionale::salvaPartite(const Stagione& stagione) const {
     // 1. Carica tutte le partite esistenti
-    std::vector<std::tuple<int, int, int, int, int, int, int>> partiteEsistenti;
+    std::vector<std::tuple<int, int, int, int, int, int, int, int, int, int, int, double, double>> partiteEsistenti;
+    // (partita_id, stagione_anno, data, id_locali, id_ospiti, pt_locali, pt_ospiti,
+    //  cartellino_rosso_loc, cartellino_rosso_osp, cartellino_giallo_loc, cartellino_giallo_osp,
+    //  possesso_loc, possesso_osp)
+    
     std::ifstream lettura("database/partite.csv");
     std::string line;
     bool primaRiga = true;
@@ -570,7 +701,7 @@ void Gestionale::salvaPartite(const Stagione& stagione) const {
         if (primaRiga) { primaRiga = false; continue; }
         if (!line.empty()) {
             auto tokens = splitCSVLine(line);
-            if (tokens.size() >= 7) {
+            if (tokens.size() >= 13) {
                 int id = std::stoi(tokens[0]);
                 int anno = std::stoi(tokens[1]);
                 int data = std::stoi(tokens[2]);
@@ -578,7 +709,17 @@ void Gestionale::salvaPartite(const Stagione& stagione) const {
                 int idOspiti = std::stoi(tokens[4]);
                 int ptLocali = std::stoi(tokens[5]);
                 int ptOspiti = std::stoi(tokens[6]);
-                partiteEsistenti.emplace_back(id, anno, data, idLocali, idOspiti, ptLocali, ptOspiti);
+                int cartellinoRossoLoc = std::stoi(tokens[7]);
+                int cartellinoRossoOsp = std::stoi(tokens[8]);
+                int cartellinoGialloLoc = std::stoi(tokens[9]);
+                int cartellinoGialloOsp = std::stoi(tokens[10]);
+                double possessoLoc = std::stod(tokens[11]);
+                double possessoOsp = std::stod(tokens[12]);
+                
+                partiteEsistenti.emplace_back(id, anno, data, idLocali, idOspiti, ptLocali, ptOspiti,
+                                            cartellinoRossoLoc, cartellinoRossoOsp,
+                                            cartellinoGialloLoc, cartellinoGialloOsp,
+                                            possessoLoc, possessoOsp);
             }
         }
     }
@@ -593,6 +734,12 @@ void Gestionale::salvaPartite(const Stagione& stagione) const {
         int idOspiti = p.getOspiti().getId();
         int ptLocali = p.getPuntiLocali();
         int ptOspiti = p.getPuntiOspiti();
+        int cartellinoRossoLoc = p.getCartellinoRossoLoc();
+        int cartellinoRossoOsp = p.getCartellinoRossoOsp();
+        int cartellinoGialloLoc = p.getCartellinoGialloLoc();
+        int cartellinoGialloOsp = p.getCartellinoGialloOsp();
+        double possessoLoc = p.getPossessoLoc();
+        double possessoOsp = p.getPossessoOsp();
 
         bool presente = false;
         for (const auto& pe : partiteEsistenti) {
@@ -602,7 +749,10 @@ void Gestionale::salvaPartite(const Stagione& stagione) const {
             }
         }
         if (!presente) {
-            partiteEsistenti.emplace_back(id, anno, data, idLocali, idOspiti, ptLocali, ptOspiti);
+            partiteEsistenti.emplace_back(id, anno, data, idLocali, idOspiti, ptLocali, ptOspiti,
+                                        cartellinoRossoLoc, cartellinoRossoOsp,
+                                        cartellinoGialloLoc, cartellinoGialloOsp,
+                                        possessoLoc, possessoOsp);
         }
     }
 
@@ -611,11 +761,16 @@ void Gestionale::salvaPartite(const Stagione& stagione) const {
     if (!scrittura.is_open()) {
         throw std::runtime_error("Errore apertura file: database/partite.csv");
     }
-    scrittura << "partita_id,stagione_anno,data,id_locali,id_ospiti,pt_locali,pt_ospiti\n";
+    scrittura << "partita_id,stagione_anno,data,id_locali,id_ospiti,pt_locali,pt_ospiti,"
+              << "cartellino_rosso_loc,cartellino_rosso_osp,cartellino_giallo_loc,cartellino_giallo_osp,"
+              << "possesso_loc,possesso_osp\n";
+    
     for (const auto& p : partiteEsistenti) {
         scrittura << std::get<0>(p) << "," << std::get<1>(p) << "," << std::get<2>(p) << ","
                   << std::get<3>(p) << "," << std::get<4>(p) << "," << std::get<5>(p) << ","
-                  << std::get<6>(p) << "\n";
+                  << std::get<6>(p) << "," << std::get<7>(p) << "," << std::get<8>(p) << ","
+                  << std::get<9>(p) << "," << std::get<10>(p) << "," << std::get<11>(p) << ","
+                  << std::get<12>(p) << "\n";
     }
     scrittura.close();
 }
