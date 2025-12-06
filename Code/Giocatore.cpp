@@ -1,28 +1,71 @@
 #include "Giocatore.h"
+#include <iostream>
 
 // Costruttore
-Giocatore::Giocatore(const std::string& nome, 
-					 const std::string& cognome,
-					 int eta,
-                     const std::string& ruolo_,
-					 int id_)
-    : Persona(nome, cognome, eta),
-	  ruolo(ruolo_), 
-	  id(id_) 
-	  {
-	placcaggi=0;
-	metriCorsi =0;
-	mete=0;
-	calciPiazzati=0;
+Giocatore::Giocatore(const std::string& nome, const std::string& cognome, int eta, const std::string& ruolo, int id)
+    : Persona(nome, cognome, eta), ruolo(ruolo), id(id),
+      placcaggi(0), metriCorsi(0), mete(0), calciPiazzati(0),
+      falliCommessi(0), offload(0), minutiGiocati(0), partiteGiocate(0) {}
+	
+// ? COPY CONSTRUCTOR
+Giocatore::Giocatore(const Giocatore& other)
+    : Persona(other),  // Base class copy
+      ruolo(other.ruolo), id(other.id),
+      placcaggi(other.placcaggi), metriCorsi(other.metriCorsi),
+      mete(other.mete), calciPiazzati(other.calciPiazzati),
+      falliCommessi(other.falliCommessi), offload(other.offload),
+      minutiGiocati(other.minutiGiocati), partiteGiocate(other.partiteGiocate) {
+    std::cout << "Copy Giocatore(" << ruolo << ")" << std::endl;
+}
 
-	falliCommessi=0;
-	offload=0;
+// ? MOVE CONSTRUCTOR
+Giocatore::Giocatore(Giocatore&& other) noexcept
+    : Persona(std::move(other)),  // Move base class
+      ruolo(std::move(other.ruolo)), id(other.id),
+      placcaggi(other.placcaggi), metriCorsi(other.metriCorsi),
+      mete(other.mete), calciPiazzati(other.calciPiazzati),
+      falliCommessi(other.falliCommessi), offload(other.offload),
+      minutiGiocati(other.minutiGiocati), partiteGiocate(other.partiteGiocate) {
+    other.id = 0;
+    std::cout << "Move Giocatore(" << ruolo << ")" << std::endl;
+}
 
-	minutiGiocati=0;
-	partiteGiocate=0;;	
+// ? COPY ASSIGNMENT
+Giocatore& Giocatore::operator=(const Giocatore& other) {
+    if(this != &other) {
+        Persona::operator=(other);  // Base class assignment
+        
+        ruolo = other.ruolo;
+        id = other.id;
+        placcaggi = other.placcaggi;
+        metriCorsi = other.metriCorsi;
+        mete = other.mete;
+        calciPiazzati = other.calciPiazzati;
+        falliCommessi = other.falliCommessi;
+        offload = other.offload;
+        minutiGiocati = other.minutiGiocati;
+        partiteGiocate = other.partiteGiocate;
+    }
+    std::cout << "Copy assign Giocatore(" << ruolo << ")" << std::endl;
+    return *this;
+}
 
-	}
-
+// ? MOVE ASSIGNMENT
+Giocatore& Giocatore::operator=(Giocatore&& other) noexcept {
+    if(this != &other) {
+        Persona::operator=(std::move(other));  // Move base class
+        
+        ruolo = std::move(other.ruolo);
+        id = other.id;
+        placcaggi = other.placcaggi;
+        // ... move tutti i primitivi
+        
+        other.id = 0;
+    }
+    std::cout << "Move assign Giocatore(" << ruolo << ")" << std::endl;
+    return *this;
+}
+	
 
 // Getter e setter base
 std::string Giocatore::getRuolo() const {

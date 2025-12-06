@@ -7,51 +7,62 @@
 #include "Squadra.h"
 #include "Partita.h"
 
-//CIAKA IMPLEMENTA LA CLASSIFICA, ATTENTO ALLE CLASSI SQUADRA/PARTITA/STAGIONE
-
-
-// La classe Stagione possiede le squadre tramite unique_ptr, evitando memory leak.
-// Le partite sono snapshot e vengono memorizzate per valore.
 class Stagione {
 private:
     int anno;
-    std::vector<std::unique_ptr<Squadra>> squadre; // Ownership esclusiva sulle squadre
-    std::vector<Partita> partite; // Snapshot: le partite contengono copie delle squadre
-	
+    std::vector<std::unique_ptr<Squadra>> squadre;
+    std::vector<Partita> partite;
 
 public:
     explicit Stagione(int anno);
     
-    // Disabilita copia
-    Stagione(const Stagione& other) = delete;
-    Stagione& operator=(const Stagione& other) = delete;
+    // ? COPY CONSTRUCTOR - Implementazione PROFONDA
+    Stagione(const Stagione& other);
+    
+    // ? COPY ASSIGNMENT
+    Stagione& operator=(const Stagione& other);
+    
+    // ? MOVE CONSTRUCTOR - Efficiente
+    Stagione(Stagione&& other) noexcept;
+    
+    // ? MOVE ASSIGNMENT - Efficiente  
+    Stagione& operator=(Stagione&& other) noexcept;
+    
+    // Ordina squadre per punteggio e restituisce classifica
+    std::vector<const Squadra*> classificaSquadre() const;
+    
+    // Calcola media statistiche squadre (NUMERIC)
+    double mediaPunteggioSquadre() const;
+    double mediaMeteTotaliSquadre() const;
+    
+    // Trova top N squadre (ALGORITHM)
+    std::vector<const Squadra*> topSquadre(size_t n) const;
+    
+    // ? TEMPLATE METAPROGRAMMING - Pointer to member function
+	template<typename StatType>
+	StatType calcolaMedia(const std::vector<std::unique_ptr<Squadra>>& squadre, 
+	                      StatType(Squadra::*getter)() const) const;
+	
+	template<typename StatType>
+	StatType sommaStatistica(const std::vector<std::unique_ptr<Squadra>>& squadre, 
+	                         StatType(Squadra::*getter)() const) const;
+	
+	// Esempi di utilizzo concreti
+	double mediaPunteggioTemplate() const;  // Usa template internamente
+	int sommaMeteTemplate() const;
 
-    // Abilita move
-    Stagione(Stagione&& other)  = default;
-    Stagione& operator=(Stagione&& other)  = default;
-
-    // Il distruttore di default gestisce correttamente unique_ptr e vector!
+    
     ~Stagione() = default;
 
-    // Restituisce la squadra vincente in classifica, non trasferisce la proprietà.
-    // Modifica il tipo: const Squadra* (sola lettura, non ownership).
     const Squadra* getClassificaFinale() const;
-
-    // Calendario delle partite (solo lettura)
     const std::vector<Partita>& getCalendario() const;
-	const std::vector<std::unique_ptr<Squadra>>& getSquadre() const;
-	const std::vector<Partita>& getPartite() const;
+    const std::vector<std::unique_ptr<Squadra>>& getSquadre() const;
+    const std::vector<Partita>& getPartite() const;
+    int getAnno() const;
 
-	int getAnno() const;
-
-
-
-	
-    // Inserisce una partita per valore (snapshot).
     void addPartita(const Partita& p);
     void addSquadra(std::unique_ptr<Squadra> s);
 
-    // Stampa la stagione
     friend std::ostream& operator<<(std::ostream& os, const Stagione& s);
 };
 

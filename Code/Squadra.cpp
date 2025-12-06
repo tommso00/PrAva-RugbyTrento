@@ -13,6 +13,105 @@ Squadra::Squadra(int id_, const std::string& nome_, const std::string& indirizzo
       mischiePerse(0),
       toucheVinte(0),
       touchePerse(0) {}
+      
+
+// MOVE CONSTRUCTOR - COMPLETO
+Squadra::Squadra(Squadra&& other) noexcept
+    : id(other.id),
+      nome(std::move(other.nome)), 
+      indirizzo(std::move(other.indirizzo)),
+      possessoPalla(other.possessoPalla),
+      territorio(other.territorio),
+      placcaggiTotali(other.placcaggiTotali),
+      metriGuadagnatiTotali(other.metriGuadagnatiTotali),
+      meteTotali(other.meteTotali),
+      falliTotali(other.falliTotali),
+      mischieVinte(other.mischieVinte),
+      mischiePerse(other.mischiePerse),
+      toucheVinte(other.toucheVinte),
+      touchePerse(other.touchePerse),
+      punteggioClassifica(other.punteggioClassifica),
+      giocatori(std::move(other.giocatori))  // ? ULTIMO, seguito da )
+{
+    // Reset source object
+    other.id = 0;
+    other.nome.clear();
+    other.indirizzo.clear();
+    other.possessoPalla = 0;
+    // ... reset altri primitivi se necessario
+    
+    std::cout << "Move Squadra(" << nome << ")" << std::endl;
+}
+
+// COPY CONSTRUCTOR - COMPLETO
+Squadra::Squadra(const Squadra& other)
+    : id(other.id),
+      nome(other.nome), 
+      indirizzo(other.indirizzo),
+      possessoPalla(other.possessoPalla),
+      territorio(other.territorio),
+      placcaggiTotali(other.placcaggiTotali),
+      metriGuadagnatiTotali(other.metriGuadagnatiTotali),
+      meteTotali(other.meteTotali),
+      falliTotali(other.falliTotali),
+      mischieVinte(other.mischieVinte),
+      mischiePerse(other.mischiePerse),
+      toucheVinte(other.toucheVinte),
+      touchePerse(other.touchePerse),
+      punteggioClassifica(other.punteggioClassifica),
+      giocatori(other.giocatori)
+{
+    std::cout << "Copy Squadra(" << nome << ")" << std::endl;
+}
+
+// COPY ASSIGNMENT - COMPLETO
+Squadra& Squadra::operator=(const Squadra& other) {
+    if(this != &other) {
+        // Copy tutti i campi
+        id = other.id;
+        nome = other.nome;
+        indirizzo = other.indirizzo;
+        possessoPalla = other.possessoPalla;
+        territorio = other.territorio;
+        placcaggiTotali = other.placcaggiTotali;
+        metriGuadagnatiTotali = other.metriGuadagnatiTotali;
+        meteTotali = other.meteTotali;
+        falliTotali = other.falliTotali;
+        mischieVinte = other.mischieVinte;
+        mischiePerse = other.mischiePerse;
+        toucheVinte = other.toucheVinte;
+        touchePerse = other.touchePerse;
+        punteggioClassifica = other.punteggioClassifica;
+        giocatori = other.giocatori;
+    }
+    std::cout << "Copy assign Squadra(" << nome << ")" << std::endl;
+    return *this;
+}
+
+// MOVE ASSIGNMENT - COMPLETO
+Squadra& Squadra::operator=(Squadra&& other) noexcept {
+    if(this != &other) {
+        // Cleanup
+        giocatori.clear();
+        
+        // Move
+        id = other.id;
+        nome = std::move(other.nome);
+        indirizzo = std::move(other.indirizzo);
+        possessoPalla = other.possessoPalla;
+        territorio = other.territorio;
+        // ... move tutti i primitivi
+        giocatori = std::move(other.giocatori);
+        
+        // Reset source
+        other.id = 0;
+        other.nome.clear();
+        other.indirizzo.clear();
+    }
+    std::cout << "Move assign Squadra(" << nome << ")" << std::endl;
+    return *this;
+}
+
 
 // Getter/Setter info principali
 std::string Squadra::getNome() const {

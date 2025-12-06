@@ -101,7 +101,7 @@ void Gestionale::modificaStagione(Stagione& stagione) {
     
     while(controllo == 0) {
         cout << endl << "Seleziona azione:" << endl;
-        cout << "1) Aggiungi squadra" << endl << "2) Aggiungi partita" << endl << "3) Stampa Stagione" << endl;
+        cout << "1) Aggiungi squadra" << endl << "2) Aggiungi partita" << endl << "3) Stampa Stagione" << endl << "4) Vedi Classifica"<< endl << "5) Medie Punteggio" <<endl;
         cin >> azione;
         
         switch (azione) {
@@ -145,6 +145,39 @@ void Gestionale::modificaStagione(Stagione& stagione) {
             case 3:
                 cout << stagione;
                 break;
+            case 4: {
+			    // ? DIMOSTRAZIONE STL ALGORITHMS
+			    auto classifica = stagione.classificaSquadre();
+			    std::cout << "\n?? CLASSIFICA (STL sort + lambda):\n";
+			    for(size_t i = 0; i < classifica.size(); ++i) {
+			        std::cout << (i+1) << ". " << classifica[i]->getNome() 
+			                  << " (" << classifica[i]->getPunteggio() << " pt)\n";
+			    }
+			    
+			    std::cout << "\n?? Media punteggio: " << stagione.mediaPunteggioSquadre() << "\n";
+			    std::cout << "?? Media mete: " << stagione.mediaMeteTotaliSquadre() << "\n";
+			    
+			    auto top3 = stagione.topSquadre(3);
+			    std::cout << "\n?? TOP 3 (partial_sort):\n";
+			    for(size_t i = 0; i < top3.size(); ++i) {
+			        std::cout << (i+1) << ". " << top3[i]->getNome() << "\n";
+			    }
+			    break;
+				}
+			case 5: {
+			    // ? TEMPLATE METAPROGRAMMING DEMO
+			    std::cout << "\n?? TEMPLATE METAPROGRAMMING:\n";
+			    std::cout << "Media punteggio (template): " << stagione.mediaPunteggioTemplate() << "\n";
+			    std::cout << "Somma mete totali (template): " << stagione.sommaMeteTemplate() << "\n";
+			    
+			    // Demo flessibile con diversi getter
+			    auto media_mete = stagione.calcolaMedia(stagione.getSquadre(), &Squadra::getMeteTotali);
+			    auto media_placcaggi = stagione.calcolaMedia(stagione.getSquadre(), &Squadra::getPlaccaggiTotali);
+			    
+			    std::cout << "Media mete (pointer-to-member): " << media_mete << "\n";
+			    std::cout << "Media placcaggi (pointer-to-member): " << media_placcaggi << "\n";
+			    break;
+				}
             default:
                 cout << "Azione non valida." << endl;
                 break;
@@ -454,8 +487,8 @@ void Gestionale::salvaSquadre(const Stagione& stagione) const {
     
     for (const auto& s : squadreEsistenti) {
         scrittura << std::get<0>(s) << "," << std::get<1>(s) << ","
-                  << "\"" << std::get<2>(s) << "\"," << "\"" << std::get<3>(s) << "\","
-                  << std::get<4>(s) << "," << std::get<5>(s) << ","
+          << std::get<2>(s) << "," << std::get<3>(s) << ","  // Rimosso \"
+          << std::get<4>(s) << "," << std::get<5>(s) << ","
                   << std::get<6>(s) << "," << std::get<7>(s) << ","
                   << std::get<8>(s) << "," << std::get<9>(s) << ","
                   << std::get<10>(s) << "," << std::get<11>(s) << ","

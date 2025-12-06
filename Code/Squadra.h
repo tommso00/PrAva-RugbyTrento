@@ -36,6 +36,12 @@ private:
 
 public:
     Squadra(int id_, const std::string& nome, const std::string& indirizzo);
+    
+    // ? COPY/MOVE
+    Squadra(const Squadra& other);
+    Squadra(Squadra&& other) noexcept;
+    Squadra& operator=(const Squadra& other);
+    Squadra& operator=(Squadra&& other) noexcept;
 
     // Distruttore di default, poiché vector e string gestiscono la memoria automaticamente
     ~Squadra() = default;
