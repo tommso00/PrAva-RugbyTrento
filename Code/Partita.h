@@ -23,6 +23,7 @@ private:
 	double possessoLoc;
 	double possessoOsp;
 	int ptLocali, ptOspiti;
+	int meteLocali, meteOspiti;
     
     
     	
@@ -37,14 +38,19 @@ public:
 	// GETTER aggiunti
     int getId() const;
     int getData() const;
-    
+        
     const Squadra& getLocali() const;
     const Squadra& getOspiti() const;
-    
+
 	int getPuntiLocali() const;
     int getPuntiOspiti() const;
 	void setPuntiLocali(int value);
 	void setPuntiOspiti(int value);
+    
+    int getMeteLocali()const;
+    int getMeteOspiti()const;
+    void setMeteLocali(int val);
+    void setMeteOspiti(int val);
     
 	int getCartellinoRossoLoc() const;
 	void setCartellinoRossoLoc(int value);
@@ -54,7 +60,7 @@ public:
 
 	int getCartellinoGialloLoc() const;
 	void setCartellinoGialloLoc(int value);
-
+	
 	int getCartellinoGialloOsp() const;
 	void setCartellinoGialloOsp(int value);
 

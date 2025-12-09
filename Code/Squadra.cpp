@@ -265,6 +265,15 @@ void Squadra::aggiornaStatistiche() {
     }
 }
 
+void Squadra::addMete(int delta){
+	meteTotali += delta;
+}
+
+void Squadra::addPuntiClassifica(int delta){
+	punteggioClassifica += delta;
+}
+
+
 /*Ogni volta che aggiungi, rimuovi o modifichi i giocatori, puoi aggiornare le statistiche totali così:
 
 squadra.addGiocatore(nuovoGiocatore);

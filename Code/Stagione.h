@@ -16,6 +16,8 @@ private:
 public:
     explicit Stagione(int anno);
     
+    Squadra* trovaSquadraPerId(int id);
+    
     // ? COPY CONSTRUCTOR - Implementazione PROFONDA
     Stagione(const Stagione& other);
     

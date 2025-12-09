@@ -191,6 +191,15 @@ double Stagione::mediaMeteTotaliSquadre() const {
     return static_cast<double>(somma) / mete.size();
 }
 
+Squadra* Stagione::trovaSquadraPerId(int id){
+	for (auto& sqPtr : squadre){
+		if(sqPtr && sqPtr->getId()== id){
+			return sqPtr.get();
+		}
+	}
+	return nullptr;
+}
+
 // ? STL PARTIAL_SORT per TOP N
 std::vector<const Squadra*> Stagione::topSquadre(size_t n) const {
     std::vector<const Squadra*> top;

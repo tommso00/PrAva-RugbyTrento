@@ -4,7 +4,7 @@
 Partita::Partita(int id_, int data_, const Squadra& locali_, const Squadra& ospiti_) 
     : id(id_), data(data_), locali(locali_), ospiti(ospiti_), ptLocali(0), ptOspiti(0),cartellinoRossoLoc(0), cartellinoRossoOsp(0),
       cartellinoGialloLoc(0), cartellinoGialloOsp(0),
-      possessoLoc(0.0), possessoOsp(0.0)  {}
+      possessoLoc(0.0), possessoOsp(0.0), meteLocali(0), meteOspiti(0)  {}
 
 std::string Partita::getPunteggioPartita() const {
     return std::to_string(ptLocali) + ":" + std::to_string(ptOspiti);	
@@ -94,6 +94,21 @@ int Partita::getId() const {
     return id;
 }
 
+int Partita::getMeteLocali()const{
+	return meteLocali;
+}
+
+int Partita::getMeteOspiti()const{
+	return meteOspiti;
+}
+
+void Partita::setMeteLocali(int val){
+	meteLocali = val;
+}
+
+void Partita::setMeteOspiti(int val){
+	meteOspiti = val;
+}
 
 // Operatore di stampa per mostrare informazioni della partita
 std::ostream& operator<<(std::ostream& os, const Partita& p) {
@@ -107,11 +122,4 @@ std::ostream& operator<<(std::ostream& os, const Partita& p) {
 */  return os;
 }
 
-
-/*
-Secondo me possiamo far ritornare una stringa a getPunteggioPartita() 
-del tipo cout << ptLocali << "-" << ptOspiti << endl;
-:)
-
-*/
 

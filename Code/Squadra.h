@@ -46,6 +46,7 @@ public:
     // Distruttore di default, poiché vector e string gestiscono la memoria automaticamente
     ~Squadra() = default;
 
+	//GET-SET dati
     std::string getNome() const;
     std::string getIndirizzo() const;
     int getId() const;
@@ -57,6 +58,7 @@ public:
     void setId(int i);
     void setPunteggio(int p);
 
+	//ADD-REMOVE giocatore
     void addGiocatore(const Giocatore& g);
     void removeGiocatore(int id);
     
@@ -79,6 +81,9 @@ public:
 	int getFalliTotali() const;
 	void setFalliTotali(int value);
 
+	void aggiungiPuntiClassifica(int delta){punteggioClassifica += delta;}
+	void aggiungiMete(int delta){meteTotali +=delta;}
+	
 	// Mischie e touche
 	int getMischieVinte() const;
 	void setMischieVinte(int value);
@@ -93,6 +98,10 @@ public:
 	void setTouchePerse(int value);
 
 	void aggiornaStatistiche();
+	
+	//metodi per classifica
+	void addPuntiClassifica(int delta);
+	void addMete(int delta);
 
 
     friend std::ostream& operator<<(std::ostream& os, const Squadra& s);
