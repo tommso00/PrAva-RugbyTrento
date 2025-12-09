@@ -7,33 +7,8 @@
 #include <memory>
 
 
-//Ho pensato molto al fatto che fstream e sstream non bastino per la comunicazione tra .cpp e .csv 
-//per ora ho implementato così
-//non so' cosa hai in mente con Statistiche.h since
 
 using namespace std;
-
-// ==================== MENU PRINCIPALE ====================
-void Gestionale::avvia() {
-    int scelta = -1;
-    do {
-        cout << "\n=== MENU GESTIONALE ===\n";
-        cout << "1) Carica dati da CSV\n";
-        cout << "2) Crea nuova stagione\n";
-        cout << "3) Salva dati su CSV\n";
-        cout << "0) Esci\n";
-        cout << "Scelta: ";
-        cin >> scelta;
-
-        switch (scelta) {
-            case 1: //fetchStagioni("database/squadre_girone_rugby_trento.csv"); break;
-            case 2: //creaStagione(); break;
-            case 3: //salvaStagioni(); break;
-            case 0: cout << "Uscita...\n"; break;
-            default: cout << "Scelta non valida.\n"; break;
-        }
-    } while (scelta != 0);
-}
 
 // ==================== CREA STAGIONE ====================
 void Gestionale::creaStagione() {
@@ -224,13 +199,33 @@ void Gestionale::selezionaStagione() {
 
     std::cout << "Selezionata: " << stag << std::endl;
 
-    Stagione tempStagione(recuperaStagione("database/stagioni.csv", stag)); // Oggetto temporaneo per il caricamento
-    fetchSquadre(tempStagione);
-    for (auto& squadraPtr : tempStagione.getSquadre()) {
+    int anno = recuperaStagione("database/stagioni.csv", stag); // Oggetto temporaneo per il caricamento
+    if(anno == 0) return; //errore, possibile aggiunta di try{}cathc{}
+	
+	// Crea e SALVA la stagione nel vettore di Gestionale
+	auto stagionePtr = std::unique_ptr<Stagione>(new Stagione(anno));
+	Stagione* stagioneSelezionata = stagionePtr.get();
+	
+	// Carica TUTTO
+    fetchSquadre(*stagionePtr);
+    std::cout << "DEBUG: Caricate " << stagionePtr->getSquadre().size() << " squadre\n";
+    for (auto& squadraPtr : stagionePtr->getSquadre()) {
         fetchGiocatori(*squadraPtr);
     }
-    fetchPartite(tempStagione);
-    modificaStagione(tempStagione);
+    fetchPartite(*stagionePtr);  // applica i punti!
+    std::cout << "DEBUG: fetchPartite completato\n";
+    
+        // Debug: stampa squadre CON punti
+    std::cout << "DEBUG SQUADRE DOPO CARICAMENTO:\n";
+    for (const auto& sq : stagionePtr->getSquadre()) {
+        std::cout << "  " << sq->getNome() << " pts=" << sq->getPunteggio() << "\n";
+    }
+    
+    // AGGIUNGI al vettore delle stagioni gestite
+    stagioni.push_back(std::move(stagionePtr));
+    
+    // Passa il puntatore (non copia!)
+    modificaStagione(*stagioneSelezionata);
 }
 
 // ==================== LETTURA CSV ====================
@@ -349,6 +344,9 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
     std::string line;
     bool primaRiga = true;
     int stagioneAnno = stagione.getAnno(); // l'anno della stagione corrente (ID)
+
+	// DEBUG AGGIUNTO**
+    int squadreTrovate = 0;
 
     while (std::getline(file, line)) {
         if (primaRiga) { // salta intestazione
@@ -671,6 +669,7 @@ void Gestionale::fetchPartite(Stagione& stagione) {
 
         auto tokens = splitCSVLine(line);
         if (tokens.size() >= 15) {  // Nuova struttura completa
+        
             int id = std::stoi(tokens[0]);
             int anno = std::stoi(tokens[1]);
             int data = std::stoi(tokens[2]);
