@@ -64,7 +64,7 @@ public:
 	double getPossessoOsp() const;
 	void setPossessoOsp(double value);
 
-    int getPunteggioPartita() const; 
+    std::string getPunteggioPartita() const; 
     void setRisultato(int ptLocali, int ptOspiti);
 	
 

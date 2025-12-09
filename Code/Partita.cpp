@@ -6,8 +6,8 @@ Partita::Partita(int id_, int data_, const Squadra& locali_, const Squadra& ospi
       cartellinoGialloLoc(0), cartellinoGialloOsp(0),
       possessoLoc(0.0), possessoOsp(0.0)  {}
 
-int Partita::getPunteggioPartita() const {
-    return ptLocali + ptOspiti;	//dovremmo farlo ritornare una stringa??? ptlocali << ":" << ptospiti?
+std::string Partita::getPunteggioPartita() const {
+    return std::to_string(ptLocali) + ":" + std::to_string(ptOspiti);	
 }
 
 void Partita::setRisultato(int ptLocali_, int ptOspiti_) {
