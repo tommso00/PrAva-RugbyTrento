@@ -142,15 +142,15 @@ void Gestionale::modificaStagione(Stagione& stagione) {
 			case 5: {
 			    // ? TEMPLATE METAPROGRAMMING DEMO
 			    std::cout << "\n?? TEMPLATE METAPROGRAMMING:\n";
-			    std::cout << "Media punteggio (template): " << stagione.mediaPunteggioTemplate() << "\n";
-			    std::cout << "Somma mete totali (template): " << stagione.sommaMeteTemplate() << "\n";
+			    std::cout << "Media punteggio tra squadre(template): " << stagione.mediaPunteggioTemplate() << "\n";
+			    std::cout << "Somma mete totali in Stagione (template): " << stagione.sommaMeteTemplate() << "\n";
 			    
 			    // Demo flessibile con diversi getter
 			    auto media_mete = stagione.calcolaMedia(stagione.getSquadre(), &Squadra::getMeteTotali);
 			    auto media_placcaggi = stagione.calcolaMedia(stagione.getSquadre(), &Squadra::getPlaccaggiTotali);
 			    
-			    std::cout << "Media mete (pointer-to-member): " << media_mete << "\n";
-			    std::cout << "Media placcaggi (pointer-to-member): " << media_placcaggi << "\n";
+			    std::cout << "Media mete in Stagione(pointer-to-member): " << media_mete << "\n";
+			    std::cout << "Media placcaggi in Stagione(pointer-to-member): " << media_placcaggi << "\n";
 			    break;
 				}
             default:
@@ -931,30 +931,45 @@ void Gestionale::salvaParallel(const Stagione& stagione) const {
     int anno_stagione = stagione.getAnno();
     
     // THREAD 1: Stagioni
-    threads.emplace_back([this, anno_stagione]() {
-        Stagione temp(anno_stagione);
-        this->salvaStagioni(temp);
+    threads.emplace_back([this, &stagione]() {
+        try{
+        	this->salvaStagioni(stagione);
+		}catch(const std::exception e){
+			std::cerr << "errore salvastagioni: " << e.what() << std::endl;
+		}
     });
     
     // THREAD 2: Squadre  
     threads.emplace_back([this, &stagione]() {
-        this->salvaSquadre(stagione);
+    	try {
+            this->salvaSquadre(stagione);
+        } catch (const std::exception& e) {
+            std::cerr << "Errore salvaSquadre: " << e.what() << std::endl;
+        }
     });
     
     // THREAD 3: Partite
     threads.emplace_back([this, &stagione]() {
-        this->salvaPartite(stagione);
+		try {
+            this->salvaPartite(stagione);
+        } catch (const std::exception& e) {
+            std::cerr << "Errore salvaPartite: " << e.what() << std::endl;
+        }
     });
     
     // THREAD paralleli: Giocatori per squadra
     for (const auto& squadraPtr : stagione.getSquadre()) {
-        if (threads.size() < max_threads * 2) {
-            int squadra_id = squadraPtr->getId();
-            threads.emplace_back([this, squadra_id]() {
-                Squadra temp_squadra(squadra_id, "temp", "temp");
-                this->salvaGiocatori(temp_squadra);
-            });
-        }
+        if (threads.size() >= max_threads * 2) break;
+
+		const Squadra* squadra = squadraPtr.get();
+        threads.emplace_back([this, squadra]() {
+            try {
+                this->salvaGiocatori(*squadra);
+            } catch (const std::exception& e) {
+                std::cerr << "Errore salvaGiocatori per squadra " 
+                          << squadra->getId() << ": " << e.what() << std::endl;
+            }
+        });
     }
     
     // JOIN tutti i thread
