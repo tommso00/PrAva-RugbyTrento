@@ -27,7 +27,12 @@ class Gestionale {
     	std::string pathPartite = "database/partite.csv";
 		
 		// Mutex per sincronizzazione salvataggi
-		mutable std::mutex save_mutex;
+		/*mutable std::mutex save_mutex;
+		std::mutex mutex_stagioni;
+	    std::mutex mutex_squadre;
+	    std::mutex mutex_giocatori;
+	    std::mutex mutex_partite;
+	    std::mutex mutex_cout;*/
 		
 		//metodi ausiliari CSV
 		std::vector<std::string> splitCSVLine(const std::string& path) const;
@@ -50,25 +55,25 @@ class Gestionale {
 		
 		//STAGIONI
 		void fetchStagioni(const std::string& filename);
-		void salvaStagioni(const Stagione& nuovaStagione) const;
+		void salvaStagioni(const Stagione& nuovaStagione);
 
 		//SQUADRE
 		std::unique_ptr<Squadra> aggiungiSquadra();
 	    void fetchSquadre(Stagione& stagione);
-   		void salvaSquadre(const Stagione& stagione) const;
+   		void salvaSquadre(const Stagione& stagione);
    		int getMaxSquadraId() const;
    		
    		//GIOCATORI
     	void fetchGiocatori(Squadra& squadra);
-    	void salvaGiocatori(const Squadra& squadra) const;
+    	void salvaGiocatori(const Squadra& squadra);
     	
     	//PARTITE
     	void fetchPartite(Stagione& stagione);
-    	void salvaPartite(const Stagione& stagione) const;
+    	void salvaPartite(const Stagione& stagione);
     	void aggiungiPartita(Stagione& stagione);
     	
     	// SALVATAGGIO PARALLELO
-    	void salvaParallel(const Stagione& stagione) const;
+    	void salvaParallel(const Stagione& stagione);
 		
 };
 
