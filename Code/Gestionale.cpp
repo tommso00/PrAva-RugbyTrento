@@ -506,12 +506,15 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
 void Gestionale::salvaSquadre(const Stagione& stagione) {
     using namespace CSVHelper;
     
+    //lambda-function che converte una riga di testo CSV in un oggetto SquadraData
     auto parseSquadra = [this](const std::string& line) -> SquadraData {
         return SquadraData::fromCSV(splitCSVLine(line));
     };
-    
+    //carico le squadre esistenti nel file path e creo un vector squadreData 
     auto squadreData = caricaRighe<SquadraData>(pathSquadre, parseSquadra);
     
+    
+    //non ho capito bene cosa fa', tipo eliminare tutte le righe relative a quella stagione?
     int annoStagione = stagione.getAnno();
     squadreData.erase(
         std::remove_if(squadreData.begin(), squadreData.end(),
@@ -521,6 +524,7 @@ void Gestionale::salvaSquadre(const Stagione& stagione) {
         squadreData.end()
     );
     
+    //salvataggio dati
     for (const auto& sq : stagione.getSquadre()) {
         SquadraData sd{
             sq->getId(), annoStagione,
@@ -534,7 +538,7 @@ void Gestionale::salvaSquadre(const Stagione& stagione) {
         };
         squadreData.push_back(sd);
     }
-    
+    //Serializzazione e salvataggio su CSV
     auto formatSquadra = [](const SquadraData& sd) -> std::string {
         return sd.toCSV();
     };
