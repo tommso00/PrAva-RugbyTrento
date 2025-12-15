@@ -40,7 +40,7 @@ Squadra::Squadra(Squadra&& other) noexcept
     other.possessoPalla = 0;
     // ... reset altri primitivi se necessario
     
-    std::cout << "Move Squadra(" << nome << ")" << std::endl;
+    //std::cout << "Move Squadra(" << nome << ")" << std::endl;
 }
 
 // COPY CONSTRUCTOR - COMPLETO
@@ -61,7 +61,7 @@ Squadra::Squadra(const Squadra& other)
       punteggioClassifica(other.punteggioClassifica),
       giocatori(other.giocatori)
 {
-    std::cout << "Copy Squadra(" << nome << ")" << std::endl;
+    //std::cout << "Copy Squadra(" << nome << ")" << std::endl;
 }
 
 // COPY ASSIGNMENT - COMPLETO
@@ -84,7 +84,7 @@ Squadra& Squadra::operator=(const Squadra& other) {
         punteggioClassifica = other.punteggioClassifica;
         giocatori = other.giocatori;
     }
-    std::cout << "Copy assign Squadra(" << nome << ")" << std::endl;
+    //std::cout << "Copy assign Squadra(" << nome << ")" << std::endl;
     return *this;
 }
 
@@ -108,7 +108,7 @@ Squadra& Squadra::operator=(Squadra&& other) noexcept {
         other.nome.clear();
         other.indirizzo.clear();
     }
-    std::cout << "Move assign Squadra(" << nome << ")" << std::endl;
+    //std::cout << "Move assign Squadra(" << nome << ")" << std::endl;
     return *this;
 }
 

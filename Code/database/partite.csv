@@ -1,4 +1,4 @@
-partita_id,stagione_anno,data,id_locali,id_ospiti,pt_locali,pt_ospiti,mete_locali, mete_ospiti,cartellino_rosso_loc,cartellino_rosso_osp,cartellino_giallo_loc,cartellino_giallo_osp,possesso_loc,possesso_osp
+partita_id,stagione_anno,data,id_locali,id_ospiti,pt_locali,pt_ospiti,mete_locali,mete_ospiti,cartellino_rosso_loc,cartellino_rosso_osp,cartellino_giallo_loc,cartellino_giallo_osp,possesso_loc,possesso_osp
 1,2024,20240915,1,2,24,17,4,3,0,0,2,3,52,48
 2,2024,20240915,3,4,31,19,5,3,0,1,1,2,58,42
 3,2024,20240915,5,6,28,14,4,2,0,0,3,1,54,46

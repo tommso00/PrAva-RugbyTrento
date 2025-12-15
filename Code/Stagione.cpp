@@ -93,14 +93,15 @@ StatType Stagione::sommaStatistica(const std::vector<std::unique_ptr<Squadra>>& 
     return totale;
 }
 
-// ? WRAPPER per uso semplice nel menu
+// ? CORRETTO: passa getSquadre()
 double Stagione::mediaPunteggioTemplate() const {
-    return calcolaMedia(squadre, &Squadra::getPunteggio);
+    return calcolaMedia(getSquadre(), &Squadra::getPunteggio);
 }
 
 int Stagione::sommaMeteTemplate() const {
-    return sommaStatistica(squadre, &Squadra::getMeteTotali);
+    return sommaStatistica(getSquadre(), &Squadra::getMeteTotali);
 }
+
 
 
 // Metodi pubblici

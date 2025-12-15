@@ -338,7 +338,12 @@ void Gestionale::modificaStagione(Stagione& stagione) {
         cout << "Vuoi modificare ancora? 0=si / 1=no" << endl;
         cin >> controllo;
     }
-    
+	
+	/*for (const auto& sq : stagione.getSquadre()) {
+	    std::cout << sq->getNome()
+	              << " meteTotali=" << sq->getMeteTotali() << "\n";
+	}*/
+
     salvaParallel(stagione);
 }
 
@@ -381,19 +386,19 @@ void Gestionale::selezionaStagione() {
     Stagione* stagioneSelezionata = stagionePtr.get();
     
     fetchSquadre(*stagionePtr);
-    std::cout << "DEBUG: Caricate " << stagionePtr->getSquadre().size() << " squadre\n";
+    //std::cout << "DEBUG: Caricate " << stagionePtr->getSquadre().size() << " squadre\n";
     
     for (auto& squadraPtr : stagionePtr->getSquadre()) {
         fetchGiocatori(*squadraPtr);
     }
     
     fetchPartite(*stagionePtr);
-    std::cout << "DEBUG: fetchPartite completato\n";
+    //std::cout << "DEBUG: fetchPartite completato\n";
     
-    std::cout << "DEBUG SQUADRE DOPO CARICAMENTO:\n";
+    /*std::cout << "DEBUG SQUADRE DOPO CARICAMENTO:\n";
     for (const auto& sq : stagionePtr->getSquadre()) {
         std::cout << "  " << sq->getNome() << " pts=" << sq->getPunteggio() << "\n";
-    }
+    }*/
     
     stagioni.push_back(std::move(stagionePtr));
     modificaStagione(*stagioneSelezionata);
@@ -482,7 +487,7 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
                 squadraPtr->setTerritorio(std::stod(tokens[5]));
                 squadraPtr->setPlaccaggiTotali(std::stoi(tokens[6]));
                 squadraPtr->setMetriGuadagnatiTotali(std::stoi(tokens[7]));
-                squadraPtr->setMeteTotali(std::stoi(tokens[8]));
+                //squadraPtr->setMeteTotali(std::stoi(tokens[8]));
                 squadraPtr->setFalliTotali(std::stoi(tokens[9]));
                 squadraPtr->setMischieVinte(std::stoi(tokens[10]));
                 squadraPtr->setMischiePerse(std::stoi(tokens[11]));
@@ -506,25 +511,10 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
 void Gestionale::salvaSquadre(const Stagione& stagione) {
     using namespace CSVHelper;
     
-    //lambda-function che converte una riga di testo CSV in un oggetto SquadraData
-    auto parseSquadra = [this](const std::string& line) -> SquadraData {
-        return SquadraData::fromCSV(splitCSVLine(line));
-    };
-    //carico le squadre esistenti nel file path e creo un vector squadreData 
-    auto squadreData = caricaRighe<SquadraData>(pathSquadre, parseSquadra);
-    
-    
-    //non ho capito bene cosa fa', tipo eliminare tutte le righe relative a quella stagione?
+    std::vector<SquadraData> squadreData;
     int annoStagione = stagione.getAnno();
-    squadreData.erase(
-        std::remove_if(squadreData.begin(), squadreData.end(),
-            [annoStagione](const SquadraData& sd) {
-                return sd.anno == annoStagione;
-            }),
-        squadreData.end()
-    );
     
-    //salvataggio dati
+    // ? Popola SOLO con dati della stagione corrente
     for (const auto& sq : stagione.getSquadre()) {
         SquadraData sd{
             sq->getId(), annoStagione,
@@ -538,17 +528,14 @@ void Gestionale::salvaSquadre(const Stagione& stagione) {
         };
         squadreData.push_back(sd);
     }
-    //Serializzazione e salvataggio su CSV
-    auto formatSquadra = [](const SquadraData& sd) -> std::string {
-        return sd.toCSV();
-    };
     
     salvaRighe(pathSquadre, 
         "squadra_id,stagione_anno,nome,indirizzo,possesso_palla,territorio,"
         "placcaggi_totali,metri_guadagnati_totali,mete_totali,falli_totali,"
         "mischie_vinte,mischie_perse,touche_vinte,touche_perse,punteggio_classifica",
-        squadreData, formatSquadra);
+        squadreData, [](const SquadraData& sd) { return sd.toCSV(); });
 }
+
 
 // ==================== FETCH GIOCATORI ====================
 void Gestionale::fetchGiocatori(Squadra& squadra) {
@@ -597,21 +584,26 @@ void Gestionale::fetchGiocatori(Squadra& squadra) {
 void Gestionale::salvaGiocatori(const Squadra& squadra) {
     using namespace CSVHelper;
     
+    // 1) Carico TUTTI i giocatori già presenti nel file
     auto parseGiocatore = [this](const std::string& line) {
         return GiocatoreData::fromCSV(splitCSVLine(line));
     };
     
-    auto giocatoriData = caricaRighe<GiocatoreData>(pathGiocatori, parseGiocatore);
+    std::vector<GiocatoreData> giocatoriData =
+        caricaRighe<GiocatoreData>(pathGiocatori, parseGiocatore);
     
     int squadraId = squadra.getId();
+    
+    // 2) Rimuovo i giocatori appartenenti a questa squadra
     giocatoriData.erase(
         std::remove_if(giocatoriData.begin(), giocatoriData.end(),
-            [squadraId](const GiocatoreData& gd) { 
-                return gd.squadraId == squadraId; 
+            [squadraId](const GiocatoreData& gd) {
+                return gd.squadraId == squadraId;
             }),
         giocatoriData.end()
     );
     
+    // 3) Aggiungo i giocatori ATTUALI della squadra
     for (const auto& g : squadra.getGiocatori()) {
         GiocatoreData gd{
             g.getId(), squadraId, g.getEta(),
@@ -622,12 +614,17 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) {
         giocatoriData.push_back(gd);
     }
     
+    // 4) Riscrivo l'intero file con TUTTI i giocatori (vecchi + aggiornati)
     salvaRighe(pathGiocatori,
         "giocatore_id,squadra_id,nome,cognome,eta,ruolo,"
         "placcaggi,metri_corsi,mete,calci_piazzati,"
         "falli_commessi,offload,minuti_giocati,partite_giocate",
-        giocatoriData, [](const GiocatoreData& gd) { return gd.toCSV(); });
+        giocatoriData,
+        [](const GiocatoreData& gd) { return gd.toCSV(); }
+    );
 }
+
+
 
 // ==================== FETCH PARTITE ====================
 void Gestionale::fetchPartite(Stagione& stagione) {
@@ -670,6 +667,9 @@ void Gestionale::fetchPartite(Stagione& stagione) {
                     int meteLocali = std::stoi(tokens[7]);
                     int meteOspiti = std::stoi(tokens[8]);
                     
+                    p.setMeteLocali(meteLocali);   // ? NUOVO
+					p.setMeteOspiti(meteOspiti);   // ? NUOVO
+                    
                     p.setRisultato(ptLocali, ptOspiti);
                     p.setCartellinoRossoLoc(std::stoi(tokens[9]));
                     p.setCartellinoRossoOsp(std::stoi(tokens[10]));
@@ -711,27 +711,17 @@ void Gestionale::fetchPartite(Stagione& stagione) {
         }
     }
     file.close();
+
 }
 
 // ==================== SALVA PARTITE (OTTIMIZZATO) ====================
 void Gestionale::salvaPartite(const Stagione& stagione) {
     using namespace CSVHelper;
     
-    auto parsePartita = [this](const std::string& line) {
-        return PartitaData::fromCSV(splitCSVLine(line));
-    };
-    
-    auto partiteData = caricaRighe<PartitaData>(pathPartite, parsePartita);
-    
+    std::vector<PartitaData> partiteData;
     int annoStagione = stagione.getAnno();
-    partiteData.erase(
-        std::remove_if(partiteData.begin(), partiteData.end(),
-            [annoStagione](const PartitaData& pd) {
-                return pd.anno == annoStagione;
-            }),
-        partiteData.end()
-    );
     
+    // ? Popola SOLO con partite della stagione corrente
     for (const auto& p : stagione.getCalendario()) {
         PartitaData pd{
             p.getId(), annoStagione, p.getData(),
@@ -753,6 +743,7 @@ void Gestionale::salvaPartite(const Stagione& stagione) {
         "possesso_loc,possesso_osp",
         partiteData, [](const PartitaData& pd) { return pd.toCSV(); });
 }
+
 
 // ==================== AGGIUNGI PARTITA ====================
 void Gestionale::aggiungiPartita(Stagione& stagione) {
@@ -816,29 +807,22 @@ int Gestionale::getMaxSquadraId() const {
 void Gestionale::salvaParallel(const Stagione& stagione) {
     printf("=== Avvio salvataggio parallelo ===\n");
     
-    const Stagione* ptrStagione = &stagione;
-    Gestionale* ptrThis = this;
+    // Thread paralleli per dati pesanti
+    std::thread t1(threadSalvaStagioni, this, &stagione);
+    std::thread t2(threadSalvaSquadre, this, &stagione);
+    std::thread t3(threadSalvaPartite, this, &stagione);
     
-    std::thread t1(threadSalvaStagioni, ptrThis, ptrStagione);
-    std::thread t2(threadSalvaSquadre, ptrThis, ptrStagione);
-    std::thread t3(threadSalvaPartite, ptrThis, ptrStagione);
+    t1.join(); t2.join(); t3.join();
     
-    printf("Thread avviati, attendo completamento...\n");
-    
-    if (t1.joinable()) t1.join();
-    if (t2.joinable()) t2.join();
-    if (t3.joinable()) t3.join();
-    
-    printf("Thread completati! Salvataggio giocatori...\n");
-    
+    // Salvataggio sequenziale per giocatori (dipende dalle squadre)
+    printf("Salvataggio giocatori...\n");
     for (const auto& squadraPtr : stagione.getSquadre()) {
-        try {
-            salvaGiocatori(*squadraPtr);
-        } catch (const std::exception& e) {
-            printf("[ERRORE] salvaGiocatori: %s\n", e.what());
-        }
-    }
+	    std::cout << "Squadra " << squadraPtr->getNome()
+	              << " giocatori: " << squadraPtr->getGiocatori().size() << "\n";
+	    salvaGiocatori(*squadraPtr);
+	}
     
-    printf("=== Salvataggio completato! ===\n");
+    printf("=== Salvataggio COMPLETO! ===\n");
 }
+
 

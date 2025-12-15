@@ -15,7 +15,7 @@ Giocatore::Giocatore(const Giocatore& other)
       mete(other.mete), calciPiazzati(other.calciPiazzati),
       falliCommessi(other.falliCommessi), offload(other.offload),
       minutiGiocati(other.minutiGiocati), partiteGiocate(other.partiteGiocate) {
-    std::cout << "Copy Giocatore(" << ruolo << ")" << std::endl;
+    //std::cout << "Copy Giocatore(" << ruolo << ")" << std::endl;
 }
 
 // ? MOVE CONSTRUCTOR
@@ -27,7 +27,7 @@ Giocatore::Giocatore(Giocatore&& other) noexcept
       falliCommessi(other.falliCommessi), offload(other.offload),
       minutiGiocati(other.minutiGiocati), partiteGiocate(other.partiteGiocate) {
     other.id = 0;
-    std::cout << "Move Giocatore(" << ruolo << ")" << std::endl;
+    //std::cout << "Move Giocatore(" << ruolo << ")" << std::endl;
 }
 
 // ? COPY ASSIGNMENT
@@ -46,7 +46,7 @@ Giocatore& Giocatore::operator=(const Giocatore& other) {
         minutiGiocati = other.minutiGiocati;
         partiteGiocate = other.partiteGiocate;
     }
-    std::cout << "Copy assign Giocatore(" << ruolo << ")" << std::endl;
+    //std::cout << "Copy assign Giocatore(" << ruolo << ")" << std::endl;
     return *this;
 }
 
@@ -62,7 +62,7 @@ Giocatore& Giocatore::operator=(Giocatore&& other) noexcept {
         
         other.id = 0;
     }
-    std::cout << "Move assign Giocatore(" << ruolo << ")" << std::endl;
+    //std::cout << "Move assign Giocatore(" << ruolo << ")" << std::endl;
     return *this;
 }
 	
