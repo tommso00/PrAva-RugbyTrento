@@ -816,10 +816,14 @@ void Gestionale::salvaParallel(const Stagione& stagione) {
     
     // Salvataggio sequenziale per giocatori (dipende dalle squadre)
     printf("Salvataggio giocatori...\n");
+    try{
     for (const auto& squadraPtr : stagione.getSquadre()) {
 	    std::cout << "Squadra " << squadraPtr->getNome()
 	              << " giocatori: " << squadraPtr->getGiocatori().size() << "\n";
 	    salvaGiocatori(*squadraPtr);
+		}
+	}catch(const std::exception& e){
+		std::cerr << "[ERRORE] salvaGiocatori: " << e.what() << "\n";
 	}
     
     printf("=== Salvataggio COMPLETO! ===\n");
