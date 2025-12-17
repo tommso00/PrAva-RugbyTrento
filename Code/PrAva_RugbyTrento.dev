@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=2
 CompilerSettings=0000000000000000100000000
-UnitCount=15
+UnitCount=17
 
 [VersionInfo]
 Major=1
@@ -181,7 +181,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit16]
-FileName=Gestionale.cpp
+FileName=Statistiche.h
 CompileCpp=1
 Folder=
 Compile=1
@@ -202,6 +202,16 @@ BuildCmd=
 
 [Unit14]
 FileName=Gestionale.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit17]
+FileName=Statistiche.cpp
 CompileCpp=1
 Folder=
 Compile=1

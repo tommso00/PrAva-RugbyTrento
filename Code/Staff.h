@@ -56,7 +56,7 @@ public:
      * 
      * Libera le risorse allocate e chiama il distruttore della classe base Persona.
      */
-    ~Staff();
+    ~Staff() = default;
 
     // *** METODI GETTER E SETTER ***
 

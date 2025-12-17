@@ -4,10 +4,6 @@ using namespace std;
 Staff::Staff(const string& nome,const string& cognome ,int eta, RuoloStaff ruolo): Persona(nome, cognome, eta), ruolo(ruolo){}
 
 
-Staff::~Staff() {
-    cout << "Distruttore Staff chiamato per: " << nome << endl;
-}
-
 RuoloStaff Staff::getRuolo() const {
     return ruolo;
 }
