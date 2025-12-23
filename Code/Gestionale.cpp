@@ -7,6 +7,7 @@
 #include <memory>
 #include <algorithm>
 #include <numeric>
+#include <thread>
 #include "Statistiche.h"
 
 using namespace std;
@@ -255,7 +256,7 @@ int Gestionale::recuperaStagione(const std::string& filename, int numeroRiga) {
     return 0;
 }
 
-// ==================== MODIFICA STAGIONE (CON CASE 6) ====================
+// ==================== MODIFICA STAGIONE ====================
 void Gestionale::modificaStagione(Stagione& stagione) {
     int lastSquadraId = getMaxSquadraId();  
     for (const auto& s : stagione.getSquadre()) {
@@ -273,7 +274,7 @@ void Gestionale::modificaStagione(Stagione& stagione) {
              << "3) Stampa Stagione" << endl 
              << "4) Vedi Classifica" << endl 
              << "5) Medie Punteggio" << endl
-             << "6) Statistiche Avanzate (STL)" << endl;  // ? NUOVO CASE
+             << "6) Statistiche Avanzate (STL)" << endl;
         cin >> azione;
         
         switch (azione) {
@@ -339,24 +340,24 @@ void Gestionale::modificaStagione(Stagione& stagione) {
                 break;
             case 4: {
                 auto classifica = stagione.classificaSquadre();
-                std::cout << "\n?? CLASSIFICA (STL sort + lambda):\n";
+                std::cout << "\nCLASSIFICA (sort + lambda):\n";
                 for(size_t i = 0; i < classifica.size(); ++i) {
                     std::cout << (i+1) << ". " << classifica[i]->getNome() 
                               << " (" << classifica[i]->getPunteggio() << " pt)\n";
                 }
                 
-                std::cout << "\n?? Media punteggio: " << stagione.mediaPunteggioSquadre() << "\n";
-                std::cout << "?? Media mete: " << stagione.mediaMeteTotaliSquadre() << "\n";
+                std::cout << "\nMedia punteggio: " << stagione.mediaPunteggioSquadre() << "\n";
+                std::cout << "Media mete: " << stagione.mediaMeteTotaliSquadre() << "\n";
                 
                 auto top3 = stagione.topSquadre(3);
-                std::cout << "\n?? TOP 3 (partial_sort):\n";
+                std::cout << "\nTOP 3 (partial_sort):\n";
                 for(size_t i = 0; i < top3.size(); ++i) {
                     std::cout << (i+1) << ". " << top3[i]->getNome() << "\n";
                 }
                 break;
             }
             case 5: {
-                std::cout << "\n?? TEMPLATE METAPROGRAMMING:\n";
+                std::cout << "\nTEMPLATE METAPROGRAMMING:\n";
                 std::cout << "Media punteggio (template): " << stagione.mediaPunteggioTemplate() << "\n";
                 std::cout << "Somma mete totali (template): " << stagione.sommaMeteTemplate() << "\n";
                 
@@ -367,12 +368,10 @@ void Gestionale::modificaStagione(Stagione& stagione) {
                 std::cout << "Media placcaggi (pointer-to-member): " << media_placcaggi << "\n";
                 break;
             }
-            
-            // ==================== NUOVO CASE 6: STATISTICHE STL ====================
             case 6: {
                 int sceltaStats;
 			    std::cout << "\n+----------------------------------------------------+\n";
-			    std::cout << "¦       STATISTICHE AVANZATE (Algoritmi STL)       ¦\n";
+			    std::cout << "¦       STATISTICHE AVANZATE (Algoritmi STL)        ¦\n";
 			    std::cout << "+----------------------------------------------------+\n";
 			    std::cout << "\n1) Statistiche per Squadra (giocatori)\n";
 			    std::cout << "2) Report Completo Stagione\n";
@@ -380,12 +379,10 @@ void Gestionale::modificaStagione(Stagione& stagione) {
 			    std::cin >> sceltaStats;
 			    
 			    if (sceltaStats == 1) {
-			        // Statistiche squadre (giocatori)
 			        for (const auto& sq : stagione.getSquadre()) {
 			            Statistiche::stampaReportSquadra(*sq);
 			        }
 			    } else if (sceltaStats == 2) {
-			        // Report completo stagione
 			        Statistiche::stampaReportStagione(stagione);
 			    } else {
 			        std::cout << "Scelta non valida.\n";
@@ -416,9 +413,8 @@ std::unique_ptr<Squadra> Gestionale::aggiungiSquadra() {
     return std::unique_ptr<Squadra>(new Squadra(newId, nome, indirizzo));
 }
 
-// ==================== RICERCA STAGIONE (Lambda Migliorata) ====================
+// ==================== RICERCA STAGIONE ====================
 Stagione* Gestionale::trovaStagione(int anno) {
-    // Lambda con capture by value esplicito
     auto confrontaAnno = [anno](const std::unique_ptr<Stagione>& s) {
         return s->getAnno() == anno;
     };
@@ -560,10 +556,27 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
 // ==================== SALVA SQUADRE ====================
 void Gestionale::salvaSquadre(const Stagione& stagione) {
     using namespace CSVHelper;
-    
-    std::vector<SquadraData> squadreData;
+
+    auto parseSquadra = [this](const std::string& line) {
+        return SquadraData::fromCSV(splitCSVLine(line));
+    };
+
+    // Carica tutte le squadre esistenti
+    std::vector<SquadraData> squadreData =
+        caricaRighe<SquadraData>(pathSquadre, parseSquadra);
+
     int annoStagione = stagione.getAnno();
-    
+
+    // Rimuovi solo le squadre della stagione corrente
+    squadreData.erase(
+        std::remove_if(squadreData.begin(), squadreData.end(),
+            [annoStagione](const SquadraData& sd) {
+                return sd.anno == annoStagione;
+            }),
+        squadreData.end()
+    );
+
+    // Aggiungi le squadre aggiornate della stagione corrente
     for (const auto& sq : stagione.getSquadre()) {
         SquadraData sd{
             sq->getId(), annoStagione,
@@ -577,7 +590,7 @@ void Gestionale::salvaSquadre(const Stagione& stagione) {
         };
         squadreData.push_back(sd);
     }
-    
+
     salvaRighe(pathSquadre, 
         "squadra_id,stagione_anno,nome,indirizzo,possesso_palla,territorio,"
         "placcaggi_totali,metri_guadagnati_totali,mete_totali,falli_totali,"
@@ -668,7 +681,7 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) {
     );
 }
 
-// ==================== FETCH STAFF (CON MOVE SEMANTICS) ====================
+// ==================== FETCH STAFF ====================
 void Gestionale::fetchStaff(Squadra& squadra) {
     std::ifstream file(pathStaff);
     if (!file.is_open()) {
@@ -689,17 +702,20 @@ void Gestionale::fetchStaff(Squadra& squadra) {
         std::vector<std::string> tokens = splitCSVLine(line);
 
         if (tokens.size() >= 6) {
+            int idStaff = std::stoi(tokens[0]);
             int idSquadra = std::stoi(tokens[1]);
 
             if (idSquadra == squadraId) {
-                RuoloStaff ruolo = StaffData::stringToRuolo(tokens[5]);
-                Staff s(tokens[2], tokens[3], std::stoi(tokens[4]), ruolo);
-                squadra.addStaff(std::move(s));
-            }
+			    RuoloStaff ruolo = Staff::stringToRuolo(tokens[5]);
+			    Staff s(idStaff, tokens[2], tokens[3], std::stoi(tokens[4]), ruolo);
+			    squadra.addStaff(std::move(s));
+			}
+
         }
     }
     file.close();
 }
+
 
 // ==================== SALVA STAFF ====================
 void Gestionale::salvaStaff(const Squadra& squadra) {
@@ -714,6 +730,7 @@ void Gestionale::salvaStaff(const Squadra& squadra) {
     
     int squadraId = squadra.getId();
     
+    // Rimuovi solo le righe della squadra corrente
     staffData.erase(
         std::remove_if(staffData.begin(), staffData.end(),
             [squadraId](const StaffData& sd) {
@@ -722,15 +739,23 @@ void Gestionale::salvaStaff(const Squadra& squadra) {
         staffData.end()
     );
     
-    int staffId = 1;
+    // Calcola il prossimo ID globale disponibile
+    int nextId = 1;
     if (!staffData.empty()) {
-        staffId = std::max_element(staffData.begin(), staffData.end(),
+        nextId = std::max_element(staffData.begin(), staffData.end(),
             [](const StaffData& a, const StaffData& b) { return a.id < b.id; })->id + 1;
     }
     
+    // Inserisci lo staff della squadra, mantenendo l'id se già esistente
     for (const auto& s : squadra.getStaff()) {
+        int idStaff = s.getId();
+        if (idStaff == 0) {
+            idStaff = nextId++;
+            const_cast<Staff&>(s).setId(idStaff);
+        }
+
         StaffData sd{
-            staffId++, squadraId, s.getEta(),
+            idStaff, squadraId, s.getEta(),
             s.getNome(), s.getCognome(),
             s.getRuolo()
         };
@@ -833,10 +858,27 @@ void Gestionale::fetchPartite(Stagione& stagione) {
 // ==================== SALVA PARTITE ====================
 void Gestionale::salvaPartite(const Stagione& stagione) {
     using namespace CSVHelper;
-    
-    std::vector<PartitaData> partiteData;
+
+    auto parsePartita = [this](const std::string& line) {
+        return PartitaData::fromCSV(splitCSVLine(line));
+    };
+
+    // Carica tutte le partite esistenti
+    std::vector<PartitaData> partiteData =
+        caricaRighe<PartitaData>(pathPartite, parsePartita);
+
     int annoStagione = stagione.getAnno();
-    
+
+    // Rimuovi le partite della stagione corrente
+    partiteData.erase(
+        std::remove_if(partiteData.begin(), partiteData.end(),
+            [annoStagione](const PartitaData& pd) {
+                return pd.anno == annoStagione;
+            }),
+        partiteData.end()
+    );
+
+    // Aggiungi le partite della stagione corrente
     for (const auto& p : stagione.getCalendario()) {
         PartitaData pd{
             p.getId(), annoStagione, p.getData(),

@@ -36,61 +36,26 @@ enum RuoloStaff {
  */
 class Staff : public Persona {
 protected:
-    RuoloStaff ruolo; ///< Ruolo professionale del membro dello staff all'interno del club.
+    int id = 0;
+    RuoloStaff ruolo;
 
 public:
-    /**
-     * @brief Costruttore della classe Staff.
-     * 
-     * Inizializza un membro dello staff con i dati anagrafici e il ruolo professionale.
-     * 
-     * @param nome Nome del membro dello staff.
-     * @param cognome Cognome del membro dello staff.
-     * @param eta Età del membro dello staff.
-     * @param ruolo Ruolo professionale (enum RuoloStaff).
-     */
     Staff(const std::string& nome, const std::string& cognome, int eta, RuoloStaff ruolo);
+    Staff(int id, const std::string& nome, const std::string& cognome, int eta, RuoloStaff ruolo);
 
-    /**
-     * @brief Distruttore della classe.
-     * 
-     * Libera le risorse allocate e chiama il distruttore della classe base Persona.
-     */
-    ~Staff() = default;
+    int getId() const;
+    void setId(int nuovoId);
 
-    // *** METODI GETTER E SETTER ***
-
-    /**
-     * @brief Restituisce il ruolo professionale del membro dello staff.
-     * @return Valore dell'enumerazione RuoloStaff.
-     */
     RuoloStaff getRuolo() const;
-
-    /**
-     * @brief Modifica il ruolo professionale del membro dello staff.
-     * 
-     * @param nuovoRuolo Nuovo ruolo da assegnare (enum RuoloStaff).
-     */
     void setRuolo(RuoloStaff nuovoRuolo);
 
-    /**
-     * @brief Operatore di output per la stampa delle informazioni dello staff.
-     * 
-     * Visualizza nome, cognome, età e ruolo in formato leggibile su uno stream.
-     */
-    friend std::ostream& operator<<(std::ostream& os, const Staff& s);
-
-    /**
-     * @brief Converte un valore di enumerazione RuoloStaff in stringa leggibile.
-     * 
-     * Metodo statico ausiliario per la visualizzazione del ruolo in formato testuale.
-     * Utile per logging, interfacce utente o debug.
-     * 
-     * @param r Valore dell'enumerazione da convertire.
-     * @return Stringa che rappresenta il ruolo (es. "ALLENATORE", "DS", ecc.).
-     */
+    static RuoloStaff stringToRuolo(const std::string& s);
     static std::string ruoloToString(RuoloStaff r);
+
+    friend std::ostream& operator<<(std::ostream& os, const Staff& s);
 };
+
+
 
 #endif
 

@@ -1,4 +1,14 @@
 squadra_id,stagione_anno,nome,indirizzo,possesso_palla,territorio,placcaggi_totali,metri_guadagnati_totali,mete_totali,falli_totali,mischie_vinte,mischie_perse,touche_vinte,touche_perse,punteggio_classifica
+1,2023,RugbyTrento,ViaRovigo15Trento,52,54.5,645,2850,21,78,45,12,38,15,17
+2,2023,AmatoriValpolicella,ViaVerona88SantAmbrogio,48,48.2,598,2640,16,82,42,15,35,18,3
+3,2023,RugbyRiviera,CorsoItalia22Rimini,55,56.8,672,3120,28,71,50,10,42,13,27
+4,2023,CUSVerona,ViaUniversita5Verona,50,51.3,615,2730,22,75,44,14,37,16,18
+5,2023,RugbyEste,VialeSport12Este,46,45.8,580,2510,12,85,40,16,33,19,2
+6,2023,SanMarcoRugby,PiazzaSanMarco8Venezia,53,55.2,658,2980,24,73,48,11,40,14,30
+7,2023,RugbyMogliano,ViaStadio33Mogliano,51,52.7,628,2820,22,76,46,13,39,15,18
+8,2023,VillorbaRugby,ViaRoma45Villorba,49,49.5,605,2690,18,80,43,14,36,17,12
+9,2023,RugbyUdine,ViaOlimpica33Udine,54,57.1,685,3250,32,69,52,9,44,12,30
+10,2023,RovigoDelta,VialeDelta18Rovigo,47,47.3,592,2580,15,83,41,15,34,18,10
 11,2024,RugbyTrento,ViaRovigo15Trento,54,56.2,668,3080,23,72,47,11,41,14,19
 12,2024,AmatoriValpolicella,ViaVerona88SantAmbrogio,50,50.5,625,2780,17,77,44,13,38,16,4
 13,2024,RugbyRiviera,CorsoItalia22Rimini,57,59.3,705,3380,29,68,53,8,45,11,27
