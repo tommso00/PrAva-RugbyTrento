@@ -1,7 +1,9 @@
 #include "Staff.h"
 using namespace std;
 
-// Nuovi membri (id da assegnare al salvataggio)
+/**
+ * @brief Costruttore Staff senza ID (da assegnare al salvataggio).
+ */
 Staff::Staff(const std::string& nome,
              const std::string& cognome,
              int eta,
@@ -10,7 +12,9 @@ Staff::Staff(const std::string& nome,
       id(0),
       ruolo(ruolo) {}          // <-- QUI
 
-// Membri letti dal CSV (id noto)
+/**
+ * @brief Costruttore Staff con ID (letto da CSV).
+ */
 Staff::Staff(int id,
              const std::string& nome,
              const std::string& cognome,
@@ -20,12 +24,29 @@ Staff::Staff(int id,
       id(id),
       ruolo(ruolo) {}          // <-- E QUI
 
+/**
+ * @brief Restituisce ID univoco staff.
+ */
 int Staff::getId() const { return id; }
+
+/**
+ * @brief Imposta ID univoco staff.
+ */
 void Staff::setId(int nuovoId) { id = nuovoId; }
 
+/**
+ * @brief Restituisce ruolo professionale.
+ */
 RuoloStaff Staff::getRuolo() const { return ruolo; }
+
+/**
+ * @brief Imposta ruolo professionale.
+ */
 void Staff::setRuolo(RuoloStaff nuovoRuolo) { ruolo = nuovoRuolo; }
 
+/**
+ * @brief Converte stringa in enum RuoloStaff.
+ */
 RuoloStaff Staff::stringToRuolo(const std::string& s) {
     if (s == "ALLENATORE")          return ALLENATORE;
     if (s == "AIUTANTE_ALLENATORE") return AIUTANTE_ALLENATORE;
@@ -35,6 +56,9 @@ RuoloStaff Staff::stringToRuolo(const std::string& s) {
     return ALLENATORE;
 }
 
+/**
+ * @brief Converte enum RuoloStaff in stringa.
+ */
 std::string Staff::ruoloToString(RuoloStaff r) {
     switch (r) {
         case ALLENATORE:          return "ALLENATORE";
@@ -46,6 +70,9 @@ std::string Staff::ruoloToString(RuoloStaff r) {
     }
 }
 
+/**
+ * @brief Overload operator<< per stampa Staff.
+ */
 std::ostream& operator<<(std::ostream& os, const Staff& s) {
     os << "Staff: " << s.getNome() << " (" << s.getEta() << " anni), Ruolo: "
        << Staff::ruoloToString(s.getRuolo());

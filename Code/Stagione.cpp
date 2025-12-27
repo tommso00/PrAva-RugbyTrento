@@ -5,10 +5,14 @@
 #include <iostream>  // ? AGGIUNTO per std::cout
 #include <numeric> 
 
-// Costruttore
+/**
+ * @brief Costruttore principale Stagione.
+ */
 Stagione::Stagione(int anno_) : anno(anno_) {}
 
-// ? COPY CONSTRUCTOR - C++11 (new invece di make_unique)
+/**
+ * @brief Copy constructor Stagione (C++11 deep copy unique_ptr).
+ */
 Stagione::Stagione(const Stagione& other) 
     : anno(other.anno), partite(other.partite) {
     
@@ -19,7 +23,9 @@ Stagione::Stagione(const Stagione& other)
     std::cout << "Copy constructor Stagione(" << anno << ")" << std::endl;
 }
 
-// ? COPY ASSIGNMENT - C++11
+/**
+ * @brief Copy assignment operator Stagione (C++11).
+ */
 Stagione& Stagione::operator=(const Stagione& other) {
     if(this != &other) {
         // Cleanup risorse esistenti
@@ -38,7 +44,9 @@ Stagione& Stagione::operator=(const Stagione& other) {
     return *this;
 }
 
-// ? MOVE CONSTRUCTOR
+/**
+ * @brief Move constructor Stagione (efficiente).
+ */
 Stagione::Stagione(Stagione&& other) noexcept 
     : anno(other.anno), 
       squadre(std::move(other.squadre)),
@@ -48,7 +56,9 @@ Stagione::Stagione(Stagione&& other) noexcept
     std::cout << "Move constructor Stagione(" << anno << ")" << std::endl;
 }
 
-// ? MOVE ASSIGNMENT
+/**
+ * @brief Move assignment operator Stagione.
+ */
 Stagione& Stagione::operator=(Stagione&& other) noexcept {
     if(this != &other) {
         // Cleanup
@@ -66,7 +76,9 @@ Stagione& Stagione::operator=(Stagione&& other) noexcept {
     return *this;
 }
 
-// ? TEMPLATE IMPLEMENTATION - Compile-time polymorphism
+/**
+ * @brief Template media statistiche (pointer-to-member).
+ */
 template<typename StatType>
 StatType Stagione::calcolaMedia(const std::vector<std::unique_ptr<Squadra>>& squadre, 
                                 StatType(Squadra::*getter)() const) const {
@@ -83,6 +95,9 @@ StatType Stagione::calcolaMedia(const std::vector<std::unique_ptr<Squadra>>& squ
     return somma / static_cast<StatType>(count);
 }
 
+/**
+ * @brief Template somma statistiche (pointer-to-member).
+ */
 template<typename StatType>
 StatType Stagione::sommaStatistica(const std::vector<std::unique_ptr<Squadra>>& squadre, 
                                    StatType(Squadra::*getter)() const) const {
@@ -93,38 +108,60 @@ StatType Stagione::sommaStatistica(const std::vector<std::unique_ptr<Squadra>>& 
     return totale;
 }
 
-// ? CORRETTO: passa getSquadre()
+/**
+ * @brief Media punteggio squadre (template instantiation).
+ */
 double Stagione::mediaPunteggioTemplate() const {
     return calcolaMedia(getSquadre(), &Squadra::getPunteggio);
 }
 
+/**
+ * @brief Somma totale mete squadre (template instantiation).
+ */
 int Stagione::sommaMeteTemplate() const {
     return sommaStatistica(getSquadre(), &Squadra::getMeteTotali);
 }
 
-
-
 // Metodi pubblici
+
+/**
+ * @brief Aggiunge squadra alla stagione (move semantics).
+ */
 void Stagione::addSquadra(std::unique_ptr<Squadra> s) {
     squadre.push_back(std::move(s));
 }
 
+/**
+ * @brief Aggiunge partita al calendario.
+ */
 void Stagione::addPartita(const Partita& p) {
     partite.push_back(p);
 }
 
+/**
+ * @brief Anno della stagione.
+ */
 int Stagione::getAnno() const {
     return anno;
 }
 
+/**
+ * @brief Vettore squadre (costante).
+ */
 const std::vector<std::unique_ptr<Squadra>>& Stagione::getSquadre() const {
     return squadre;
 }
 
+/**
+ * @brief Calendario partite (costante).
+ */
 const std::vector<Partita>& Stagione::getCalendario() const {
     return partite;
 }
 
+/**
+ * @brief Squadra vincitrice classifica finale (max punteggio).
+ */
 const Squadra* Stagione::getClassificaFinale() const {
     if (squadre.empty()) return nullptr;
     
@@ -135,6 +172,9 @@ const Squadra* Stagione::getClassificaFinale() const {
     return it != squadre.end() ? it->get() : nullptr;
 }
 
+/**
+ * @brief Overload operator<< per stampa completa Stagione.
+ */
 std::ostream& operator<<(std::ostream& os, const Stagione& s) {
     os << "Stagione " << s.anno << "\n";
     os << "Squadre:\n";
@@ -148,8 +188,9 @@ std::ostream& operator<<(std::ostream& os, const Stagione& s) {
     return os;
 }
 
-
-// ? STL SORT + LAMBDA
+/**
+ * @brief Classifica squadre (std::sort + lambda descending).
+ */
 std::vector<const Squadra*> Stagione::classificaSquadre() const {
     std::vector<const Squadra*> classifica;
     for(const auto& sq : squadre) {
@@ -165,7 +206,9 @@ std::vector<const Squadra*> Stagione::classificaSquadre() const {
     return classifica;
 }
 
-// ? STL ACCUMULATE (NUMERIC)
+/**
+ * @brief Media punteggio squadre (std::accumulate).
+ */
 double Stagione::mediaPunteggioSquadre() const {
     if(squadre.empty()) return 0.0;
     
@@ -180,6 +223,9 @@ double Stagione::mediaPunteggioSquadre() const {
     return static_cast<double>(somma) / punteggi.size();
 }
 
+/**
+ * @brief Media mete totali squadre (std::accumulate).
+ */
 double Stagione::mediaMeteTotaliSquadre() const {
     if(squadre.empty()) return 0.0;
     
@@ -192,6 +238,9 @@ double Stagione::mediaMeteTotaliSquadre() const {
     return static_cast<double>(somma) / mete.size();
 }
 
+/**
+ * @brief Cerca squadra per ID.
+ */
 Squadra* Stagione::trovaSquadraPerId(int id){
 	for (auto& sqPtr : squadre){
 		if(sqPtr && sqPtr->getId()== id){
@@ -201,7 +250,9 @@ Squadra* Stagione::trovaSquadraPerId(int id){
 	return nullptr;
 }
 
-// ? STL PARTIAL_SORT per TOP N
+/**
+ * @brief Top N squadre (std::partial_sort ottimizzato).
+ */
 std::vector<const Squadra*> Stagione::topSquadre(size_t n) const {
     std::vector<const Squadra*> top;
     for(const auto& sq : squadre) {
@@ -214,7 +265,7 @@ std::vector<const Squadra*> Stagione::topSquadre(size_t n) const {
             [](const Squadra* a, const Squadra* b) {
                 return a->getPunteggio() > b->getPunteggio();
             });
-        top.resize(n);  // Truncate
+        top.resize(n);  
     }
     
     return top;

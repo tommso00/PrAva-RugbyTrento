@@ -5,34 +5,21 @@
 #include <string>
 #include <iostream>
 
-// Rimuovere "using namespace std;" dai file header per evitare conflitti di nomi.
-
 /**
  * @enum RuoloStaff
  * @brief Enumerazione che definisce i possibili ruoli del personale tecnico/amministrativo.
- * 
- * Elenca tutte le posizioni dello staff di una squadra di rugby:
- * - ALLENATORE: Allenatore principale
- * - AIUTANTE_ALLENATORE: Vice-allenatore o tecnico specializzato
- * - DS: Direttore Sportivo
- * - SEGRETERIA: Personale amministrativo
- * - ALLENATORE_MINI: Allenatore delle giovanili/mini-rugby
  */
 enum RuoloStaff {
-    ALLENATORE,           ///< Allenatore principale della prima squadra.
-    AIUTANTE_ALLENATORE,  ///< Vice-allenatore o tecnico specializzato.
-    DS,                   ///< Direttore Sportivo.
-    SEGRETERIA,           ///< Personale amministrativo/segreteria.
-    ALLENATORE_MINI       ///< Allenatore delle categorie giovanili/mini-rugby.
+    ALLENATORE,           ///< Allenatore principale
+    AIUTANTE_ALLENATORE,  ///< Vice-allenatore o tecnico specializzato
+    DS,                   ///< Direttore Sportivo
+    SEGRETERIA,           ///< Personale amministrativo
+    ALLENATORE_MINI       ///< Allenatore delle giovanili/mini-rugby
 };
 
 /**
  * @class Staff
  * @brief Rappresenta un membro dello staff tecnico/amministrativo di una squadra di rugby.
- * 
- * Estende la classe base Persona aggiungendo il ruolo specifico all'interno 
- * dell'organizzazione della squadra. Include i membri comuni (nome, cognome, età) 
- * più il ruolo professionale (allenatore, DS, segretario, ecc.).
  */
 class Staff : public Persona {
 protected:
@@ -40,22 +27,71 @@ protected:
     RuoloStaff ruolo;
 
 public:
+    /**
+     * @brief Costruttore senza ID.
+     * @param nome Nome staff
+     * @param cognome Cognome staff
+     * @param eta Età staff
+     * @param ruolo Ruolo professionale
+     */
     Staff(const std::string& nome, const std::string& cognome, int eta, RuoloStaff ruolo);
+    
+    /**
+     * @brief Costruttore con ID.
+     * @param id ID univoco
+     * @param nome Nome staff
+     * @param cognome Cognome staff
+     * @param eta Età staff
+     * @param ruolo Ruolo professionale
+     */
     Staff(int id, const std::string& nome, const std::string& cognome, int eta, RuoloStaff ruolo);
 
+    /**
+     * @brief ID membro staff.
+     * @return ID numerico
+     */
     int getId() const;
+    
+    /**
+     * @brief Imposta ID.
+     * @param nuovoId Nuovo ID
+     */
     void setId(int nuovoId);
 
+    /**
+     * @brief Ruolo professionale.
+     * @return Enum RuoloStaff
+     */
     RuoloStaff getRuolo() const;
+    
+    /**
+     * @brief Imposta ruolo.
+     * @param nuovoRuolo Nuovo ruolo
+     */
     void setRuolo(RuoloStaff nuovoRuolo);
 
+    /**
+     * @brief Converte stringa ? RuoloStaff.
+     * @param s Stringa ruolo
+     * @return Enum corrispondente
+     */
     static RuoloStaff stringToRuolo(const std::string& s);
+    
+    /**
+     * @brief Converte RuoloStaff ? stringa.
+     * @param r Enum ruolo
+     * @return Stringa ruolo
+     */
     static std::string ruoloToString(RuoloStaff r);
 
+    /**
+     * @brief Overload operator<< Staff.
+     * @param os Stream output
+     * @param s Staff da stampare
+     * @return Stream modificato
+     */
     friend std::ostream& operator<<(std::ostream& os, const Staff& s);
 };
-
-
 
 #endif
 

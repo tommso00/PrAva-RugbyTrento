@@ -4,9 +4,15 @@
 
 using namespace std;
 
+/**
+ * @brief Input validazione scelta con gestione eccezioni.
+ */
 int getScelta(int min, int max);
 
 int main(int argc, char** argv) {
+    /**
+     * @brief Main del sistema gestionale rugby.
+     */
     Gestionale gest;
     int scelta = 0;
 
@@ -38,6 +44,15 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+
+
+
+/**
+ * @brief Gestisce input numerico sicuro con validazione range.
+ * @param min Valore minimo accettato
+ * @param max Valore massimo accettato
+ * @return Scelta validata nell'intervallo [min, max]
+ */
 int getScelta(int min, int max) {
     int scelta;
     

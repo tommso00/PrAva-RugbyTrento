@@ -1,7 +1,9 @@
 #include "Squadra.h"
 #include <algorithm>
 
-// Costruttore con RESERVE per ottimizzazione
+/**
+ * @brief Costruttore principale Squadra con reserve ottimizzato.
+ */
 Squadra::Squadra(int id_, const std::string& nome_, const std::string& indirizzo_)
     : id(id_), nome(nome_), indirizzo(indirizzo_), punteggioClassifica(0),
       possessoPalla(0), territorio(0.0),
@@ -13,7 +15,9 @@ Squadra::Squadra(int id_, const std::string& nome_, const std::string& indirizzo
     staffTecnico.reserve(5);  // Staff tecnico (allenatore + assistenti)
 }
 
-// MOVE CONSTRUCTOR
+/**
+ * @brief Move constructor Squadra (efficiente).
+ */
 Squadra::Squadra(Squadra&& other) noexcept
     : id(other.id),
       nome(std::move(other.nome)), 
@@ -38,7 +42,9 @@ Squadra::Squadra(Squadra&& other) noexcept
     other.possessoPalla = 0;
 }
 
-// COPY CONSTRUCTOR
+/**
+ * @brief Copy constructor Squadra (deep copy).
+ */
 Squadra::Squadra(const Squadra& other)
     : id(other.id),
       nome(other.nome), 
@@ -58,7 +64,9 @@ Squadra::Squadra(const Squadra& other)
       staffTecnico(other.staffTecnico)
 {}
 
-// COPY ASSIGNMENT
+/**
+ * @brief Copy assignment operator Squadra.
+ */
 Squadra& Squadra::operator=(const Squadra& other) {
     if(this != &other) {
         id = other.id;
@@ -81,7 +89,9 @@ Squadra& Squadra::operator=(const Squadra& other) {
     return *this;
 }
 
-// MOVE ASSIGNMENT
+/**
+ * @brief Move assignment operator Squadra.
+ */
 Squadra& Squadra::operator=(Squadra&& other) noexcept {
     if(this != &other) {
         giocatori.clear();
@@ -112,20 +122,59 @@ Squadra& Squadra::operator=(Squadra&& other) noexcept {
 }
 
 // Getter/Setter info principali
+
+/**
+ * @brief Getter nome squadra (inline nel .h).
+ */
 std::string Squadra::getNome() const { return nome; }
+
+/**
+ * @brief Setter nome squadra (inline nel .h).
+ */
 void Squadra::setNome(const std::string& n) { nome = n; }
+
+/**
+ * @brief Getter indirizzo squadra (inline nel .h).
+ */
 std::string Squadra::getIndirizzo() const { return indirizzo; }
+
+/**
+ * @brief Setter indirizzo squadra (inline nel .h).
+ */
 void Squadra::setIndirizzo(const std::string& i) { indirizzo = i; }
+
+/**
+ * @brief Getter ID squadra (inline nel .h).
+ */
 int Squadra::getId() const { return id; }
+
+/**
+ * @brief Setter ID squadra (inline nel .h).
+ */
 void Squadra::setId(int i) { id = i; }
+
+/**
+ * @brief Getter punteggio classifica (inline nel .h).
+ */
 int Squadra::getPunteggio() const { return punteggioClassifica; }
+
+/**
+ * @brief Setter punteggio classifica (inline nel .h).
+ */
 void Squadra::setPunteggio(int p) { punteggioClassifica = p; }
 
 // Gestione giocatori
+
+/**
+ * @brief Aggiunge giocatore al roster (copy).
+ */
 void Squadra::addGiocatore(const Giocatore& g) {
     giocatori.push_back(g);
 }
 
+/**
+ * @brief Rimuove giocatore per ID usando std::remove_if.
+ */
 void Squadra::removeGiocatore(int idGiocatore) {
     auto it = std::remove_if(giocatori.begin(), giocatori.end(),
         [idGiocatore](const Giocatore& g) { return g.getId() == idGiocatore; });
@@ -136,27 +185,39 @@ void Squadra::removeGiocatore(int idGiocatore) {
 
 // *** GESTIONE STAFF CON MOVE SEMANTICS ***
 
-// Versione COPY (lvalue)
+/**
+ * @brief Aggiunge staff (versione copy - lvalue).
+ */
 void Squadra::addStaff(const Staff& membro) {
     staffTecnico.push_back(membro);
 }
 
-// Versione MOVE (rvalue) - OTTIMIZZATO
+/**
+ * @brief Aggiunge staff (versione move - rvalue, ottimizzato).
+ */
 void Squadra::addStaff(Staff&& membro) {
     staffTecnico.push_back(std::move(membro));
 }
 
+/**
+ * @brief Rimuove staff per indice.
+ */
 void Squadra::removeStaff(size_t index) {
     if (index < staffTecnico.size()) {
         staffTecnico.erase(staffTecnico.begin() + index);
     }
 }
 
+/**
+ * @brief Svuota completamente roster staff.
+ */
 void Squadra::clearStaff() {
     staffTecnico.clear();
 }
 
-// Operatore di stampa
+/**
+ * @brief Overload operator<< per stampa completa Squadra.
+ */
 std::ostream& operator<<(std::ostream& os, const Squadra& s) {
     os << "Squadra: " << s.nome << ", Indirizzo: " << s.indirizzo 
        << ", ID: " << s.getId() << "\n";
@@ -175,27 +236,110 @@ std::ostream& operator<<(std::ostream& os, const Squadra& s) {
 }
 
 // Statistiche di squadra (dati grezzi, non calcoli)
+
+/**
+ * @brief Getter possesso palla (inline nel .h).
+ */
 int Squadra::getPossessoPalla() const { return possessoPalla; }
+
+/**
+ * @brief Setter possesso palla (inline nel .h).
+ */
 void Squadra::setPossessoPalla(int value) { possessoPalla = value; }
+
+/**
+ * @brief Getter territorio (inline nel .h).
+ */
 double Squadra::getTerritorio() const { return territorio; }
+
+/**
+ * @brief Setter territorio (inline nel .h).
+ */
 void Squadra::setTerritorio(double value) { territorio = value; }
+
+/**
+ * @brief Getter placcaggi totali (inline nel .h).
+ */
 int Squadra::getPlaccaggiTotali() const { return placcaggiTotali; }
+
+/**
+ * @brief Setter placcaggi totali (inline nel .h).
+ */
 void Squadra::setPlaccaggiTotali(int value) { placcaggiTotali = value; }
+
+/**
+ * @brief Getter metri guadagnati totali (inline nel .h).
+ */
 int Squadra::getMetriGuadagnatiTotali() const { return metriGuadagnatiTotali; }
+
+/**
+ * @brief Setter metri guadagnati totali (inline nel .h).
+ */
 void Squadra::setMetriGuadagnatiTotali(int value) { metriGuadagnatiTotali = value; }
+
+/**
+ * @brief Getter mete totali (inline nel .h).
+ */
 int Squadra::getMeteTotali() const { return meteTotali; }
+
+/**
+ * @brief Setter mete totali (inline nel .h).
+ */
 void Squadra::setMeteTotali(int value) { meteTotali = value; }
+
+/**
+ * @brief Getter falli totali (inline nel .h).
+ */
 int Squadra::getFalliTotali() const { return falliTotali; }
+
+/**
+ * @brief Setter falli totali (inline nel .h).
+ */
 void Squadra::setFalliTotali(int value) { falliTotali = value; }
+
+/**
+ * @brief Getter mischie vinte (inline nel .h).
+ */
 int Squadra::getMischieVinte() const { return mischieVinte; }
+
+/**
+ * @brief Setter mischie vinte (inline nel .h).
+ */
 void Squadra::setMischieVinte(int value) { mischieVinte = value; }
+
+/**
+ * @brief Getter mischie perse (inline nel .h).
+ */
 int Squadra::getMischiePerse() const { return mischiePerse; }
+
+/**
+ * @brief Setter mischie perse (inline nel .h).
+ */
 void Squadra::setMischiePerse(int value) { mischiePerse = value; }
+
+/**
+ * @brief Getter touche vinte (inline nel .h).
+ */
 int Squadra::getToucheVinte() const { return toucheVinte; }
+
+/**
+ * @brief Setter touche vinte (inline nel .h).
+ */
 void Squadra::setToucheVinte(int value) { toucheVinte = value; }
+
+/**
+ * @brief Getter touche perse (inline nel .h).
+ */
 int Squadra::getTouchePerse() const { return touchePerse; }
+
+/**
+ * @brief Setter touche perse (inline nel .h).
+ */
 void Squadra::setTouchePerse(int value) { touchePerse = value; }
 
+/**
+ * @brief Ricalcola statistiche aggregate da roster giocatori.
+ */
 void Squadra::aggiornaStatistiche() {
     placcaggiTotali = 0;
     metriGuadagnatiTotali = 0;
@@ -210,6 +354,13 @@ void Squadra::aggiornaStatistiche() {
     }
 }
 
+/**
+ * @brief Incrementa contatore mete totali.
+ */
 void Squadra::addMete(int delta) { meteTotali += delta; }
+
+/**
+ * @brief Incrementa punteggio classifica.
+ */
 void Squadra::addPuntiClassifica(int delta) { punteggioClassifica += delta; }
 

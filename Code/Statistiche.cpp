@@ -5,7 +5,9 @@
 #include <iostream>
 #include <iomanip>
 
-// Lista ruoli standard del rugby
+/**
+ * @brief Ruoli standard rugby (costante statica).
+ */
 const std::vector<std::string> Statistiche::RUOLI_STANDARD = {
     "Pilone", "Tallonatore", "SecondaLinea", 
     "TerzaLineaCentro", "TerzaLineaAla",
@@ -13,8 +15,12 @@ const std::vector<std::string> Statistiche::RUOLI_STANDARD = {
     "CentroThreeQuarter", "AlaThreeQuarter", "Estremo"
 };
 
-// ==================== STATISTICHE GIOCATORI ====================
+// ==================== STATISTICHE X GIOCATORI ====================
 
+/**
+ * @brief Trova giocatore con più placcaggi usando std::max_element.
+ */
+// Lezione 7: std::max_element con lambda comparator
 const Giocatore* Statistiche::getMigliorPlaccaggitore(const Squadra& squadra) {
     const auto& giocatori = squadra.getGiocatori();
     if (giocatori.empty()) return nullptr;
@@ -27,6 +33,10 @@ const Giocatore* Statistiche::getMigliorPlaccaggitore(const Squadra& squadra) {
     return &(*it);
 }
 
+/**
+ * @brief Capocannoniere della squadra (più mete).
+ */
+// Lezione 7: std::max_element inline lambda
 const Giocatore* Statistiche::getCapocannoniere(const Squadra& squadra) {
     const auto& giocatori = squadra.getGiocatori();
     if (giocatori.empty()) return nullptr;
@@ -39,6 +49,9 @@ const Giocatore* Statistiche::getCapocannoniere(const Squadra& squadra) {
     return &(*it);
 }
 
+/**
+ * @brief Giocatore con più metri percorsi con palla.
+ */
 const Giocatore* Statistiche::getMigliorCorridore(const Squadra& squadra) {
     const auto& giocatori = squadra.getGiocatori();
     if (giocatori.empty()) return nullptr;
@@ -51,6 +64,9 @@ const Giocatore* Statistiche::getMigliorCorridore(const Squadra& squadra) {
     return &(*it);
 }
 
+/**
+ * @brief Conta giocatori per ruolo (std::count_if + lambda capture).
+ */
 int Statistiche::contaGiocatoriPerRuolo(const Squadra& squadra, const std::string& ruolo) {
     const auto& giocatori = squadra.getGiocatori();
     
@@ -61,6 +77,9 @@ int Statistiche::contaGiocatoriPerRuolo(const Squadra& squadra, const std::strin
     return std::count_if(giocatori.begin(), giocatori.end(), haStoRuolo);
 }
 
+/**
+ * @brief Filtra giocatori con mete = soglia (std::copy_if).
+ */
 std::vector<Giocatore> Statistiche::giocatoriConMeteSopra(const Squadra& squadra, int soglia) {
     const auto& giocatori = squadra.getGiocatori();
     std::vector<Giocatore> risultato;
@@ -77,6 +96,9 @@ std::vector<Giocatore> Statistiche::giocatoriConMeteSopra(const Squadra& squadra
     return risultato;
 }
 
+/**
+ * @brief Filtra giocatori con placcaggi = soglia (std::copy_if).
+ */
 std::vector<Giocatore> Statistiche::giocatoriConPlaccaggiSopra(const Squadra& squadra, int soglia) {
     const auto& giocatori = squadra.getGiocatori();
     std::vector<Giocatore> risultato;
@@ -91,6 +113,9 @@ std::vector<Giocatore> Statistiche::giocatoriConPlaccaggiSopra(const Squadra& sq
     return risultato;
 }
 
+/**
+ * @brief Media aritmetica mete per giocatore (std::accumulate).
+ */
 double Statistiche::mediaMetePerGiocatore(const Squadra& squadra) {
     const auto& giocatori = squadra.getGiocatori();
     if (giocatori.empty()) return 0.0;
@@ -103,6 +128,9 @@ double Statistiche::mediaMetePerGiocatore(const Squadra& squadra) {
     return static_cast<double>(totale) / giocatori.size();
 }
 
+/**
+ * @brief Media aritmetica placcaggi per giocatore (std::accumulate).
+ */
 double Statistiche::mediaPlaccaggiPerGiocatore(const Squadra& squadra) {
     const auto& giocatori = squadra.getGiocatori();
     if (giocatori.empty()) return 0.0;
@@ -115,6 +143,9 @@ double Statistiche::mediaPlaccaggiPerGiocatore(const Squadra& squadra) {
     return static_cast<double>(totale) / giocatori.size();
 }
 
+/**
+ * @brief Distribuzione giocatori per ruolo standard.
+ */
 std::map<std::string, int> Statistiche::distribuzioneRuoli(const Squadra& squadra) {
     std::map<std::string, int> distribuzione;
     
@@ -125,6 +156,9 @@ std::map<std::string, int> Statistiche::distribuzioneRuoli(const Squadra& squadr
     return distribuzione;
 }
 
+/**
+ * @brief Stampa report statistico completo squadra.
+ */
 void Statistiche::stampaReportSquadra(const Squadra& squadra) {
     std::cout << "\n+----------------------------------------------------+\n";
     std::cout << "¦          REPORT STATISTICO SQUADRA                 ¦\n";
@@ -199,6 +233,9 @@ void Statistiche::stampaReportSquadra(const Squadra& squadra) {
 
 // ==================== STATISTICHE STAGIONE ====================
 
+/**
+ * @brief Classifica completa (std::sort + std::transform).
+ */
 std::vector<Squadra*> Statistiche::classificaCompleta(const Stagione& stagione) {
     const auto& squadre = stagione.getSquadre();
     std::vector<Squadra*> classifica;
@@ -219,6 +256,9 @@ std::vector<Squadra*> Statistiche::classificaCompleta(const Stagione& stagione) 
     return classifica;
 }
 
+/**
+ * @brief Top N squadre (std::partial_sort ottimizzato).
+ */
 std::vector<Squadra*> Statistiche::topNSquadre(const Stagione& stagione, size_t n) {
     const auto& squadre = stagione.getSquadre();
     std::vector<Squadra*> risultato;
@@ -246,6 +286,9 @@ std::vector<Squadra*> Statistiche::topNSquadre(const Stagione& stagione, size_t 
     return risultato;
 }
 
+/**
+ * @brief Squadra mediana classifica (std::nth_element O(n)).
+ */
 Squadra* Statistiche::squadraMediana(const Stagione& stagione) {
     const auto& squadre = stagione.getSquadre();
     if (squadre.empty()) return nullptr;
@@ -268,6 +311,9 @@ Squadra* Statistiche::squadraMediana(const Stagione& stagione) {
     return temp[mid];
 }
 
+/**
+ * @brief Confronta due squadre su 5 metriche.
+ */
 std::map<std::string, int> Statistiche::confrontaSquadre(const Squadra& sq1, const Squadra& sq2) {
     std::map<std::string, int> confronto;
     
@@ -280,6 +326,9 @@ std::map<std::string, int> Statistiche::confrontaSquadre(const Squadra& sq1, con
     return confronto;
 }
 
+/**
+ * @brief Squadra leader per metrica specifica.
+ */
 Squadra* Statistiche::squadraMigliorePerMetrica(const Stagione& stagione, const std::string& metrica) {
     const auto& squadre = stagione.getSquadre();
     if (squadre.empty()) return nullptr;
@@ -306,6 +355,9 @@ Squadra* Statistiche::squadraMigliorePerMetrica(const Stagione& stagione, const 
     return it->get();
 }
 
+/**
+ * @brief Media metrica squadre (pointer-to-member + std::accumulate).
+ */
 double Statistiche::mediaMetrica(const Stagione& stagione, int (Squadra::*getter)() const) {
     const auto& squadre = stagione.getSquadre();
     if (squadre.empty()) return 0.0;
@@ -318,6 +370,9 @@ double Statistiche::mediaMetrica(const Stagione& stagione, int (Squadra::*getter
     return static_cast<double>(somma) / squadre.size();
 }
 
+/**
+ * @brief Deviazione standard metrica (pointer-to-member).
+ */
 double Statistiche::deviazioneStandard(const Stagione& stagione, int (Squadra::*getter)() const) {
     const auto& squadre = stagione.getSquadre();
     if (squadre.size() < 2) return 0.0;
@@ -334,6 +389,9 @@ double Statistiche::deviazioneStandard(const Stagione& stagione, int (Squadra::*
     return std::sqrt(sommaScartiQuadrati / squadre.size());
 }
 
+/**
+ * @brief Minimo valore metrica (std::min_element).
+ */
 int Statistiche::minimoMetrica(const Stagione& stagione, int (Squadra::*getter)() const) {
     const auto& squadre = stagione.getSquadre();
     if (squadre.empty()) return 0;
@@ -346,6 +404,9 @@ int Statistiche::minimoMetrica(const Stagione& stagione, int (Squadra::*getter)(
     return (it->get()->*getter)();
 }
 
+/**
+ * @brief Massimo valore metrica (std::max_element).
+ */
 int Statistiche::massimoMetrica(const Stagione& stagione, int (Squadra::*getter)() const) {
     const auto& squadre = stagione.getSquadre();
     if (squadre.empty()) return 0;
@@ -358,6 +419,9 @@ int Statistiche::massimoMetrica(const Stagione& stagione, int (Squadra::*getter)
     return (it->get()->*getter)();
 }
 
+/**
+ * @brief Squadre con attacco/difesa sopra media.
+ */
 std::vector<Squadra*> Statistiche::squadreBilanciate(const Stagione& stagione) {
     double mediaMete = mediaMetrica(stagione, &Squadra::getMeteTotali);
     double mediaPlaccaggi = mediaMetrica(stagione, &Squadra::getPlaccaggiTotali);
@@ -374,6 +438,9 @@ std::vector<Squadra*> Statistiche::squadreBilanciate(const Stagione& stagione) {
     return risultato;
 }
 
+/**
+ * @brief Classifica efficienza punti/mete (std::sort pair).
+ */
 std::vector<std::pair<Squadra*, double>> Statistiche::classificaEfficienza(const Stagione& stagione) {
     const auto& squadre = stagione.getSquadre();
     std::vector<std::pair<Squadra*, double>> efficienza;
@@ -393,6 +460,9 @@ std::vector<std::pair<Squadra*, double>> Statistiche::classificaEfficienza(const
     return efficienza;
 }
 
+/**
+ * @brief Stampa report statistico completo stagione.
+ */
 void Statistiche::stampaReportStagione(const Stagione& stagione) {
     std::cout << "\n+----------------------------------------------------------+\n";
     std::cout << "¦          REPORT STATISTICO STAGIONE " << stagione.getAnno() << "              ¦\n";
