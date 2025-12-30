@@ -165,6 +165,8 @@ public:
      * @param stagione Stagione da salvare (squadre/giocatori/staff/partite)
      */
     void salvaParallel(const Stagione& stagione);
+    
+    static std::string trim(const std::string& str);
 };
 
 #endif

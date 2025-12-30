@@ -9,206 +9,15 @@
 #include <numeric>
 #include <thread>
 #include "Statistiche.h"
+#include "CSVManager.h"
 
 using namespace std;
 
-// ==================== RAII FILE GUARD ====================
-namespace CSVHelper {
-    class FileGuard {
-        std::ifstream infile;
-        std::ofstream outfile;
-    public:
-        explicit FileGuard(const std::string& path, bool write = false) {
-            if (write) {
-                outfile.open(path);
-                if (!outfile.is_open()) {
-                    throw std::runtime_error("Impossibile aprire " + path + " in scrittura");
-                }
-            } else {
-                infile.open(path);
-            }
-        }
-        
-        std::ifstream& getInput() { return infile; }
-        std::ofstream& getOutput() { return outfile; }
-        bool inputOpen() const { return infile.is_open(); }
-        
-        ~FileGuard() = default;
-    };
-    
-    template<typename T, typename LoadFunc>
-    std::vector<T> caricaRighe(const std::string& filepath, LoadFunc loader) {
-        std::vector<T> risultati;
-        FileGuard file(filepath);
-        
-        if (!file.inputOpen()) return risultati;
-        
-        std::string line;
-        bool primaRiga = true;
-        while (std::getline(file.getInput(), line)) {
-            if (primaRiga) { primaRiga = false; continue; }
-            if (line.empty()) continue;
-            
-            try {
-                risultati.push_back(loader(line));
-            } catch (const std::exception& e) {
-                printf("[WARN] Riga CSV ignorata: %s\n", e.what());
-            }
-        }
-        return risultati;
-    }
-    
-    template<typename T, typename FormatFunc>
-    void salvaRighe(const std::string& filepath, 
-                    const std::string& header,
-                    const std::vector<T>& dati,
-                    FormatFunc formatter) {
-        FileGuard file(filepath, true);
-        auto& out = file.getOutput();
-        
-        out << header << "\n";
-        std::for_each(dati.begin(), dati.end(), [&](const T& item) {
-            out << formatter(item) << "\n";
-        });
-    }
-}
-
-// ==================== STRUCT PER DATI CSV ====================
-namespace {
-    struct SquadraData {
-        int id, anno;
-        std::string nome, indirizzo;
-        int possessoPalla;
-        double territorio;
-        int placcaggiTotali, metriGuadagnatiTotali, meteTotali, falliTotali;
-        int mischieVinte, mischiePerse, toucheVinte, touchePerse;
-        int punteggio;
-        
-        static SquadraData fromCSV(const std::vector<std::string>& tokens) {
-            if (tokens.size() < 15) throw std::runtime_error("CSV squadra incompleto");
-            
-            return SquadraData{
-                std::stoi(tokens[0]), std::stoi(tokens[1]),
-                tokens[2], tokens[3],
-                std::stoi(tokens[4]), std::stod(tokens[5]),
-                std::stoi(tokens[6]), std::stoi(tokens[7]), std::stoi(tokens[8]), std::stoi(tokens[9]),
-                std::stoi(tokens[10]), std::stoi(tokens[11]), std::stoi(tokens[12]), std::stoi(tokens[13]),
-                std::stoi(tokens[14])
-            };
-        }
-        
-        std::string toCSV() const {
-            std::ostringstream oss;
-            oss << id << "," << anno << "," << nome << "," << indirizzo << ","
-                << possessoPalla << "," << territorio << ","
-                << placcaggiTotali << "," << metriGuadagnatiTotali << "," << meteTotali << "," << falliTotali << ","
-                << mischieVinte << "," << mischiePerse << "," << toucheVinte << "," << touchePerse << ","
-                << punteggio;
-            return oss.str();
-        }
-    };
-    
-    struct GiocatoreData {
-        int id, squadraId, eta;
-        std::string nome, cognome, ruolo;
-        int placcaggi, metriCorsi, mete, calciPiazzati;
-        int falliCommessi, offload, minutiGiocati, partiteGiocate;
-        
-        static GiocatoreData fromCSV(const std::vector<std::string>& tokens) {
-            if (tokens.size() < 14) throw std::runtime_error("CSV giocatore incompleto");
-            return GiocatoreData{
-                std::stoi(tokens[0]), std::stoi(tokens[1]), std::stoi(tokens[4]),
-                tokens[2], tokens[3], tokens[5],
-                std::stoi(tokens[6]), std::stoi(tokens[7]), std::stoi(tokens[8]), std::stoi(tokens[9]),
-                std::stoi(tokens[10]), std::stoi(tokens[11]), std::stoi(tokens[12]), std::stoi(tokens[13])
-            };
-        }
-        
-        std::string toCSV() const {
-            std::ostringstream oss;
-            oss << id << "," << squadraId << "," << nome << "," << cognome << "," << eta << "," << ruolo << ","
-                << placcaggi << "," << metriCorsi << "," << mete << "," << calciPiazzati << ","
-                << falliCommessi << "," << offload << "," << minutiGiocati << "," << partiteGiocate;
-            return oss.str();
-        }
-    };
-    
-    struct StaffData {
-        int id, squadraId, eta;
-        std::string nome, cognome;
-        RuoloStaff ruolo;
-        
-        static StaffData fromCSV(const std::vector<std::string>& tokens) {
-            if (tokens.size() < 6) throw std::runtime_error("CSV staff incompleto");
-            return StaffData{
-                std::stoi(tokens[0]), 
-                std::stoi(tokens[1]),
-                std::stoi(tokens[4]),
-                tokens[2], 
-                tokens[3],
-                stringToRuolo(tokens[5])
-            };
-        }
-        
-        std::string toCSV() const {
-            std::ostringstream oss;
-            oss << id << "," << squadraId << "," << nome << "," << cognome << "," 
-                << eta << "," << ruoloToStringEnum(ruolo);
-            return oss.str();
-        }
-        
-        static RuoloStaff stringToRuolo(const std::string& s) {
-            if (s == "ALLENATORE") return ALLENATORE;
-            if (s == "AIUTANTE_ALLENATORE") return AIUTANTE_ALLENATORE;
-            if (s == "DS") return DS;
-            if (s == "SEGRETERIA") return SEGRETERIA;
-            if (s == "ALLENATORE_MINI") return ALLENATORE_MINI;
-            return ALLENATORE;
-        }
-        
-        static std::string ruoloToStringEnum(RuoloStaff r) {
-            switch(r) {
-                case ALLENATORE: return "ALLENATORE";
-                case AIUTANTE_ALLENATORE: return "AIUTANTE_ALLENATORE";
-                case DS: return "DS";
-                case SEGRETERIA: return "SEGRETERIA";
-                case ALLENATORE_MINI: return "ALLENATORE_MINI";
-                default: return "ALLENATORE";
-            }
-        }
-    };
-    
-    struct PartitaData {
-        int id, anno, data, idLocali, idOspiti;
-        int ptLocali, ptOspiti, meteLocali, meteOspiti;
-        int cartellinoRossoLoc, cartellinoRossoOsp;
-        int cartellinoGialloLoc, cartellinoGialloOsp;
-        double possessoLoc, possessoOsp;
-        
-        static PartitaData fromCSV(const std::vector<std::string>& tokens) {
-            if (tokens.size() < 15) throw std::runtime_error("CSV partita incompleto");
-            return PartitaData{
-                std::stoi(tokens[0]), std::stoi(tokens[1]), std::stoi(tokens[2]), 
-                std::stoi(tokens[3]), std::stoi(tokens[4]),
-                std::stoi(tokens[5]), std::stoi(tokens[6]), std::stoi(tokens[7]), std::stoi(tokens[8]),
-                std::stoi(tokens[9]), std::stoi(tokens[10]), std::stoi(tokens[11]), std::stoi(tokens[12]),
-                std::stod(tokens[13]), std::stod(tokens[14])
-            };
-        }
-        
-        std::string toCSV() const {
-            std::ostringstream oss;
-            oss << id << "," << anno << "," << data << "," << idLocali << "," << idOspiti << ","
-                << ptLocali << "," << ptOspiti << "," << meteLocali << "," << meteOspiti << ","
-                << cartellinoRossoLoc << "," << cartellinoRossoOsp << ","
-                << cartellinoGialloLoc << "," << cartellinoGialloOsp << ","
-                << possessoLoc << "," << possessoOsp;
-            return oss.str();
-        }
-    };
-}
-
-// ==================== CREA STAGIONE ====================
+/**
+ * @brief Crea nuova stagione interattivamente.
+ * 
+ * Verifica unicità anno e avvia modalità modifica.
+ */
 void Gestionale::creaStagione() {
     int anno;
     cout << "Inserisci anno stagione: ";
@@ -228,35 +37,51 @@ void Gestionale::creaStagione() {
     modificaStagione(*stagioneRaw);
 }
 
-// ==================== RECUPERA STAGIONE ====================
 int Gestionale::recuperaStagione(const std::string& filename, int numeroRiga) {
-    std::ifstream file(filename);
-    if (!file.is_open()) {
+    CSVManager::FileGuard file(filename);
+    if (!file.inputOpen()) {
         std::cerr << "Errore apertura file: " << filename << std::endl;
         return 0;
     }
 
     std::string riga;
-    int contoRighe = 0;
+    int numeroRigaTrovata = 1;  // ? Inizia da 1 come fetchStagioni()
     bool intestazioneSaltata = false;
 
-    while (std::getline(file, riga)) {
+    while (std::getline(file.getInput(), riga)) {
         if (!intestazioneSaltata) {
             intestazioneSaltata = true;
             continue;
         }
-        contoRighe++;
-        if (contoRighe == numeroRiga) {
-            std::cout << "Riga " << numeroRiga << ": " << riga << std::endl;
-            return std::stoi(riga);
+        
+        if (numeroRigaTrovata == numeroRiga) {  // ? Controllo diretto
+            std::string annoPulito = trim(riga);
+            try {
+                int anno = std::stoi(annoPulito);
+                std::cout << "Riga " << numeroRiga << ": " << riga 
+                          << " ? Anno caricato: " << anno << std::endl;
+                return anno;
+            } catch (const std::exception& e) {
+                std::cerr << "[WARN] Errore parsing riga " << numeroRiga 
+                          << ": " << e.what() << std::endl;
+                return 0;
+            }
         }
+        numeroRigaTrovata++;  // ? Incrementa DOPO controllo
     }
-
+    
     std::cout << "Riga " << numeroRiga << " non trovata nel file." << std::endl;
     return 0;
 }
 
-// ==================== MODIFICA STAGIONE ====================
+
+
+/**
+ * @brief Modalità interattiva modifica/estensione stagione.
+ * @param stagione Stagione da modificare.
+ * 
+ * Menu completo: squadre, partite, statistiche STL.
+ */
 void Gestionale::modificaStagione(Stagione& stagione) {
     int lastSquadraId = getMaxSquadraId();  
     for (const auto& s : stagione.getSquadre()) {
@@ -272,9 +97,8 @@ void Gestionale::modificaStagione(Stagione& stagione) {
         cout << "1) Aggiungi squadra" << endl 
              << "2) Aggiungi partita" << endl 
              << "3) Stampa Stagione" << endl 
-             << "4) Vedi Classifica" << endl 
-             << "5) Medie Punteggio" << endl
-             << "6) Statistiche Avanzate (STL)" << endl;
+             << "4) Statistiche Avanzate (STL)" << endl
+			 << "5) ESCI"<<endl;
         cin >> azione;
         
         switch (azione) {
@@ -291,104 +115,81 @@ void Gestionale::modificaStagione(Stagione& stagione) {
                         cout << "Nome: "; cin >> nome;
                         cout << "Cognome: "; cin >> cognome;
                         cout << "Eta: "; cin >> eta;
-                        cout << "Ruolo (0=ALLENATORE, 1=AIUTANTE, 2=DS, 3=SEGRETERIA, 4=ALLENATORE_MINI): ";
-                        int ruoloInt;
-                        cin >> ruoloInt;
-                        
-                        RuoloStaff ruoloStaff = static_cast<RuoloStaff>(ruoloInt);
-                        Staff s1(nome, cognome, eta, ruoloStaff);
-                        squadraPtr->addStaff(std::move(s1));
-                        
-                        cout << "Vuoi Aggiungere altro Staff? 0=si / 1=no" << endl;
-                        cin >> azstaff;
+                                            cout << "Ruolo (0=ALLENATORE, 1=AIUTANTE, 2=DS, 3=SEGRETERIA, 4=ALLENATORE_MINI): ";
+                    int ruoloInt;
+                    cin >> ruoloInt;
+                    
+                    RuoloStaff ruoloStaff = static_cast<RuoloStaff>(ruoloInt);
+                    Staff s1(nome, cognome, eta, ruoloStaff);
+                    squadraPtr->addStaff(std::move(s1));
+                    
+                    cout << "Vuoi Aggiungere altro Staff? 0=si / 1=no" << endl;
+                    cin >> azstaff;
+                }
+                
+                cout << "Vuoi Aggiungere Giocatori? 0=si / 1=no" << endl;
+                cin >> azgioc;
+                int lastGiocatoreId = 0;
+                
+                if (!squadraPtr->getGiocatori().empty()) {
+                    for (const auto& g : squadraPtr->getGiocatori()) {
+                        if (g.getId() > lastGiocatoreId) lastGiocatoreId = g.getId();
                     }
+                }
+                
+                while(azgioc == 0) {
+                    cout << "Nome: "; cin >> nome;
+                    cout << "Cognome: "; cin >> cognome;
+                    cout << "Eta: "; cin >> eta;
+                    cout << "Ruolo: "; cin >> ruolo;
+                    
+                    Giocatore g1(nome, cognome, eta, ruolo, ++lastGiocatoreId);
+                    squadraPtr->addGiocatore(g1);
                     
                     cout << "Vuoi Aggiungere Giocatori? 0=si / 1=no" << endl;
                     cin >> azgioc;
-                    int lastGiocatoreId = 0;
-                    
-                    if (!squadraPtr->getGiocatori().empty()) {
-                        for (const auto& g : squadraPtr->getGiocatori()) {
-                            if (g.getId() > lastGiocatoreId) lastGiocatoreId = g.getId();
-                        }
-                    }
-                    
-                    while(azgioc == 0) {
-                        cout << "Nome: "; cin >> nome;
-                        cout << "Cognome: "; cin >> cognome;
-                        cout << "Eta: "; cin >> eta;
-                        cout << "Ruolo: "; cin >> ruolo;
-                        
-                        Giocatore g1(nome, cognome, eta, ruolo, ++lastGiocatoreId);
-                        squadraPtr->addGiocatore(g1);
-                        
-                        cout << "Vuoi Aggiungere Giocatori? 0=si / 1=no" << endl;
-                        cin >> azgioc;
-                    }	            
-                    
-                    stagione.addSquadra(std::move(squadraPtr));
-                    cout << "Vuoi aggiungere un'altra squadra? 0=si / 1=no" << endl;
-                    cin >> c;	
-                }
-                break;
-            }
+                }	            
+                
+                stagione.addSquadra(std::move(squadraPtr));
+                cout << "Vuoi aggiungere un'altra squadra? 0=si / 1=no" << endl;
+                cin >> c;	
+            	}
+            break;
+        	}
             case 2:
                 aggiungiPartita(stagione);
                 break;
+                
             case 3:
                 cout << stagione;
                 break;
+                
+            
             case 4: {
-                auto classifica = stagione.classificaSquadre();
-                std::cout << "\nCLASSIFICA (sort + lambda):\n";
-                for(size_t i = 0; i < classifica.size(); ++i) {
-                    std::cout << (i+1) << ". " << classifica[i]->getNome() 
-                              << " (" << classifica[i]->getPunteggio() << " pt)\n";
-                }
-                
-                std::cout << "\nMedia punteggio: " << stagione.mediaPunteggioSquadre() << "\n";
-                std::cout << "Media mete: " << stagione.mediaMeteTotaliSquadre() << "\n";
-                
-                auto top3 = stagione.topSquadre(3);
-                std::cout << "\nTOP 3 (partial_sort):\n";
-                for(size_t i = 0; i < top3.size(); ++i) {
-                    std::cout << (i+1) << ". " << top3[i]->getNome() << "\n";
-                }
-                break;
-            }
-            case 5: {
-                std::cout << "\nTEMPLATE METAPROGRAMMING:\n";
-                std::cout << "Media punteggio (template): " << stagione.mediaPunteggioTemplate() << "\n";
-                std::cout << "Somma mete totali (template): " << stagione.sommaMeteTemplate() << "\n";
-                
-                auto media_mete = stagione.calcolaMedia(stagione.getSquadre(), &Squadra::getMeteTotali);
-                auto media_placcaggi = stagione.calcolaMedia(stagione.getSquadre(), &Squadra::getPlaccaggiTotali);
-                
-                std::cout << "Media mete (pointer-to-member): " << media_mete << "\n";
-                std::cout << "Media placcaggi (pointer-to-member): " << media_placcaggi << "\n";
-                break;
-            }
-            case 6: {
                 int sceltaStats;
-			    std::cout << "\n+----------------------------------------------------+\n";
-			    std::cout << "¦       STATISTICHE AVANZATE (Algoritmi STL)        ¦\n";
-			    std::cout << "+----------------------------------------------------+\n";
-			    std::cout << "\n1) Statistiche per Squadra (giocatori)\n";
-			    std::cout << "2) Report Completo Stagione\n";
-			    std::cout << "Scelta: ";
-			    std::cin >> sceltaStats;
-			    
-			    if (sceltaStats == 1) {
-			        for (const auto& sq : stagione.getSquadre()) {
-			            Statistiche::stampaReportSquadra(*sq);
-			        }
-			    } else if (sceltaStats == 2) {
-			        Statistiche::stampaReportStagione(stagione);
-			    } else {
-			        std::cout << "Scelta non valida.\n";
-			    }
-			    break;
+                std::cout << "\n+----------------------------------------------------+\n";
+                std::cout << "¦       STATISTICHE AVANZATE (Algoritmi STL)        ¦\n";
+                std::cout << "+----------------------------------------------------+\n";
+                std::cout << "\n1) Statistiche per Squadra (giocatori)\n";
+                std::cout << "2) Report Completo Stagione\n";
+                std::cout << "Scelta: ";
+                std::cin >> sceltaStats;
+                
+                if (sceltaStats == 1) {
+                    for (const auto& sq : stagione.getSquadre()) {
+                        Statistiche::stampaReportSquadra(*sq);
+                    }
+                } else if (sceltaStats == 2) {
+                    Statistiche::stampaReportStagione(stagione);
+                } else {
+                    std::cout << "Scelta non valida.\n";
+                }
+                break;
             }
+            
+            case 5:
+            	cout<<endl<<"Uscito!"<<endl;
+            	break;
             
             default:
                 cout << "Azione non valida." << endl;
@@ -401,19 +202,26 @@ void Gestionale::modificaStagione(Stagione& stagione) {
     salvaParallel(stagione);
 }
 
-// ==================== AGGIUNGI SQUADRA ====================
+/**
+ * @brief Crea nuova squadra con ID sequenziale.
+ * @return unique_ptr<Squadra> pronta per l'uso.
+ */
 std::unique_ptr<Squadra> Gestionale::aggiungiSquadra() {
-    int newId = getMaxSquadraId() + 1;
-    string nome, indirizzo;
-    cout << "Nome squadra: ";
-    cin >> nome;
-    cout << "Indirizzo squadra: ";
-    cin >> indirizzo;
-
-    return std::unique_ptr<Squadra>(new Squadra(newId, nome, indirizzo));
+	int newId = getMaxSquadraId() + 1;
+	string nome, indirizzo;
+	cout << "Nome squadra: ";
+	cin >> nome;
+	cout << "Indirizzo squadra: ";
+	cin >> indirizzo;
+	
+	return std::unique_ptr<Squadra>(new Squadra(newId, nome, indirizzo));
 }
 
-// ==================== RICERCA STAGIONE ====================
+/**
+ * @brief Cerca stagione per anno usando STL find_if + lambda.
+ * @param anno Anno da cercare.
+ * @return Puntatore a Stagione o nullptr.
+ */
 Stagione* Gestionale::trovaStagione(int anno) {
     auto confrontaAnno = [anno](const std::unique_ptr<Stagione>& s) {
         return s->getAnno() == anno;
@@ -423,7 +231,6 @@ Stagione* Gestionale::trovaStagione(int anno) {
     return (it != stagioni.end()) ? it->get() : nullptr;
 }
 
-// ==================== SELEZIONA STAGIONE ====================
 void Gestionale::selezionaStagione() {
     fetchStagioni(pathStagioni);
     
@@ -431,154 +238,170 @@ void Gestionale::selezionaStagione() {
     std::cout << std::endl << "Seleziona numero stagione da caricare:" << std::endl;
     std::cin >> stag;
 
-    std::cout << "Selezionata: " << stag << std::endl;
-
     int anno = recuperaStagione(pathStagioni, stag);
     if(anno == 0) return;
     
+    // PASSO 1: Crea stagione VUOTA
     auto stagionePtr = std::unique_ptr<Stagione>(new Stagione(anno));
-    Stagione* stagioneSelezionata = stagionePtr.get();
     
+    // PASSO 2: Carica SQUADRE
     fetchSquadre(*stagionePtr);
     
+    // PASSO 3: Carica GIOCATORI/STAFF
     for (auto& squadraPtr : stagionePtr->getSquadre()) {
         fetchGiocatori(*squadraPtr);
         fetchStaff(*squadraPtr);
     }
     
+    // PASSO 4: Carica PARTITE
     fetchPartite(*stagionePtr);
     
+    // ? FIX: Salva pointer PRIMA del move
+    Stagione* rawPtr = stagionePtr.get();
     stagioni.push_back(std::move(stagionePtr));
-    modificaStagione(*stagioneSelezionata);
+    modificaStagione(*rawPtr);  // Usa rawPtr valido!
 }
 
-// ==================== SPLIT CSV LINE ====================
+
+/**
+ * @brief Split riga CSV su virgola.
+ * @param line Riga CSV grezza.
+ * @return Vettore token splittati.
+ */
 vector<string> Gestionale::splitCSVLine(const string& line) const {
-    vector<string> tokens;
-    stringstream ss(line);
-    string cell;
-    while (getline(ss, cell, ','))
-        tokens.push_back(cell);
-    return tokens;
+    return CSVManager::splitCSVLine(line);
 }
 
-// ==================== FETCH STAGIONI ====================
+/**
+ * @brief Visualizza elenco stagioni da CSV.
+ * @param filename File stagioni.csv.
+ */
 void Gestionale::fetchStagioni(const std::string& filename) {
-    std::ifstream file(filename);
+    CSVManager::FileGuard file(filename);
+    
+    if (!file.inputOpen()) {
+        std::cout << "[ERRORE] Impossibile aprire " << filename << std::endl;
+        return;
+    }
+    
     std::string riga;
     int numeroRiga = 1;
-    std::cout << endl << "=== Elenco Stagioni ===" << endl;
-    bool prima = true;
+    std::cout << std::endl << "=== Elenco Stagioni ===" << std::endl;
+    bool primaRiga = true;
     
-    while (std::getline(file, riga)) {
-        if (prima) { 
-            prima = false; 
+    while (std::getline(file.getInput(), riga)) {
+        if (primaRiga) { 
+            primaRiga = false; 
             continue; 
         }
         std::cout << numeroRiga << ". " << riga << std::endl;
         ++numeroRiga;
     }
-    file.close();
+    // File chiude automaticamente grazie a RAII!
 }
 
-// ==================== SALVA STAGIONI ====================
+
+/**
+ * @brief Salva stagioni uniche (merge con esistenti).
+ * @param nuovaStagione Stagione da salvare.
+ */
 void Gestionale::salvaStagioni(const Stagione& nuovaStagione) {
-    using namespace CSVHelper;
-    
+    // Parser per estrarre anno da riga CSV (solo numero)
     auto parseAnno = [](const std::string& line) -> int {
         return std::stoi(line);
     };
     
-    auto anni = caricaRighe<int>(pathStagioni, parseAnno);
+    // Carica anni esistenti dal CSV
+    auto anni = CSVManager::caricaRighe<int>(pathStagioni, parseAnno);
     
+    // Aggiungi anno se non esiste (merge)
     int annoNuova = nuovaStagione.getAnno();
     if (std::find(anni.begin(), anni.end(), annoNuova) == anni.end()) {
         anni.push_back(annoNuova);
     }
     
+    // Formatter per scrivere anno come stringa
     auto formatAnno = [](int anno) -> std::string {
         return std::to_string(anno);
     };
     
-    salvaRighe(pathStagioni, "anno", anni, formatAnno);
+    // Salva con header "anno"
+    CSVManager::salvaRighe(pathStagioni, "anno", anni, formatAnno);
 }
 
-// ==================== FETCH SQUADRE ====================
+
 void Gestionale::fetchSquadre(Stagione& stagione) {
-    std::ifstream file(pathSquadre);
-    if (!file.is_open()) {
-        std::cerr << "Impossibile aprire il file squadre.csv" << std::endl;
-        return;
-    }
-
-    std::string line;
-    bool primaRiga = true;
     int stagioneAnno = stagione.getAnno();
-
-    while (std::getline(file, line)) {
-        if (primaRiga) { 
-            primaRiga = false; 
-            continue; 
-        }
-        if (line.empty()) continue;
-
-        std::vector<std::string> tokens = splitCSVLine(line);
-        if (tokens.size() >= 15) {
-            int anno = std::stoi(tokens[1]);
+    auto parseSquadra = [&stagione, stagioneAnno, this](const std::string& line) -> int {
+        auto tokens = CSVManager::splitCSVLine(line);
+        if (tokens.size() < 15) return 0;
+        
+        try {
+            std::string annoStr = trim(tokens[1]);
+            int anno = std::stoi(annoStr);
+            if (anno != stagioneAnno) return 0;
             
-            if (anno == stagioneAnno) {
-                auto squadraPtr = std::unique_ptr<Squadra>(new Squadra(
-                    std::stoi(tokens[0]), tokens[2], tokens[3]
-                ));
-                
-                squadraPtr->setPossessoPalla(std::stoi(tokens[4]));
-                squadraPtr->setTerritorio(std::stod(tokens[5]));
-                squadraPtr->setPlaccaggiTotali(std::stoi(tokens[6]));
-                squadraPtr->setMetriGuadagnatiTotali(std::stoi(tokens[7]));
-                squadraPtr->setFalliTotali(std::stoi(tokens[9]));
-                squadraPtr->setMischieVinte(std::stoi(tokens[10]));
-                squadraPtr->setMischiePerse(std::stoi(tokens[11]));
-                squadraPtr->setToucheVinte(std::stoi(tokens[12]));
-                squadraPtr->setTouchePerse(std::stoi(tokens[13]));
-                squadraPtr->setPunteggio(std::stoi(tokens[14]));
-                
-                stagione.addSquadra(std::move(squadraPtr));
-            }
+            int id = std::stoi(trim(tokens[0]));
+            auto squadraPtr = std::unique_ptr<Squadra>(new Squadra(id, tokens[2], tokens[3]));
+            
+            squadraPtr->setPossessoPalla(std::stoi(trim(tokens[4])));
+            squadraPtr->setTerritorio(std::stod(trim(tokens[5])));
+            squadraPtr->setPlaccaggiTotali(std::stoi(trim(tokens[6])));
+            squadraPtr->setMetriGuadagnatiTotali(std::stoi(trim(tokens[7])));
+            squadraPtr->setMeteTotali(0);
+            squadraPtr->setFalliTotali(std::stoi(trim(tokens[9])));
+            squadraPtr->setMischieVinte(std::stoi(trim(tokens[10])));
+            squadraPtr->setMischiePerse(std::stoi(trim(tokens[11])));
+            squadraPtr->setToucheVinte(std::stoi(trim(tokens[12])));
+            squadraPtr->setTouchePerse(std::stoi(trim(tokens[13])));
+            squadraPtr->setPunteggio(std::stoi(trim(tokens[14])));
+            
+            stagione.addSquadra(std::move(squadraPtr));
+            return 1;
+        } catch (const std::exception& e) {
+            std::cerr << "[WARN] Riga CSV ignorata (squadre): " << line.substr(0, 50) 
+                      << "... ? " << e.what() << std::endl;
+            return 0;
         }
-    }
+    };
     
-    for (auto& squadraPtr : stagione.getSquadre()) {
-        squadraPtr->setPunteggio(0);
+    try {
+        CSVManager::caricaRighe<int>(pathSquadre, parseSquadra, false);
+        // Reset punteggi dopo caricamento
+        for (auto& squadraPtr : stagione.getSquadre()) {
+            squadraPtr->setPunteggio(0);
+        }
+        std::cout << "Caricate " << stagione.getSquadre().size() << " squadre per 2024." << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "[ERRORE] fetchSquadre: " << e.what() << std::endl;
     }
-    file.close();
 }
 
-// ==================== SALVA SQUADRE ====================
-void Gestionale::salvaSquadre(const Stagione& stagione) {
-    using namespace CSVHelper;
 
-    auto parseSquadra = [this](const std::string& line) {
-        return SquadraData::fromCSV(splitCSVLine(line));
+/**
+ * @brief Salva squadre della stagione (merge con esistenti).
+ * @param stagione Stagione contenente squadre da salvare.
+ */
+void Gestionale::salvaSquadre(const Stagione& stagione) {
+    auto parseSquadra = [](const std::string& line) {
+        return CSVManager::SquadraData::fromCSV(CSVManager::splitCSVLine(line));
     };
 
-    // Carica tutte le squadre esistenti
-    std::vector<SquadraData> squadreData =
-        caricaRighe<SquadraData>(pathSquadre, parseSquadra);
+    std::vector<CSVManager::SquadraData> squadreData =
+        CSVManager::caricaRighe<CSVManager::SquadraData>(pathSquadre, parseSquadra);
 
     int annoStagione = stagione.getAnno();
 
-    // Rimuovi solo le squadre della stagione corrente
     squadreData.erase(
         std::remove_if(squadreData.begin(), squadreData.end(),
-            [annoStagione](const SquadraData& sd) {
+            [annoStagione](const CSVManager::SquadraData& sd) {
                 return sd.anno == annoStagione;
             }),
         squadreData.end()
     );
 
-    // Aggiungi le squadre aggiornate della stagione corrente
     for (const auto& sq : stagione.getSquadre()) {
-        SquadraData sd{
+        CSVManager::SquadraData sd{
             sq->getId(), annoStagione,
             sq->getNome(), sq->getIndirizzo(),
             sq->getPossessoPalla(), sq->getTerritorio(),
@@ -591,79 +414,80 @@ void Gestionale::salvaSquadre(const Stagione& stagione) {
         squadreData.push_back(sd);
     }
 
-    salvaRighe(pathSquadre, 
+    CSVManager::salvaRighe(pathSquadre, 
         "squadra_id,stagione_anno,nome,indirizzo,possesso_palla,territorio,"
         "placcaggi_totali,metri_guadagnati_totali,mete_totali,falli_totali,"
         "mischie_vinte,mischie_perse,touche_vinte,touche_perse,punteggio_classifica",
-        squadreData, [](const SquadraData& sd) { return sd.toCSV(); });
+        squadreData, [](const CSVManager::SquadraData& sd) { return sd.toCSV(); });
 }
 
-// ==================== FETCH GIOCATORI ====================
+
+/**
+ * @brief Carica giocatori della squadra da CSV.
+ * @param squadra Squadra da popolare.
+ */
 void Gestionale::fetchGiocatori(Squadra& squadra) {
-    std::ifstream file(pathGiocatori);
-    if (!file.is_open()) {
-        std::cerr << "Impossibile aprire il file giocatori.csv" << std::endl;
-        return;
-    }
-
-    std::string line;
-    bool primaRiga = true;
-    int squadraId = squadra.getId();
-
-    while (std::getline(file, line)) {
-        if (primaRiga) { 
-            primaRiga = false; 
-            continue; 
+    auto parseGiocatore = [this, &squadra](const std::string& line) -> int {
+        auto tokens = CSVManager::splitCSVLine(line);
+        if (tokens.size() < 14) return 0;
+        
+        try {
+            int idSquadra = std::stoi(trim(tokens[1]));
+            if (idSquadra != squadra.getId()) return 0;
+            
+            Giocatore g(trim(tokens[2]), trim(tokens[3]), 
+                       std::stoi(trim(tokens[4])), trim(tokens[5]), 
+                       std::stoi(trim(tokens[0])));
+            g.setPlaccaggi(std::stoi(trim(tokens[6])));
+            g.setMetriCorsi(std::stoi(trim(tokens[7])));
+            g.setMete(std::stoi(trim(tokens[8])));
+            g.setCalciPiazzati(std::stoi(trim(tokens[9])));
+            g.setFalliCommessi(std::stoi(trim(tokens[10])));
+            g.setOffload(std::stoi(trim(tokens[11])));
+            g.setMinutiGiocati(std::stoi(trim(tokens[12])));
+            g.setPartiteGiocate(std::stoi(trim(tokens[13])));
+            
+            squadra.addGiocatore(g);
+            return 1;
+        } catch (const std::exception& e) {
+            // Silenzioso: ignora righe malformate
+            return 0;
         }
-        if (line.empty()) continue;
-
-        std::vector<std::string> tokens = splitCSVLine(line);
-
-        if (tokens.size() >= 14) {
-            int idSquadra = std::stoi(tokens[1]);
-
-            if (idSquadra == squadraId) {
-                Giocatore g(tokens[2], tokens[3], std::stoi(tokens[4]), tokens[5], std::stoi(tokens[0]));
-                
-                g.setPlaccaggi(std::stoi(tokens[6]));
-                g.setMetriCorsi(std::stoi(tokens[7]));
-                g.setMete(std::stoi(tokens[8]));
-                g.setCalciPiazzati(std::stoi(tokens[9]));
-                g.setFalliCommessi(std::stoi(tokens[10]));
-                g.setOffload(std::stoi(tokens[11]));
-                g.setMinutiGiocati(std::stoi(tokens[12]));
-                g.setPartiteGiocate(std::stoi(tokens[13]));
-                
-                squadra.addGiocatore(g);
-            }
-        }
-    }
-    file.close();
-}
-
-// ==================== SALVA GIOCATORI ====================
-void Gestionale::salvaGiocatori(const Squadra& squadra) {
-    using namespace CSVHelper;
-    
-    auto parseGiocatore = [this](const std::string& line) {
-        return GiocatoreData::fromCSV(splitCSVLine(line));
     };
     
-    std::vector<GiocatoreData> giocatoriData =
-        caricaRighe<GiocatoreData>(pathGiocatori, parseGiocatore);
+    try {
+        CSVManager::caricaRighe<int>(pathGiocatori, parseGiocatore);
+    } catch (const std::exception& e) {
+        std::cerr << "[WARN] fetchGiocatori(" << squadra.getId() << "): " << e.what() << std::endl;
+    }
+}
+
+
+
+/**
+ * @brief Salva giocatori della squadra (merge con esistenti).
+ * @param squadra Squadra contenente giocatori da salvare.
+ */
+void Gestionale::salvaGiocatori(const Squadra& squadra) {
+    auto parseGiocatore = [](const std::string& line) {
+        return CSVManager::GiocatoreData::fromCSV(CSVManager::splitCSVLine(line));
+    };
+    
+    std::vector<CSVManager::GiocatoreData> giocatoriData =
+        CSVManager::caricaRighe<CSVManager::GiocatoreData>(pathGiocatori, parseGiocatore);
     
     int squadraId = squadra.getId();
     
     giocatoriData.erase(
         std::remove_if(giocatoriData.begin(), giocatoriData.end(),
-            [squadraId](const GiocatoreData& gd) {
+            [squadraId](const CSVManager::GiocatoreData& gd) {
                 return gd.squadraId == squadraId;
             }),
         giocatoriData.end()
     );
     
     for (const auto& g : squadra.getGiocatori()) {
-        GiocatoreData gd{
+        CSVManager::GiocatoreData gd{
             g.getId(), squadraId, g.getEta(),
             g.getNome(), g.getCognome(), g.getRuolo(),
             g.getPlaccaggi(), g.getMetriCorsi(), g.getMete(), g.getCalciPiazzati(),
@@ -672,215 +496,209 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) {
         giocatoriData.push_back(gd);
     }
     
-    salvaRighe(pathGiocatori,
-        "giocatore_id,squadra_id,nome,cognome,eta,ruolo,"
-        "placcaggi,metri_corsi,mete,calci_piazzati,"
+    CSVManager::salvaRighe(pathGiocatori,
+        "giocatore_id,squadra_id,nome,cognome,eta,ruolo,placcaggi,metri_corsi,mete,calci_piazzati,"
         "falli_commessi,offload,minuti_giocati,partite_giocate",
         giocatoriData,
-        [](const GiocatoreData& gd) { return gd.toCSV(); }
+        [](const CSVManager::GiocatoreData& gd) { return gd.toCSV(); }
     );
 }
 
-// ==================== FETCH STAFF ====================
+
+/**
+ * @brief Carica staff della squadra da CSV.
+ * @param squadra Squadra da popolare.
+ */
 void Gestionale::fetchStaff(Squadra& squadra) {
-    std::ifstream file(pathStaff);
-    if (!file.is_open()) {
-        return;
-    }
-
-    std::string line;
-    bool primaRiga = true;
-    int squadraId = squadra.getId();
-
-    while (std::getline(file, line)) {
-        if (primaRiga) { 
-            primaRiga = false; 
-            continue; 
+    auto parseStaff = [this, &squadra](const std::string& line) -> int {
+        auto tokens = CSVManager::splitCSVLine(line);
+        if (tokens.size() < 6) return 0;
+        
+        try {
+            int idSquadra = std::stoi(trim(tokens[1]));
+            if (idSquadra != squadra.getId()) return 0;
+            
+            RuoloStaff ruolo = Staff::stringToRuolo(trim(tokens[5]));
+            Staff s(std::stoi(trim(tokens[0])), trim(tokens[2]), trim(tokens[3]), 
+                   std::stoi(trim(tokens[4])), ruolo);
+            squadra.addStaff(std::move(s));
+            return 1;
+        } catch (const std::exception& e) {
+            // Silenzioso
+            return 0;
         }
-        if (line.empty()) continue;
-
-        std::vector<std::string> tokens = splitCSVLine(line);
-
-        if (tokens.size() >= 6) {
-            int idStaff = std::stoi(tokens[0]);
-            int idSquadra = std::stoi(tokens[1]);
-
-            if (idSquadra == squadraId) {
-			    RuoloStaff ruolo = Staff::stringToRuolo(tokens[5]);
-			    Staff s(idStaff, tokens[2], tokens[3], std::stoi(tokens[4]), ruolo);
-			    squadra.addStaff(std::move(s));
-			}
-
-        }
+    };
+    
+    try {
+        CSVManager::caricaRighe<int>(pathStaff, parseStaff);
+    } catch (const std::exception& e) {
+        std::cerr << "[WARN] fetchStaff(" << squadra.getId() << "): " << e.what() << std::endl;
     }
-    file.close();
 }
 
 
-// ==================== SALVA STAFF ====================
+
+
+/**
+ * @brief Salva staff della squadra (merge con esistenti).
+ * @param squadra Squadra contenente staff da salvare.
+ */
 void Gestionale::salvaStaff(const Squadra& squadra) {
-    using namespace CSVHelper;
-    
-    auto parseStaff = [this](const std::string& line) {
-        return StaffData::fromCSV(splitCSVLine(line));
+    auto parseStaff = [](const std::string& line) {
+        return CSVManager::StaffData::fromCSV(CSVManager::splitCSVLine(line));
     };
     
-    std::vector<StaffData> staffData =
-        caricaRighe<StaffData>(pathStaff, parseStaff);
+    std::vector<CSVManager::StaffData> staffData =
+        CSVManager::caricaRighe<CSVManager::StaffData>(pathStaff, parseStaff);
     
     int squadraId = squadra.getId();
     
-    // Rimuovi solo le righe della squadra corrente
     staffData.erase(
         std::remove_if(staffData.begin(), staffData.end(),
-            [squadraId](const StaffData& sd) {
+            [squadraId](const CSVManager::StaffData& sd) {
                 return sd.squadraId == squadraId;
             }),
         staffData.end()
     );
     
-    // Calcola il prossimo ID globale disponibile
     int nextId = 1;
     if (!staffData.empty()) {
         nextId = std::max_element(staffData.begin(), staffData.end(),
-            [](const StaffData& a, const StaffData& b) { return a.id < b.id; })->id + 1;
+            [](const CSVManager::StaffData& a, const CSVManager::StaffData& b) { 
+                return a.id < b.id; 
+            })->id + 1;
     }
     
-    // Inserisci lo staff della squadra, mantenendo l'id se già esistente
     for (const auto& s : squadra.getStaff()) {
         int idStaff = s.getId();
         if (idStaff == 0) {
             idStaff = nextId++;
+            // Nota: const_cast necessario per modificare ID (design da migliorare)
             const_cast<Staff&>(s).setId(idStaff);
         }
 
-        StaffData sd{
+        CSVManager::StaffData sd{
             idStaff, squadraId, s.getEta(),
             s.getNome(), s.getCognome(),
-            s.getRuolo()
+            static_cast<CSVManager::RuoloStaff>(s.getRuolo())
         };
         staffData.push_back(sd);
     }
     
-    salvaRighe(pathStaff,
+    CSVManager::salvaRighe(pathStaff,
         "staff_id,squadra_id,nome,cognome,eta,ruolo",
         staffData,
-        [](const StaffData& sd) { return sd.toCSV(); }
+        [](const CSVManager::StaffData& sd) { return sd.toCSV(); }
     );
 }
 
-// ==================== FETCH PARTITE ====================
-void Gestionale::fetchPartite(Stagione& stagione) {
-    std::ifstream file(pathPartite);
-    if (!file.is_open()) {
-        std::cerr << "Impossibile aprire partite.csv" << std::endl;
-        return;
-    }
 
-    std::string line;
-    bool primaRiga = true;
+/**
+ * @brief Carica partite della stagione da CSV con calcolo punti automatici.
+ * @param stagione Stagione da popolare.
+ */
+void Gestionale::fetchPartite(Stagione& stagione) {
     int stagioneAnno = stagione.getAnno();
     const auto& squadre = stagione.getSquadre();
-
-    while (getline(file, line)) {
-        if (primaRiga) { primaRiga = false; continue; }
-        if (line.empty()) continue;
-
-        auto tokens = splitCSVLine(line);
-        if (tokens.size() >= 15) {
-            int anno = std::stoi(tokens[1]);
-
-            if (anno == stagioneAnno) {
-                int idLocali = std::stoi(tokens[3]);
-                int idOspiti = std::stoi(tokens[4]);
-                
-                Squadra* locali = nullptr;
-                Squadra* ospiti = nullptr;
-                
-                for (const auto& sqPtr : squadre) {
-                    if (sqPtr->getId() == idLocali) locali = sqPtr.get();
-                    if (sqPtr->getId() == idOspiti) ospiti = sqPtr.get();
-                }
-                
-                if (locali && ospiti) {
-                    Partita p(std::stoi(tokens[0]), std::stoi(tokens[2]), *locali, *ospiti);
-                    
-                    int ptLocali = std::stoi(tokens[5]);
-                    int ptOspiti = std::stoi(tokens[6]);
-                    int meteLocali = std::stoi(tokens[7]);
-                    int meteOspiti = std::stoi(tokens[8]);
-                    
-                    p.setMeteLocali(meteLocali);
-                    p.setMeteOspiti(meteOspiti);
-                    
-                    p.setRisultato(ptLocali, ptOspiti);
-                    p.setCartellinoRossoLoc(std::stoi(tokens[9]));
-                    p.setCartellinoRossoOsp(std::stoi(tokens[10]));
-                    p.setCartellinoGialloLoc(std::stoi(tokens[11]));
-                    p.setCartellinoGialloOsp(std::stoi(tokens[12]));
-                    p.setPossessoLoc(std::stod(tokens[13]));
-                    p.setPossessoOsp(std::stod(tokens[14]));
-                    
-                    int puntiLoc = 0, puntiOsp = 0;
-                    
-                    if (ptLocali > ptOspiti) {
-                        puntiLoc += 4;
-                    } else if (ptLocali < ptOspiti) {
-                        puntiOsp += 4;
-                    } else {
-                        puntiLoc += 2;
-                        puntiOsp += 2;
-                    }
-                    
-                    int diff = std::abs(ptLocali - ptOspiti);
-                    if (ptLocali > ptOspiti && diff <= 7) {
-                        puntiOsp += 1;
-                    } else if (ptOspiti > ptLocali && diff <= 7) {
-                        puntiLoc += 1;
-                    }
-                    
-                    if (meteLocali >= 4) puntiLoc += 1;
-                    if (meteOspiti >= 4) puntiOsp += 1;
-                    
-                    locali->aggiungiPuntiClassifica(puntiLoc);
-                    ospiti->aggiungiPuntiClassifica(puntiOsp);
-                    locali->aggiungiMete(meteLocali);
-                    ospiti->aggiungiMete(meteOspiti);
-                    
-                    stagione.addPartita(p);
-                }
+    
+    auto parsePartita = [this, &stagione, &squadre, stagioneAnno](const std::string& line) -> int {
+        auto tokens = CSVManager::splitCSVLine(line);
+        if (tokens.size() < 15) return 0;
+        
+        try {
+            int anno = std::stoi(trim(tokens[1]));
+            if (anno != stagioneAnno) return 0;
+            
+            int idLocali = std::stoi(trim(tokens[3]));
+            int idOspiti = std::stoi(trim(tokens[4]));
+            
+            Squadra* locali = nullptr;
+            Squadra* ospiti = nullptr;
+            
+            for (const auto& sqPtr : squadre) {
+                if (sqPtr->getId() == idLocali) locali = sqPtr.get();
+                if (sqPtr->getId() == idOspiti) ospiti = sqPtr.get();
             }
+            
+            if (!locali || !ospiti) return 0;
+            
+            Partita p(std::stoi(trim(tokens[0])), std::stoi(trim(tokens[2])), *locali, *ospiti);
+            int ptLocali = std::stoi(trim(tokens[5]));
+            int ptOspiti = std::stoi(trim(tokens[6]));
+            int meteLocali = std::stoi(trim(tokens[7]));
+            int meteOspiti = std::stoi(trim(tokens[8]));
+            
+            p.setMeteLocali(meteLocali);
+            p.setMeteOspiti(meteOspiti);
+            p.setRisultato(ptLocali, ptOspiti);
+            p.setCartellinoRossoLoc(std::stoi(trim(tokens[9])));
+            p.setCartellinoRossoOsp(std::stoi(trim(tokens[10])));
+            p.setCartellinoGialloLoc(std::stoi(trim(tokens[11])));
+            p.setCartellinoGialloOsp(std::stoi(trim(tokens[12])));
+            p.setPossessoLoc(std::stod(trim(tokens[13])));
+            p.setPossessoOsp(std::stod(trim(tokens[14])));
+            
+            // Calcolo punti rugby COMPLETO
+            int puntiLoc = 0, puntiOsp = 0;
+            if (ptLocali > ptOspiti) puntiLoc += 4;
+            else if (ptLocali < ptOspiti) puntiOsp += 4;
+            else { puntiLoc += 2; puntiOsp += 2; }
+            
+            int diff = std::abs(ptLocali - ptOspiti);
+            if (ptLocali > ptOspiti && diff <= 7) puntiOsp += 1;
+            else if (ptOspiti > ptLocali && diff <= 7) puntiLoc += 1;
+            
+            if (meteLocali >= 4) puntiLoc += 1;
+            if (meteOspiti >= 4) puntiOsp += 1;
+            
+            locali->aggiungiPuntiClassifica(puntiLoc);
+            ospiti->aggiungiPuntiClassifica(puntiOsp);
+            locali->aggiungiMete(meteLocali);
+            ospiti->aggiungiMete(meteOspiti);
+            
+            stagione.addPartita(p);
+            return 1;
+        } catch (const std::exception& e) {
+            // Silenzioso: ignora righe malformate
+            return 0;
         }
+    };
+    
+    try {
+        CSVManager::caricaRighe<int>(pathPartite, parsePartita);
+        std::cout << "Caricate " << stagione.getCalendario().size() << " partite per 2024." << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "[WARN] fetchPartite(2024): " << e.what() << std::endl;
     }
-    file.close();
 }
 
-// ==================== SALVA PARTITE ====================
-void Gestionale::salvaPartite(const Stagione& stagione) {
-    using namespace CSVHelper;
 
-    auto parsePartita = [this](const std::string& line) {
-        return PartitaData::fromCSV(splitCSVLine(line));
+
+
+/**
+ * @brief Salva partite della stagione (merge con esistenti).
+ * @param stagione Stagione contenente partite da salvare.
+ */
+void Gestionale::salvaPartite(const Stagione& stagione) {
+    auto parsePartita = [](const std::string& line) {
+        return CSVManager::PartitaData::fromCSV(CSVManager::splitCSVLine(line));
     };
 
-    // Carica tutte le partite esistenti
-    std::vector<PartitaData> partiteData =
-        caricaRighe<PartitaData>(pathPartite, parsePartita);
+    std::vector<CSVManager::PartitaData> partiteData =
+        CSVManager::caricaRighe<CSVManager::PartitaData>(pathPartite, parsePartita);
 
     int annoStagione = stagione.getAnno();
 
-    // Rimuovi le partite della stagione corrente
     partiteData.erase(
         std::remove_if(partiteData.begin(), partiteData.end(),
-            [annoStagione](const PartitaData& pd) {
+            [annoStagione](const CSVManager::PartitaData& pd) {
                 return pd.anno == annoStagione;
             }),
         partiteData.end()
     );
 
-    // Aggiungi le partite della stagione corrente
     for (const auto& p : stagione.getCalendario()) {
-        PartitaData pd{
+        CSVManager::PartitaData pd{
             p.getId(), annoStagione, p.getData(),
             p.getLocali().getId(), p.getOspiti().getId(),
             p.getPuntiLocali(), p.getPuntiOspiti(),
@@ -892,16 +710,20 @@ void Gestionale::salvaPartite(const Stagione& stagione) {
         partiteData.push_back(pd);
     }
     
-    salvaRighe(pathPartite,
+    CSVManager::salvaRighe(pathPartite,
         "partita_id,stagione_anno,data,id_locali,id_ospiti,pt_locali,pt_ospiti,"
         "mete_locali,mete_ospiti,"
         "cartellino_rosso_loc,cartellino_rosso_osp,"
         "cartellino_giallo_loc,cartellino_giallo_osp,"
         "possesso_loc,possesso_osp",
-        partiteData, [](const PartitaData& pd) { return pd.toCSV(); });
+        partiteData, [](const CSVManager::PartitaData& pd) { return pd.toCSV(); });
 }
 
-// ==================== AGGIUNGI PARTITA ====================
+
+/**
+ * @brief Aggiunge partita interattivamente con validazione squadre.
+ * @param stagione Stagione da modificare.
+ */
 void Gestionale::aggiungiPartita(Stagione& stagione) {
     int idPartita = stagione.getCalendario().size() + 1;
     int dataPartita, idSquadraLocale, idSquadraOspite;
@@ -944,63 +766,83 @@ void Gestionale::aggiungiPartita(Stagione& stagione) {
     std::cout << "Partita aggiunta con successo.\n";
 }
 
-// ==================== GET MAX SQUADRA ID ====================
+/**
+ * @brief Trova massimo ID squadra globale da CSV.
+ * @return Massimo ID trovato o 0.
+ */
 int Gestionale::getMaxSquadraId() const {
-    using namespace CSVHelper;
-    
     auto parseId = [this](const std::string& line) -> int {
-        auto tokens = splitCSVLine(line);
-        return tokens.empty() ? 0 : std::stoi(tokens[0]);
+        auto tokens = CSVManager::splitCSVLine(line);
+        if (tokens.empty()) return 0;
+        try {
+            return std::stoi(trim(tokens[0]));
+        } catch (...) { return 0; }
     };
-    
-    auto ids = caricaRighe<int>(pathSquadre, parseId);
-    
-    if (ids.empty()) return 0;
-    return *std::max_element(ids.begin(), ids.end());
+    auto ids = CSVManager::caricaRighe<int>(pathSquadre, parseId);
+    return ids.empty() ? 0 : *std::max_element(ids.begin(), ids.end());
 }
 
-// ==================== SALVATAGGIO PARALLELO ====================
+
+/**
+ * @brief Salvataggio COMPLETO parallelo con 5 thread.
+ * 
+ * t1: stagioni.csv
+ * t2: squadre.csv
+ * t3: partite.csv
+ * t4: TUTTI giocatori (parallelo)
+ * t5: TUTTI staff (parallelo)
+ */
 void Gestionale::salvaParallel(const Stagione& stagione) {
-    printf("=== Avvio salvataggio parallelo ===\n");
+    printf("=== Avvio salvataggio PARALLELO (5 THREAD) ===\n");
     
+    // THREAD 1-3: Indipendenti (stagioni/squadre/partite)
     std::thread t1([this, &stagione]() {
-        try { 
-            salvaStagioni(stagione); 
-        } catch (const std::exception& e) { 
-            printf("[ERRORE] salvaStagioni: %s\n", e.what()); 
-        }
+        try { salvaStagioni(stagione); }
+        catch (const std::exception& e) { printf("[ERRORE] salvaStagioni: %s\n", e.what()); }
     });
     
     std::thread t2([this, &stagione]() {
-        try { 
-            salvaSquadre(stagione); 
-        } catch (const std::exception& e) { 
-            printf("[ERRORE] salvaSquadre: %s\n", e.what()); 
-        }
+        try { salvaSquadre(stagione); }
+        catch (const std::exception& e) { printf("[ERRORE] salvaSquadre: %s\n", e.what()); }
     });
     
     std::thread t3([this, &stagione]() {
-        try { 
-            salvaPartite(stagione); 
-        } catch (const std::exception& e) { 
-            printf("[ERRORE] salvaPartite: %s\n", e.what()); 
+        try { salvaPartite(stagione); }
+        catch (const std::exception& e) { printf("[ERRORE] salvaPartite: %s\n", e.what()); }
+    });
+    
+    // THREAD 4: TUTTI GIOCATORI (parallelo)
+    std::thread t4([this, &stagione]() {
+        try {
+            for (const auto& squadraPtr : stagione.getSquadre()) {
+                salvaGiocatori(*squadraPtr);
+            }
+        } catch(const std::exception& e) {
+            printf("[ERRORE] salvaGiocatori: %s\n", e.what());
         }
     });
     
-    t1.join(); 
-    t2.join(); 
-    t3.join();
-    
-    printf("Salvataggio giocatori e staff...\n");
-    try {
-        for (const auto& squadraPtr : stagione.getSquadre()) {
-            salvaGiocatori(*squadraPtr);
-            salvaStaff(*squadraPtr);
+    // THREAD 5: TUTTI STAFF (parallelo)
+    std::thread t5([this, &stagione]() {
+        try {
+            for (const auto& squadraPtr : stagione.getSquadre()) {
+                salvaStaff(*squadraPtr);
+            }
+        } catch(const std::exception& e) {
+            printf("[ERRORE] salvaStaff: %s\n", e.what());
         }
-    } catch(const std::exception& e) {
-        std::cerr << "[ERRORE] salvataggio dipendenze: " << e.what() << "\n";
-    }
+    });
     
-    printf("=== Salvataggio COMPLETO! ===\n");
+    // Join tutti i 5 thread
+    t1.join(); t2.join(); t3.join(); t4.join(); t5.join();
+    printf("=== Salvataggio COMPLETO (5 THREAD)! ===\n");
 }
 
+
+std::string Gestionale::trim(const std::string& str) {
+    size_t first = str.find_first_not_of(" \t\r\n");
+    if (first == std::string::npos) return "";
+    
+    size_t last = str.find_last_not_of(" \t\r\n");
+    return str.substr(first, (last - first + 1));
+}

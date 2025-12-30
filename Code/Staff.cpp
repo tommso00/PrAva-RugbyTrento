@@ -1,6 +1,4 @@
 #include "Staff.h"
-using namespace std;
-
 /**
  * @brief Costruttore Staff senza ID (da assegnare al salvataggio).
  */
@@ -48,12 +46,12 @@ void Staff::setRuolo(RuoloStaff nuovoRuolo) { ruolo = nuovoRuolo; }
  * @brief Converte stringa in enum RuoloStaff.
  */
 RuoloStaff Staff::stringToRuolo(const std::string& s) {
-    if (s == "ALLENATORE")          return ALLENATORE;
-    if (s == "AIUTANTE_ALLENATORE") return AIUTANTE_ALLENATORE;
-    if (s == "DS")                  return DS;
-    if (s == "SEGRETERIA")          return SEGRETERIA;
-    if (s == "ALLENATORE_MINI")     return ALLENATORE_MINI;
-    return ALLENATORE;
+    if (s == "ALLENATORE")          return RuoloStaff::ALLENATORE;
+    if (s == "AIUTANTE_ALLENATORE") return RuoloStaff::AIUTANTE_ALLENATORE;
+    if (s == "DS")                  return RuoloStaff::DS;
+    if (s == "SEGRETERIA")          return RuoloStaff::SEGRETERIA;
+    if (s == "ALLENATORE_MINI")     return RuoloStaff::ALLENATORE_MINI;
+    return RuoloStaff::ALLENATORE;  // ? Default esplicito
 }
 
 /**
@@ -61,14 +59,16 @@ RuoloStaff Staff::stringToRuolo(const std::string& s) {
  */
 std::string Staff::ruoloToString(RuoloStaff r) {
     switch (r) {
-        case ALLENATORE:          return "ALLENATORE";
-        case AIUTANTE_ALLENATORE: return "AIUTANTE_ALLENATORE";
-        case DS:                  return "DS";
-        case SEGRETERIA:          return "SEGRETERIA";
-        case ALLENATORE_MINI:     return "ALLENATORE_MINI";
-        default:                  return "SCONOSCIUTO";
+        case RuoloStaff::ALLENATORE:          return "ALLENATORE";
+        case RuoloStaff::AIUTANTE_ALLENATORE: return "AIUTANTE_ALLENATORE";
+        case RuoloStaff::DS:                  return "DS";
+        case RuoloStaff::SEGRETERIA:          return "SEGRETERIA";
+        case RuoloStaff::ALLENATORE_MINI:     return "ALLENATORE_MINI";
+        default:                              return "SCONOSCIUTO";
     }
 }
+
+
 
 /**
  * @brief Overload operator<< per stampa Staff.

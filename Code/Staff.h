@@ -9,7 +9,7 @@
  * @enum RuoloStaff
  * @brief Enumerazione che definisce i possibili ruoli del personale tecnico/amministrativo.
  */
-enum RuoloStaff {
+enum class RuoloStaff {
     ALLENATORE,           ///< Allenatore principale
     AIUTANTE_ALLENATORE,  ///< Vice-allenatore o tecnico specializzato
     DS,                   ///< Direttore Sportivo

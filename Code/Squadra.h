@@ -47,19 +47,19 @@ public:
 
     // *** COPY & MOVE SEMANTICS ***
     /**
-     * @brief Copy constructor.
+     * @brief Costruttore di Copia.
      */
     Squadra(const Squadra& other);
     /**
-     * @brief Move constructor.
+     * @brief Costruttore Move.
      */
     Squadra(Squadra&& other) noexcept;
     /**
-     * @brief Copy assignment.
+     * @brief Assegnazione di Copia.
      */
     Squadra& operator=(const Squadra& other);
     /**
-     * @brief Move assignment.
+     * @brief Assegnazione Move.
      */
     Squadra& operator=(Squadra&& other) noexcept;
 

@@ -10,38 +10,36 @@ Giocatore::Giocatore(const std::string& nome, const std::string& cognome, int et
       falliCommessi(0), offload(0), minutiGiocati(0), partiteGiocate(0) {}
 
 /**
- * @brief Copy constructor Giocatore (deep copy).
+ * @brief Costruttore di copia Giocatore (copia profonda).
  */
 Giocatore::Giocatore(const Giocatore& other)
-    : Persona(other),  // Base class copy
+    : Persona(other),  // Copia classe base
       ruolo(other.ruolo), id(other.id),
       placcaggi(other.placcaggi), metriCorsi(other.metriCorsi),
       mete(other.mete), calciPiazzati(other.calciPiazzati),
       falliCommessi(other.falliCommessi), offload(other.offload),
       minutiGiocati(other.minutiGiocati), partiteGiocate(other.partiteGiocate) {
-    //std::cout << "Copy Giocatore(" << ruolo << ")" << std::endl;
 }
 
 /**
- * @brief Move constructor Giocatore (efficiente).
+ * @brief Costruttore di move Giocatore (efficiente).
  */
 Giocatore::Giocatore(Giocatore&& other) noexcept
-    : Persona(std::move(other)),  // Move base class
+    : Persona(std::move(other)),  // Move classe base
       ruolo(std::move(other.ruolo)), id(other.id),
       placcaggi(other.placcaggi), metriCorsi(other.metriCorsi),
       mete(other.mete), calciPiazzati(other.calciPiazzati),
       falliCommessi(other.falliCommessi), offload(other.offload),
       minutiGiocati(other.minutiGiocati), partiteGiocate(other.partiteGiocate) {
     other.id = 0;
-    //std::cout << "Move Giocatore(" << ruolo << ")" << std::endl;
 }
 
 /**
- * @brief Copy assignment operator Giocatore.
+ * @brief Operatore di assegnazione per copia Giocatore.
  */
 Giocatore& Giocatore::operator=(const Giocatore& other) {
     if(this != &other) {
-        Persona::operator=(other);  // Base class assignment
+        Persona::operator=(other);  // Assegnazione classe base
         
         ruolo = other.ruolo;
         id = other.id;
@@ -54,25 +52,29 @@ Giocatore& Giocatore::operator=(const Giocatore& other) {
         minutiGiocati = other.minutiGiocati;
         partiteGiocate = other.partiteGiocate;
     }
-    //std::cout << "Copy assign Giocatore(" << ruolo << ")" << std::endl;
     return *this;
 }
 
 /**
- * @brief Move assignment operator Giocatore.
+ * @brief Operatore di assegnazione per move Giocatore.
  */
 Giocatore& Giocatore::operator=(Giocatore&& other) noexcept {
     if(this != &other) {
-        Persona::operator=(std::move(other));  // Move base class
+        Persona::operator=(std::move(other));  // Move classe base
         
         ruolo = std::move(other.ruolo);
         id = other.id;
         placcaggi = other.placcaggi;
-        // ... move tutti i primitivi
+        metriCorsi = other.metriCorsi;
+        mete = other.mete;
+        calciPiazzati = other.calciPiazzati;
+        falliCommessi = other.falliCommessi;
+        offload = other.offload;
+        minutiGiocati = other.minutiGiocati;
+        partiteGiocate = other.partiteGiocate;
         
         other.id = 0;
     }
-    //std::cout << "Move assign Giocatore(" << ruolo << ")" << std::endl;
     return *this;
 }
 

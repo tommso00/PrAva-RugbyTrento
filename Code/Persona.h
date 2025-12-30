@@ -12,8 +12,8 @@
  * 
  * La classe definisce gli attributi fondamentali comuni a tutte le persone:
  * nome, cognome ed età. È pensata per essere una classe base astratta o 
- * generica, destinata a essere estesa da altre classi (es. Giocatore, Allenatore, 
- * Dirigente, ecc.) che aggiungono comportamenti o proprietà più specifiche.
+ * generica, destinata a essere estesa da altre classi (es. Giocatore e Staff)
+ * che aggiungono comportamenti o proprietà più specifiche.
  */
 class Persona {
 protected:
