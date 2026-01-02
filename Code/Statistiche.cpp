@@ -21,7 +21,7 @@ const std::vector<std::string> Statistiche::RUOLI_STANDARD = {
  * @brief Trova giocatore con più placcaggi usando std::max_element.
  */
 // Lezione 7: std::max_element con lambda comparator
-const Giocatore* Statistiche::getMigliorPlaccaggitore(const Squadra& squadra) {
+const Giocatore* Statistiche::getMigliorPlaccatore(const Squadra& squadra) {
     const auto& giocatori = squadra.getGiocatori();
     if (giocatori.empty()) return nullptr;
     
@@ -34,10 +34,10 @@ const Giocatore* Statistiche::getMigliorPlaccaggitore(const Squadra& squadra) {
 }
 
 /**
- * @brief Capocannoniere della squadra (più mete).
+ * @brief Meta Man della squadra (più mete).
  */
 // Lezione 7: std::max_element inline lambda
-const Giocatore* Statistiche::getCapocannoniere(const Squadra& squadra) {
+const Giocatore* Statistiche::getMetaMan(const Squadra& squadra) {
     const auto& giocatori = squadra.getGiocatori();
     if (giocatori.empty()) return nullptr;
     
@@ -164,67 +164,67 @@ void Statistiche::stampaReportSquadra(const Squadra& squadra) {
     std::cout << "¦          REPORT STATISTICO SQUADRA                 ¦\n";
     std::cout << "+----------------------------------------------------+\n";
     
-    std::cout << "\n??? " << squadra.getNome() << " ???\n";
+    std::cout << "\n " << squadra.getNome() << " \n";
     
     // TOP PERFORMERS
-    std::cout << "\n?? TOP PERFORMERS:\n";
+    std::cout << "\n TOP PERFORMERS:\n";
     
-    const Giocatore* migliorPlaccaggitore = getMigliorPlaccaggitore(squadra);
-    if (migliorPlaccaggitore) {
-        std::cout << "  ???  Miglior Placcatore: " 
-                  << migliorPlaccaggitore->getNome() << " " 
-                  << migliorPlaccaggitore->getCognome()
-                  << " (" << migliorPlaccaggitore->getPlaccaggi() << " placcaggi)\n";
+    const Giocatore* migliorPlaccatore = getMigliorPlaccatore(squadra);
+    if (migliorPlaccatore) {
+        std::cout << "   # Miglior Placcatore: " 
+                  << migliorPlaccatore->getNome() << " " 
+                  << migliorPlaccatore->getCognome()
+                  << " (" << migliorPlaccatore->getPlaccaggi() << " placcaggi)\n";
     }
     
-    const Giocatore* capocannoniere = getCapocannoniere(squadra);
-    if (capocannoniere) {
-        std::cout << "  ? Meta Man: " 
-                  << capocannoniere->getNome() << " " 
-                  << capocannoniere->getCognome()
-                  << " (" << capocannoniere->getMete() << " mete)\n";
+    const Giocatore* MetaMan = getMetaMan(squadra);
+    if (MetaMan) {
+        std::cout << "  # Meta Man: " 
+                  << MetaMan->getNome() << " " 
+                  << MetaMan->getCognome()
+                  << " (" << MetaMan->getMete() << " mete)\n";
     }
     
     const Giocatore* migliorCorridore = getMigliorCorridore(squadra);
     if (migliorCorridore) {
-        std::cout << "  ?? Miglior Ball Carrier: " 
+        std::cout << "  # Miglior Ball Carrier: " 
                   << migliorCorridore->getNome() << " " 
                   << migliorCorridore->getCognome()
                   << " (" << migliorCorridore->getMetriCorsi() << " metri)\n";
     }
     
     // MEDIE
-    std::cout << "\n?? MEDIE DI SQUADRA:\n";
-    std::cout << "  • Media mete per giocatore: " 
+    std::cout << "\n MEDIE DI SQUADRA:\n";
+    std::cout << "  # Media mete per giocatore: " 
               << std::fixed << std::setprecision(2) 
               << mediaMetePerGiocatore(squadra) << "\n";
-    std::cout << "  • Media placcaggi per giocatore: " 
+    std::cout << "  # Media placcaggi per giocatore: " 
               << std::fixed << std::setprecision(2) 
               << mediaPlaccaggiPerGiocatore(squadra) << "\n";
     
     // DISTRIBUZIONE RUOLI
-    std::cout << "\n?? DISTRIBUZIONE RUOLI:\n";
+    std::cout << "\n DISTRIBUZIONE RUOLI:\n";
     auto distribuzione = distribuzioneRuoli(squadra);
     for (const auto& pair : distribuzione) {
         if (pair.second > 0) {
-            std::cout << "  • " << std::setw(20) << std::left 
+            std::cout << "  # " << std::setw(20) << std::left 
                       << pair.first << ": " << pair.second << "\n";
         }
     }
     
     // GIOCATORI PRODUTTIVI
-    std::cout << "\n?? GIOCATORI PRODUTTIVI:\n";
+    std::cout << "\n GIOCATORI PRODUTTIVI:\n";
     auto topScorer = giocatoriConMeteSopra(squadra, 5);
-    std::cout << "  • Con 5+ mete: " << topScorer.size() << "\n";
+    std::cout << "  # Con 5+ mete: " << topScorer.size() << "\n";
     for (const auto& g : topScorer) {
-        std::cout << "      ? " << g.getNome() << " " << g.getCognome() 
+        std::cout << "      @ " << g.getNome() << " " << g.getCognome() 
                   << " (" << g.getMete() << " mete)\n";
     }
     
     auto difensori = giocatoriConPlaccaggiSopra(squadra, 30);
-    std::cout << "  • Con 30+ placcaggi: " << difensori.size() << "\n";
+    std::cout << "  # Con 30+ placcaggi: " << difensori.size() << "\n";
     for (const auto& g : difensori) {
-        std::cout << "      ? " << g.getNome() << " " << g.getCognome() 
+        std::cout << "      @ " << g.getNome() << " " << g.getCognome() 
                   << " (" << g.getPlaccaggi() << " placcaggi)\n";
     }
     
@@ -469,7 +469,7 @@ void Statistiche::stampaReportStagione(const Stagione& stagione) {
     std::cout << "+----------------------------------------------------------+\n";
     
     // CLASSIFICA
-    std::cout << "\n?? CLASSIFICA GENERALE:\n";
+    std::cout << "\n CLASSIFICA GENERALE:\n";
     auto classifica = classificaCompleta(stagione);
     for (size_t i = 0; i < classifica.size(); ++i) {
         std::cout << "  " << std::setw(2) << (i+1) << ". " 
@@ -479,61 +479,52 @@ void Statistiche::stampaReportStagione(const Stagione& stagione) {
     }
     
     // TOP 3
-    std::cout << "\n?? PODIO:\n";
+    std::cout << "\n PODIO:\n";
     auto top3 = topNSquadre(stagione, 3);
     for (size_t i = 0; i < top3.size() && i < 3; ++i) {
-        std::string medaglia = (i == 0) ? "??" : (i == 1) ? "??" : "??";
+        std::string medaglia = (i == 0) ? "1." : (i == 1) ? "2." : "3.";
         std::cout << "  " << medaglia << " " << top3[i]->getNome() 
                   << " (" << top3[i]->getPunteggio() << " pt)\n";
     }
     
     // STATISTICHE AGGREGATE
-    std::cout << "\n?? STATISTICHE GENERALI:\n";
-    std::cout << "  • Media punti: " << std::fixed << std::setprecision(1) 
+    std::cout << "\n STATISTICHE GENERALI:\n";
+    std::cout << "  # Media punti: " << std::fixed << std::setprecision(1) 
               << mediaMetrica(stagione, &Squadra::getPunteggio) << "\n";
-    std::cout << "  • Deviazione std punti: " << std::fixed << std::setprecision(2)
+    std::cout << "  # Deviazione std punti: " << std::fixed << std::setprecision(2)
               << deviazioneStandard(stagione, &Squadra::getPunteggio) << "\n";
-    std::cout << "  • Range punti: " << minimoMetrica(stagione, &Squadra::getPunteggio)
+    std::cout << "  # Range punti: " << minimoMetrica(stagione, &Squadra::getPunteggio)
               << " - " << massimoMetrica(stagione, &Squadra::getPunteggio) << "\n";
     
     // MIGLIORI PER CATEGORIA
-    std::cout << "\n? MIGLIORI PER CATEGORIA:\n";
+    std::cout << "\n MIGLIORI PER CATEGORIA:\n";
     auto miglioriMete = squadraMigliorePerMetrica(stagione, "mete");
     if (miglioriMete) {
-        std::cout << "  ?? Attacco: " << miglioriMete->getNome() 
+        std::cout << "   Attacco: " << miglioriMete->getNome() 
                   << " (" << miglioriMete->getMeteTotali() << " mete)\n";
     }
     
     auto miglioriPlaccaggi = squadraMigliorePerMetrica(stagione, "placcaggi");
     if (miglioriPlaccaggi) {
-        std::cout << "  ???  Difesa: " << miglioriPlaccaggi->getNome() 
+        std::cout << "    Difesa: " << miglioriPlaccaggi->getNome() 
                   << " (" << miglioriPlaccaggi->getPlaccaggiTotali() << " placcaggi)\n";
     }
     
     // SQUADRE BILANCIATE
-    std::cout << "\n??  SQUADRE BILANCIATE (attacco E difesa sopra media):\n";
+    std::cout << "\n  SQUADRE BILANCIATE (attacco E difesa sopra media):\n";
     auto bilanciate = squadreBilanciate(stagione);
     for (const auto& sq : bilanciate) {
-        std::cout << "  • " << sq->getNome() << "\n";
+        std::cout << "  # " << sq->getNome() << "\n";
     }
     
     // EFFICIENZA
-    std::cout << "\n?? TOP 5 EFFICIENZA (punti/mete):\n";
+    std::cout << "\n TOP 5 EFFICIENZA (punti/mete):\n";
     auto efficienze = classificaEfficienza(stagione);
     for (size_t i = 0; i < efficienze.size() && i < 5; ++i) {
         std::cout << "  " << (i+1) << ". " << efficienze[i].first->getNome()
                   << " - " << std::fixed << std::setprecision(2) 
                   << efficienze[i].second << " pt/meta\n";
     }
-    
-    std::cout << "\n----------------------------------------------------------\n";
-    std::cout << "Algoritmi STL utilizzati:\n";
-    std::cout << "  • std::max_element, std::min_element\n";
-    std::cout << "  • std::count_if, std::copy_if\n";
-    std::cout << "  • std::sort, std::partial_sort, std::nth_element\n";
-    std::cout << "  • std::accumulate, std::transform\n";
-    std::cout << "  • Lambda expressions con capture\n";
-    std::cout << "  • Pointer-to-member functions\n";
-    std::cout << "----------------------------------------------------------\n";
+
 }
 

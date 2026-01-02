@@ -198,10 +198,6 @@ std::ostream& operator<<(std::ostream& os, const Partita& p) {
  	os << "Partita ID: " << p.id << ", Data: " << p.data << "\n";
 	os << "Squadre: " << p.locali.getNome() << " vs " << p.ospiti.getNome() << "\n";
 	os << "Punteggio partita: " << p.ptLocali << ":" << p.ptOspiti;
-
-/* 	os << "Partita ID: " << p.id << ", Data: " << p.data << "\n";
-	os << "Locali: " << p.locali << " - Punti: " << p.ptLocali << "\n";
-    os << "Ospiti: " << p.ospiti << " - Punti: " << p.ptOspiti;
-*/  return os;
+	return os;
 }
 

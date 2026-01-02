@@ -3,9 +3,6 @@
 
 #include <string>
 
-// Evitare "using namespace std;" nei file header per prevenire conflitti di nomi.
-// Si utilizza invece il fully-qualified name (std::string)
-
 /**
  * @class Persona
  * @brief Classe base che rappresenta una persona generica.

@@ -100,9 +100,6 @@ namespace CSVManager {
 	    return risultati;
 	}
 
-
-
-    
     /**
      * @brief Salva righe CSV con formatter personalizzato.
      * @tparam T Tipo dati da serializzare.

@@ -35,10 +35,10 @@ public:
      */
     Squadra* trovaSquadraPerId(int id);
 
-    // *** COPY & MOVE SEMANTICS (IMPLEMENTAZIONE AVANZATA) ***
+    // *** COPY & MOVE SEMANTICS ***
     /**
      * @brief Costruttore di copia con implementazione PROFONDA.
-     * Crea una copia completa di tutte le squadre (deep copy dei dati).
+     * Crea una copia completa di tutte le squadre (copia profonda dei dati).
      */
     Stagione(const Stagione& other);
 
@@ -49,13 +49,13 @@ public:
     Stagione& operator=(const Stagione& other);
 
     /**
-     * @brief Costruttore di move (EFFICIENTE).
+     * @brief Costruttore di move.
      * Trasferisce ownership delle risorse senza duplicazione.
      */
     Stagione(Stagione&& other) noexcept;
 
     /**
-     * @brief Operatore di assegnazione di move (EFFICIENTE).
+     * @brief Operatore di assegnazione di move.
      * Trasferisce le risorse in modo ottimizzato.
      */
     Stagione& operator=(Stagione&& other) noexcept;

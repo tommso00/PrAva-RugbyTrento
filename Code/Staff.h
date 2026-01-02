@@ -11,7 +11,7 @@
  */
 enum class RuoloStaff {
     ALLENATORE,           ///< Allenatore principale
-    AIUTANTE_ALLENATORE,  ///< Vice-allenatore o tecnico specializzato
+    AIUTANTE_ALLENATORE,  ///< Vice-allenatore
     DS,                   ///< Direttore Sportivo
     SEGRETERIA,           ///< Personale amministrativo
     ALLENATORE_MINI       ///< Allenatore delle giovanili/mini-rugby
@@ -71,14 +71,14 @@ public:
     void setRuolo(RuoloStaff nuovoRuolo);
 
     /**
-     * @brief Converte stringa ? RuoloStaff.
+     * @brief Converte stringa RuoloStaff.
      * @param s Stringa ruolo
      * @return Enum corrispondente
      */
     static RuoloStaff stringToRuolo(const std::string& s);
     
     /**
-     * @brief Converte RuoloStaff ? stringa.
+     * @brief Converte RuoloStaff stringa.
      * @param r Enum ruolo
      * @return Stringa ruolo
      */

@@ -166,6 +166,10 @@ public:
      */
     void salvaParallel(const Stagione& stagione);
     
+    /**
+     * @brief Restituisce la string senza spazi, punteggiatura o bordi
+     * @param stringa str da ripulire/tagliare
+     */
     static std::string trim(const std::string& str);
 };
 

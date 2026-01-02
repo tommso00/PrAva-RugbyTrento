@@ -1,4 +1,5 @@
 #include "Staff.h"
+
 /**
  * @brief Costruttore Staff senza ID (da assegnare al salvataggio).
  */
@@ -8,7 +9,7 @@ Staff::Staff(const std::string& nome,
              RuoloStaff ruolo)
     : Persona(nome, cognome, eta),
       id(0),
-      ruolo(ruolo) {}          // <-- QUI
+      ruolo(ruolo) {}
 
 /**
  * @brief Costruttore Staff con ID (letto da CSV).
@@ -20,7 +21,7 @@ Staff::Staff(int id,
              RuoloStaff ruolo)
     : Persona(nome, cognome, eta),
       id(id),
-      ruolo(ruolo) {}          // <-- E QUI
+      ruolo(ruolo) {}
 
 /**
  * @brief Restituisce ID univoco staff.
@@ -33,12 +34,12 @@ int Staff::getId() const { return id; }
 void Staff::setId(int nuovoId) { id = nuovoId; }
 
 /**
- * @brief Restituisce ruolo professionale.
+ * @brief Restituisce ruolo.
  */
 RuoloStaff Staff::getRuolo() const { return ruolo; }
 
 /**
- * @brief Imposta ruolo professionale.
+ * @brief Imposta ruolo.
  */
 void Staff::setRuolo(RuoloStaff nuovoRuolo) { ruolo = nuovoRuolo; }
 
@@ -51,7 +52,7 @@ RuoloStaff Staff::stringToRuolo(const std::string& s) {
     if (s == "DS")                  return RuoloStaff::DS;
     if (s == "SEGRETERIA")          return RuoloStaff::SEGRETERIA;
     if (s == "ALLENATORE_MINI")     return RuoloStaff::ALLENATORE_MINI;
-    return RuoloStaff::ALLENATORE;  // ? Default esplicito
+    return RuoloStaff::ALLENATORE;  //Default esplicito
 }
 
 /**
@@ -67,8 +68,6 @@ std::string Staff::ruoloToString(RuoloStaff r) {
         default:                              return "SCONOSCIUTO";
     }
 }
-
-
 
 /**
  * @brief Overload operator<< per stampa Staff.

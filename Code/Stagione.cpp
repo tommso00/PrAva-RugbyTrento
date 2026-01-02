@@ -1,7 +1,7 @@
 #include "Stagione.h"
 #include <stdexcept>
 #include <memory>
-#include <iostream>  // AGGIUNTO per std::cout
+#include <iostream>
 
 /**
  * @brief Costruttore principale Stagione.
@@ -41,7 +41,7 @@ Stagione& Stagione::operator=(const Stagione& other) {
 }
 
 /**
- * @brief Move constructor Stagione (efficiente).
+ * @brief Costruttore Move Stagione.
  */
 Stagione::Stagione(Stagione&& other) noexcept 
     : anno(other.anno), 
@@ -53,7 +53,7 @@ Stagione::Stagione(Stagione&& other) noexcept
 }
 
 /**
- * @brief Move assignment operator Stagione.
+ * @brief Operatore di assegnazione Move Stagione.
  */
 Stagione& Stagione::operator=(Stagione&& other) noexcept {
     if(this != &other) {
@@ -61,7 +61,7 @@ Stagione& Stagione::operator=(Stagione&& other) noexcept {
         squadre.clear();
         partite.clear();
         
-        // Move risorse
+        // Move
         anno = other.anno;
         squadre = std::move(other.squadre);
         partite = std::move(other.partite);

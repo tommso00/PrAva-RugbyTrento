@@ -17,7 +17,7 @@ using namespace std;
  * @brief Crea nuova stagione interattivamente.
  * 
  * Verifica unicità anno e avvia modalità modifica.
- */
+*/
 void Gestionale::creaStagione() {
     int anno;
     cout << "Inserisci anno stagione: ";
@@ -37,6 +37,16 @@ void Gestionale::creaStagione() {
     modificaStagione(*stagioneRaw);
 }
 
+/**
+ * @brief Legge l'anno di stagione da una riga di un file CSV.
+ *
+ * Apre il file, salta l'intestazione, raggiunge la riga richiesta e ne
+ * converte il contenuto in intero (anno). Restituisce 0 in caso di errore.
+ *
+ * @param filename Nome del file CSV.
+ * @param numeroRiga Riga (esclusa l'intestazione) da cui leggere l'anno.
+ * @return int Anno della stagione, oppure 0 se non disponibile o non valido.
+*/
 int Gestionale::recuperaStagione(const std::string& filename, int numeroRiga) {
     CSVManager::FileGuard file(filename);
     if (!file.inputOpen()) {
@@ -54,12 +64,11 @@ int Gestionale::recuperaStagione(const std::string& filename, int numeroRiga) {
             continue;
         }
         
-        if (numeroRigaTrovata == numeroRiga) {  // ? Controllo diretto
+        if (numeroRigaTrovata == numeroRiga) {  //Controllo diretto
             std::string annoPulito = trim(riga);
             try {
                 int anno = std::stoi(annoPulito);
-                std::cout << "Riga " << numeroRiga << ": " << riga 
-                          << " ? Anno caricato: " << anno << std::endl;
+                std::cout << std::endl<<"Riga " << numeroRiga << ": " << riga << " == Anno caricato: " << anno << std::endl;
                 return anno;
             } catch (const std::exception& e) {
                 std::cerr << "[WARN] Errore parsing riga " << numeroRiga 
@@ -67,21 +76,19 @@ int Gestionale::recuperaStagione(const std::string& filename, int numeroRiga) {
                 return 0;
             }
         }
-        numeroRigaTrovata++;  // ? Incrementa DOPO controllo
+        numeroRigaTrovata++;  //Incrementa DOPO controllo
     }
     
     std::cout << "Riga " << numeroRiga << " non trovata nel file." << std::endl;
     return 0;
 }
 
-
-
 /**
  * @brief Modalità interattiva modifica/estensione stagione.
  * @param stagione Stagione da modificare.
  * 
  * Menu completo: squadre, partite, statistiche STL.
- */
+*/
 void Gestionale::modificaStagione(Stagione& stagione) {
     int lastSquadraId = getMaxSquadraId();  
     for (const auto& s : stagione.getSquadre()) {
@@ -205,7 +212,7 @@ void Gestionale::modificaStagione(Stagione& stagione) {
 /**
  * @brief Crea nuova squadra con ID sequenziale.
  * @return unique_ptr<Squadra> pronta per l'uso.
- */
+*/
 std::unique_ptr<Squadra> Gestionale::aggiungiSquadra() {
 	int newId = getMaxSquadraId() + 1;
 	string nome, indirizzo;
@@ -221,7 +228,7 @@ std::unique_ptr<Squadra> Gestionale::aggiungiSquadra() {
  * @brief Cerca stagione per anno usando STL find_if + lambda.
  * @param anno Anno da cercare.
  * @return Puntatore a Stagione o nullptr.
- */
+*/
 Stagione* Gestionale::trovaStagione(int anno) {
     auto confrontaAnno = [anno](const std::unique_ptr<Stagione>& s) {
         return s->getAnno() == anno;
@@ -231,6 +238,15 @@ Stagione* Gestionale::trovaStagione(int anno) {
     return (it != stagioni.end()) ? it->get() : nullptr;
 }
 
+/**
+ * @brief Carica e seleziona una stagione dal file CSV delle stagioni.
+ *
+ * Chiede all'utente il numero di riga, recupera l'anno, crea una Stagione vuota e
+ * la popola con squadre, giocatori, staff e partite dai rispettivi file CSV.
+ *
+ * @pre File CSV delle stagioni, squadre, giocatori, staff e partite accessibili.
+ * @post La stagione caricata è disponibile in #stagioni; nessuna azione se anno=0.
+*/
 void Gestionale::selezionaStagione() {
     fetchStagioni(pathStagioni);
     
@@ -256,18 +272,17 @@ void Gestionale::selezionaStagione() {
     // PASSO 4: Carica PARTITE
     fetchPartite(*stagionePtr);
     
-    // ? FIX: Salva pointer PRIMA del move
+    //Salva pointer PRIMA del move
     Stagione* rawPtr = stagionePtr.get();
     stagioni.push_back(std::move(stagionePtr));
     modificaStagione(*rawPtr);  // Usa rawPtr valido!
 }
 
-
 /**
  * @brief Split riga CSV su virgola.
  * @param line Riga CSV grezza.
  * @return Vettore token splittati.
- */
+*/
 vector<string> Gestionale::splitCSVLine(const string& line) const {
     return CSVManager::splitCSVLine(line);
 }
@@ -275,7 +290,7 @@ vector<string> Gestionale::splitCSVLine(const string& line) const {
 /**
  * @brief Visualizza elenco stagioni da CSV.
  * @param filename File stagioni.csv.
- */
+*/
 void Gestionale::fetchStagioni(const std::string& filename) {
     CSVManager::FileGuard file(filename);
     
@@ -297,16 +312,15 @@ void Gestionale::fetchStagioni(const std::string& filename) {
         std::cout << numeroRiga << ". " << riga << std::endl;
         ++numeroRiga;
     }
-    // File chiude automaticamente grazie a RAII!
+    // File chiude automaticamente grazie a CSVManager
 }
-
 
 /**
  * @brief Salva stagioni uniche (merge con esistenti).
  * @param nuovaStagione Stagione da salvare.
- */
+*/
 void Gestionale::salvaStagioni(const Stagione& nuovaStagione) {
-    // Parser per estrarre anno da riga CSV (solo numero)
+    // Analisi per estrarre anno da riga CSV (solo numero)
     auto parseAnno = [](const std::string& line) -> int {
         return std::stoi(line);
     };
@@ -320,7 +334,7 @@ void Gestionale::salvaStagioni(const Stagione& nuovaStagione) {
         anni.push_back(annoNuova);
     }
     
-    // Formatter per scrivere anno come stringa
+    // Formatta per scrivere anno come stringa
     auto formatAnno = [](int anno) -> std::string {
         return std::to_string(anno);
     };
@@ -329,7 +343,16 @@ void Gestionale::salvaStagioni(const Stagione& nuovaStagione) {
     CSVManager::salvaRighe(pathStagioni, "anno", anni, formatAnno);
 }
 
-
+/**
+ * @brief Carica le squadre della stagione dal file CSV.
+ *
+ * Legge #pathSquadre, filtra per anno della stagione, crea Squadra con statistiche
+ * (possesso, territorio, placcaggi, etc.) e le aggiunge alla stagione. Reset punteggi.
+ *
+ * @param stagione Stagione da popolare con le squadre.
+ * @pre File CSV #pathSquadre accessibile; riga: ID,Anno,Nome,Categoria,...
+ * @post Squadre aggiunte a stagione.getSquadre(); console log del conteggio.
+*/
 void Gestionale::fetchSquadre(Stagione& stagione) {
     int stagioneAnno = stagione.getAnno();
     auto parseSquadra = [&stagione, stagioneAnno, this](const std::string& line) -> int {
@@ -359,8 +382,7 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
             stagione.addSquadra(std::move(squadraPtr));
             return 1;
         } catch (const std::exception& e) {
-            std::cerr << "[WARN] Riga CSV ignorata (squadre): " << line.substr(0, 50) 
-                      << "... ? " << e.what() << std::endl;
+            //std::cerr << "[WARN] Riga CSV ignorata (squadre): " << line.substr(0, 50) << "... " << e.what() << std::endl;
             return 0;
         }
     };
@@ -371,17 +393,16 @@ void Gestionale::fetchSquadre(Stagione& stagione) {
         for (auto& squadraPtr : stagione.getSquadre()) {
             squadraPtr->setPunteggio(0);
         }
-        std::cout << "Caricate " << stagione.getSquadre().size() << " squadre per 2024." << std::endl;
+        //std::cout << "Caricate " << stagione.getSquadre().size() << " squadre per 2024." << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "[ERRORE] fetchSquadre: " << e.what() << std::endl;
     }
 }
 
-
 /**
  * @brief Salva squadre della stagione (merge con esistenti).
  * @param stagione Stagione contenente squadre da salvare.
- */
+*/
 void Gestionale::salvaSquadre(const Stagione& stagione) {
     auto parseSquadra = [](const std::string& line) {
         return CSVManager::SquadraData::fromCSV(CSVManager::splitCSVLine(line));
@@ -421,11 +442,10 @@ void Gestionale::salvaSquadre(const Stagione& stagione) {
         squadreData, [](const CSVManager::SquadraData& sd) { return sd.toCSV(); });
 }
 
-
 /**
  * @brief Carica giocatori della squadra da CSV.
  * @param squadra Squadra da popolare.
- */
+*/
 void Gestionale::fetchGiocatori(Squadra& squadra) {
     auto parseGiocatore = [this, &squadra](const std::string& line) -> int {
         auto tokens = CSVManager::splitCSVLine(line);
@@ -462,12 +482,10 @@ void Gestionale::fetchGiocatori(Squadra& squadra) {
     }
 }
 
-
-
 /**
  * @brief Salva giocatori della squadra (merge con esistenti).
  * @param squadra Squadra contenente giocatori da salvare.
- */
+*/
 void Gestionale::salvaGiocatori(const Squadra& squadra) {
     auto parseGiocatore = [](const std::string& line) {
         return CSVManager::GiocatoreData::fromCSV(CSVManager::splitCSVLine(line));
@@ -504,11 +522,10 @@ void Gestionale::salvaGiocatori(const Squadra& squadra) {
     );
 }
 
-
 /**
  * @brief Carica staff della squadra da CSV.
  * @param squadra Squadra da popolare.
- */
+*/
 void Gestionale::fetchStaff(Squadra& squadra) {
     auto parseStaff = [this, &squadra](const std::string& line) -> int {
         auto tokens = CSVManager::splitCSVLine(line);
@@ -536,13 +553,10 @@ void Gestionale::fetchStaff(Squadra& squadra) {
     }
 }
 
-
-
-
 /**
  * @brief Salva staff della squadra (merge con esistenti).
  * @param squadra Squadra contenente staff da salvare.
- */
+*/
 void Gestionale::salvaStaff(const Squadra& squadra) {
     auto parseStaff = [](const std::string& line) {
         return CSVManager::StaffData::fromCSV(CSVManager::splitCSVLine(line));
@@ -592,11 +606,10 @@ void Gestionale::salvaStaff(const Squadra& squadra) {
     );
 }
 
-
 /**
  * @brief Carica partite della stagione da CSV con calcolo punti automatici.
  * @param stagione Stagione da popolare.
- */
+*/
 void Gestionale::fetchPartite(Stagione& stagione) {
     int stagioneAnno = stagione.getAnno();
     const auto& squadre = stagione.getSquadre();
@@ -666,19 +679,16 @@ void Gestionale::fetchPartite(Stagione& stagione) {
     
     try {
         CSVManager::caricaRighe<int>(pathPartite, parsePartita);
-        std::cout << "Caricate " << stagione.getCalendario().size() << " partite per 2024." << std::endl;
+        //std::cout << "Caricate " << stagione.getCalendario().size() << " partite." << std::endl;
     } catch (const std::exception& e) {
-        std::cerr << "[WARN] fetchPartite(2024): " << e.what() << std::endl;
+        std::cerr << "[WARN] fetchPartite(): " << e.what() << std::endl;
     }
 }
-
-
-
 
 /**
  * @brief Salva partite della stagione (merge con esistenti).
  * @param stagione Stagione contenente partite da salvare.
- */
+*/
 void Gestionale::salvaPartite(const Stagione& stagione) {
     auto parsePartita = [](const std::string& line) {
         return CSVManager::PartitaData::fromCSV(CSVManager::splitCSVLine(line));
@@ -719,11 +729,10 @@ void Gestionale::salvaPartite(const Stagione& stagione) {
         partiteData, [](const CSVManager::PartitaData& pd) { return pd.toCSV(); });
 }
 
-
 /**
  * @brief Aggiunge partita interattivamente con validazione squadre.
  * @param stagione Stagione da modificare.
- */
+*/
 void Gestionale::aggiungiPartita(Stagione& stagione) {
     int idPartita = stagione.getCalendario().size() + 1;
     int dataPartita, idSquadraLocale, idSquadraOspite;
@@ -769,7 +778,7 @@ void Gestionale::aggiungiPartita(Stagione& stagione) {
 /**
  * @brief Trova massimo ID squadra globale da CSV.
  * @return Massimo ID trovato o 0.
- */
+*/
 int Gestionale::getMaxSquadraId() const {
     auto parseId = [this](const std::string& line) -> int {
         auto tokens = CSVManager::splitCSVLine(line);
@@ -791,7 +800,7 @@ int Gestionale::getMaxSquadraId() const {
  * t3: partite.csv
  * t4: TUTTI giocatori (parallelo)
  * t5: TUTTI staff (parallelo)
- */
+*/
 void Gestionale::salvaParallel(const Stagione& stagione) {
     printf("=== Avvio salvataggio PARALLELO (5 THREAD) ===\n");
     
@@ -838,7 +847,10 @@ void Gestionale::salvaParallel(const Stagione& stagione) {
     printf("=== Salvataggio COMPLETO (5 THREAD)! ===\n");
 }
 
-
+/**
+ * @brief Restituisce la string senza spazi, punteggiatura o bordi
+ * @param stringa str da ripulire/tagliare
+*/
 std::string Gestionale::trim(const std::string& str) {
     size_t first = str.find_first_not_of(" \t\r\n");
     if (first == std::string::npos) return "";

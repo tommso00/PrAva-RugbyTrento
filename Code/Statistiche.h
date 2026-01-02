@@ -19,16 +19,16 @@ public:
     /**
      * @brief Trova il giocatore con più placcaggi usando std::max_element.
      * @param squadra Squadra da analizzare
-     * @return Puntatore al miglior placcaggiatore
+     * @return Puntatore al miglior placcatore
      */
-    static const Giocatore* getMigliorPlaccaggitore(const Squadra& squadra);
+    static const Giocatore* getMigliorPlaccatore(const Squadra& squadra);
     
     /**
-     * @brief Trova il capocannoniere (più mete) usando std::max_element.
+     * @brief Trova il Meta Man (più mete) usando std::max_element.
      * @param squadra Squadra da analizzare
-     * @return Puntatore al capocannoniere
+     * @return Puntatore al Meta Man
      */
-    static const Giocatore* getCapocannoniere(const Squadra& squadra);
+    static const Giocatore* getMetaMan(const Squadra& squadra);
     
     /**
      * @brief Trova il giocatore con più metri percorsi.
@@ -78,7 +78,7 @@ public:
     /**
      * @brief Distribuzione giocatori per tutti i ruoli.
      * @param squadra Squadra da analizzare
-     * @return Map ruolo?conteggio
+     * @return Map ruolo conteggio
      */
     static std::map<std::string, int> distribuzioneRuoli(const Squadra& squadra);
     
@@ -116,7 +116,7 @@ public:
      * @brief Confronta due squadre su metriche multiple.
      * @param sq1 Prima squadra
      * @param sq2 Seconda squadra
-     * @return Map metrica?differenza
+     * @return Map metrica differenza
      */
     static std::map<std::string, int> confrontaSquadre(const Squadra& sq1, const Squadra& sq2);
     
