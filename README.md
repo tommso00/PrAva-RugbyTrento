@@ -297,6 +297,7 @@ Università degli Studi di Trento
 ## 🙏 Ringraziamenti
 
 - Prof. Blanzieri per il corso di Programmazione Avanzata
+- Pierluigi Roberti per i laboratoi pratici
 - Comunità C++ per documentazione e best practices
 - [cppreference.com](https://en.cppreference.com/) per riferimenti STL
 
