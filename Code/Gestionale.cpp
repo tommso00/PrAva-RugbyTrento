@@ -557,16 +557,17 @@ void Gestionale::fetchStaff(Squadra& squadra) {
  * @brief Salva staff della squadra (merge con esistenti).
  * @param squadra Squadra contenente staff da salvare.
 */
-void Gestionale::salvaStaff(const Squadra& squadra) {
+void Gestionale::salvaStaff(Squadra& squadra) {
     auto parseStaff = [](const std::string& line) {
         return CSVManager::StaffData::fromCSV(CSVManager::splitCSVLine(line));
     };
-    
+
     std::vector<CSVManager::StaffData> staffData =
         CSVManager::caricaRighe<CSVManager::StaffData>(pathStaff, parseStaff);
-    
+
     int squadraId = squadra.getId();
-    
+
+    // cancella staff esistente della squadra
     staffData.erase(
         std::remove_if(staffData.begin(), staffData.end(),
             [squadraId](const CSVManager::StaffData& sd) {
@@ -574,21 +575,20 @@ void Gestionale::salvaStaff(const Squadra& squadra) {
             }),
         staffData.end()
     );
-    
+
     int nextId = 1;
     if (!staffData.empty()) {
         nextId = std::max_element(staffData.begin(), staffData.end(),
-            [](const CSVManager::StaffData& a, const CSVManager::StaffData& b) { 
-                return a.id < b.id; 
+            [](const CSVManager::StaffData& a, const CSVManager::StaffData& b) {
+                return a.id < b.id;
             })->id + 1;
     }
-    
-    for (const auto& s : squadra.getStaff()) {
+
+    for (auto& s : squadra.getStaff()) {
         int idStaff = s.getId();
         if (idStaff == 0) {
             idStaff = nextId++;
-            // Nota: const_cast necessario per modificare ID (design da migliorare)
-            const_cast<Staff&>(s).setId(idStaff);
+            s.setId(idStaff);
         }
 
         CSVManager::StaffData sd{
@@ -598,7 +598,7 @@ void Gestionale::salvaStaff(const Squadra& squadra) {
         };
         staffData.push_back(sd);
     }
-    
+
     CSVManager::salvaRighe(pathStaff,
         "staff_id,squadra_id,nome,cognome,eta,ruolo",
         staffData,

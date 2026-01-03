@@ -139,7 +139,7 @@ public:
      * @brief Salva staff squadra su file CSV.
      * @param squadra Squadra con staff da persistere
      */
-    void salvaStaff(const Squadra& squadra);
+    void salvaStaff(Squadra& squadra);
 
     // *** GESTIONE PARTITE ***
     /**

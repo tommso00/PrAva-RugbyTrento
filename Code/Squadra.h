@@ -88,9 +88,14 @@ public:
      */
     const std::vector<Giocatore>& getGiocatori() const { return giocatori; }
     /**
-     * @brief Getter roster staff.
+     * @brief Getter roster staff const.
      */
     const std::vector<Staff>& getStaff() const { return staffTecnico; }
+    
+    /**
+     * @brief Getter roster staff.
+     */
+    std::vector<Staff>& getStaff() { return staffTecnico; }
 
     /**
      * @brief Setter nome squadra.
