@@ -45,7 +45,7 @@ Il progetto dimostra l'applicazione pratica di **tecniche avanzate C++11** tra c
 - ✅ **Menu interattivo** user-friendly
 
 ### 📊 Statistiche e Analisi
-- **Top Performer**: Miglior placcaggitore, capocannoniere, corridore
+- **Top Performer**: Miglior placcatore, capocannoniere, corridore
 - **Distribuzione ruoli**: Conteggio per ogni posizione
 - **Medie di squadra**: Mete, placcaggi, metri percorsi
 - **Classifiche**: Completa, Top N, mediana, efficienza
@@ -85,9 +85,9 @@ Il progetto dimostra l'applicazione pratica di **tecniche avanzate C++11** tra c
 
 ## 📁 Struttura del Progetto
 
-rugby-management/  
+PrAva-RugbyTrento/  
 │  
-├── include/ # Header files  
+├── code/ # Header files e Implementazioni  
 │ ├── Persona.h # Classe base astratta  
 │ ├── Giocatore.h # Eredita da Persona  
 │ ├── Staff.h # Eredita da Persona  
@@ -95,9 +95,7 @@ rugby-management/
 │ ├── Partita.h # Risultati e statistiche partita  
 │ ├── Stagione.h # Container squadre (unique_ptr)  
 │ ├── Gestionale.h # Business logic e persistenza  
-│ └── Statistiche.h # Algoritmi STL per analisi dati  
-│  
-├── src/ # Implementazioni  
+│ ├── Statistiche.h # Algoritmi STL per analisi dati  
 │ ├── Persona.cpp  
 │ ├── Giocatore.cpp  
 │ ├── Staff.cpp  
@@ -106,16 +104,16 @@ rugby-management/
 │ ├── Stagione.cpp # Smart pointers  
 │ ├── Gestionale.cpp # RAII, threading, template  
 │ ├── Statistiche.cpp # Lambda, STL algorithms  
+│ ├── database/ # File CSV di persistenza  
+│ │ ├── stagioni.csv # 2 stagioni (2023-2024)  
+│ │ ├── squadre.csv # 20 squadre (10 per stagione)  
+│ │ ├── giocatori.csv # 300 giocatori (15 per squadra)  
+│ │ ├── staff.csv # 40 membri staff (2 per squadra)  
+│ │ └── partite.csv # 60 partite (30 per stagione)  
 │ └── main.cpp # Entry point  
 │  
-├── database/ # File CSV di persistenza  
-│ ├── stagioni.csv # 2 stagioni (2023-2024)  
-│ ├── squadre.csv # 20 squadre (10 per stagione)  
-│ ├── giocatori.csv # 300 giocatori (15 per squadra)  
-│ ├── staff.csv # 40 membri staff (2 per squadra)  
-│ └── partite.csv # 60 partite (30 per stagione)  
-│  
-├── Makefile # Automazione build  
+├── Documentation/ # File PDF documentazione e UML  
+├── .gitignore  
 └──README.md # Questo file  
   
 
@@ -132,10 +130,8 @@ rugby-management/
 ╚═════════════════════════╝  
 
 1. Crea nuova stagione
-2. Consulta stagione esistente
-3. Modifica stagione
-4. Salva tutto su file
-5. Esci
+2. Carica stagione esistente
+3. Esci
 
 
 ### Esempio: Consultazione Statistiche
@@ -182,35 +178,22 @@ giocatore_id,squadra_id,nome,cognome,eta,ruolo,placcaggi,mete,...
 
 ### Ricerca e Selezione
 // Trova capocannoniere (O(n))  
-auto it = std::max_element(giocatori.begin(), giocatori.end(),  
-[](const Giocatore& a, const Giocatore& b) {  
-return a.getMete() < b.getMete();  
-});
+auto it = std::max_element(giocatori.begin(), giocatori.end(),  [](const Giocatore& a, const Giocatore& b) { return a.getMete() < b.getMete(); });
 
 
 ### Filtraggio
 // Giocatori con 5+ mete (O(n))  
-std::copy_if(giocatori.begin(), giocatori.end(),  
-std::back_inserter(risultato),  
-[](const Giocatore& g) { return g.getMete() >= 5; });  
+std::copy_if(giocatori.begin(), giocatori.end(), std::back_inserter(risultato), [](const Giocatore& g) { return g.getMete() >= 5; });  
 
 
 ### Ordinamento Parziale
 // Top 3 squadre (O(n log 3))  
-std::partial_sort(squadre.begin(),  
-squadre.begin() + 3,  
-squadre.end(),  
-[](Squadra* a, Squadra* b) {  
-return a->getPunteggio() > b->getPunteggio();  
-});  
+std::partial_sort(squadre.begin(), squadre.begin() + 3, squadre.end(), [](Squadra* a, Squadra* b) { return a->getPunteggio() > b->getPunteggio(); });  
 
 
 ### Statistica Mediana
 // Squadra mediana (O(n))  
-std::nth_element(squadre.begin(),  
-squadre.begin() + squadre.size()/2,  
-squadre.end(),  
-comparatore);  
+std::nth_element(squadre.begin(), squadre.begin() + squadre.size()/2, squadre.end(), comparatore);  
 
 
 ---
@@ -226,10 +209,10 @@ comparatore);
 
 #### **RAII (Resource Acquisition Is Initialization)**
 class FileGuard {  
-std::ofstream& file;  
-public:  
-FileGuard(std::ofstream& f) : file(f) {}  
-~FileGuard() { if(file.is_open()) file.close(); }  
+ std::ofstream& file;  
+ public:  
+ FileGuard(std::ofstream& f) : file(f) {}  
+ ~FileGuard() { if(file.is_open()) file.close(); }  
 };  
 
 
@@ -247,8 +230,8 @@ Statistiche::stampaReportStagione(const Stagione& stagione);
 - **Reserve**: Pre-alloca capacità vector per evitare riallocazioni
 
 Squadra::Squadra(...) {  
-giocatori.reserve(25); // Evita 3-4 riallocazioni  
-staffTecnico.reserve(5); // 80% meno allocazioni  
+ giocatori.reserve(25); // Evita 3-4 riallocazioni  
+ staffTecnico.reserve(5); // 80% meno allocazioni  
 }  
 
 
